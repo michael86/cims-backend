@@ -1,39 +1,48 @@
 const express = require("express");
 const router = express.Router();
 const sha256 = require("sha256");
+const asyncMySQL = require("../mysql/connection");
+const { createUser } = require("../mysql/query");
 
-router.get("/", function (req, res) {
+router.put("/", async function (req, res) {
   const {
     email,
     password,
-    companyName,
+    company,
     companyStreet,
     companyCity,
     companyCounty,
     companyPostcode,
     companyCountry,
-  } = req.body;
+    pricePlan,
+  } = req.body.data;
 
   if (
     !email ||
     !password ||
-    !companyName ||
+    !company ||
     !companyStreet ||
     !companyCity ||
     !companyCounty ||
     !companyPostcode ||
-    !companyCountry
+    !companyCountry ||
+    typeof pricePlan !== "number"
   ) {
     res.send({ status: 0, error: "Invalid registration" });
   }
 
-  connection.query(
-    `INSERT INTO users (email, password) VALUES ("${email}", "${sha256(
-      password
-    )}");`
-  );
-
-  res.send({ status: 1 });
+  try {
+    const result = await asyncMySQL(createUser(), [email, sha256(password)]);
+    if (result.affectedRows > 0) {
+      res.send({ code: 1 });
+    }
+  } catch (error) {
+    console.log(error);
+    if (error.code === "ER_DUP_ENTRY") {
+      res.send({ code: 2 });
+      return;
+    }
+  }
 });
 
 module.exports = router;
