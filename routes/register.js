@@ -31,13 +31,19 @@ router.put("/", async function (req, res) {
     res.send({ status: 0, error: "Invalid registration" });
   }
 
+  console.log("register", password);
+  console.log("register", sha256(`${process.env.SALT}${password}`));
+
   try {
-    const result = await asyncMySQL(createUser(), [email, sha256(password)]);
+    const result = await asyncMySQL(createUser(), [
+      email,
+      sha256(`${process.env.SALT}${password}`),
+    ]);
     if (result.affectedRows > 0) {
       res.send({ code: 1 });
     }
   } catch (error) {
-    console.log(error);
+    console.log(error.code);
     if (error.code === "ER_DUP_ENTRY") {
       res.send({ code: 2 });
       return;

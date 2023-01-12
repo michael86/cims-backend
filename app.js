@@ -1,5 +1,5 @@
 const express = require("express");
-const { authenticate } = require("./middleware/tokens");
+const { authenticate, validateToken } = require("./middleware/tokens");
 const app = express();
 const cors = require("cors");
 
@@ -9,7 +9,8 @@ app.use(express.json()); //Turn body into json
 app.use(express.static("public")); //Handle static files.
 app.use(cors());
 app.use("/register", require("./routes/register"));
-app.use("/login", authenticate, require("./routes/login"));
+app.use("/login", require("./routes/login"));
+app.use("/auth", validateToken, require("./routes/auth"));
 
 const port = process.env.PORT || 6005;
 

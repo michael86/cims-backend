@@ -6,14 +6,12 @@ const queries = {
                         (?, ?);`;
   },
 
-  checkCreds: () => {
-    return `SELECT id FROM users WHERE 
-            email LIKE ?
-            AND 
-            password LIKE ?;`;
+  getUserCreds: (creds, like) => {
+    return `SELECT ${creds.split(", ")} FROM users WHERE 
+            ${like} LIKE ?;`;
   },
 
-  addToken: (user_id, token) => {
+  insertToken: (user_id, token) => {
     return `INSERT INTO logins
                     (user_id, token)
                             VALUES
@@ -23,13 +21,6 @@ const queries = {
   removeToken: (token) => {
     return `DELETE FROM logins
                 WHERE token = "${token}";`;
-  },
-
-  getUser: (token) => {
-    return `SELECT name, email, users.entry_date FROM users
-              JOIN logins
-                ON users.id = logins.user_id`;
-    //WHERE token = "${token}";`;
   },
 
   deleteUser: (token) => {
