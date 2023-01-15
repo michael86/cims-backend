@@ -20,21 +20,27 @@ module.exports.authenticate = (req, res, next) => {
 
 module.exports.validateToken = (req, res, next) => {
   const { token } = req.headers;
+
   for (const user in authenticatedUsers) {
-    console.log(user);
     if (authenticatedUsers[user].token === token) {
-      console.log("found");
+      const newToken = genToken();
+      req.headers.newToken = newToken;
+      authenticatedUsers[user].token = newToken;
+
       next();
+
       return;
     }
   }
 
-  res.send({ status: -1 });
+  res.send({ status: 0 });
   return;
 };
 
 //This should only ever be called if we're 1000000000%!!!!! certain that this user is genuine
-module.exports.addToken = (email, token) => {
-  authenticatedUsers[email] = {};
-  authenticatedUsers[email].token = token;
+module.exports.addToken = (email, payload) => {
+  authenticatedUsers[email] = { ...payload };
+  console.log(authenticatedUsers);
 };
+
+module.exports.updateToken = (oldToken, newToken) => {};

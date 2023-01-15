@@ -8,8 +8,8 @@ require("dotenv").config();
 app.use(express.json()); //Turn body into json
 app.use(express.static("public")); //Handle static files.
 app.use(cors());
-app.use("/register", require("./routes/register"));
-app.use("/login", require("./routes/login"));
+
+app.use("/account", require("./routes/account"));
 app.use("/auth", validateToken, require("./routes/auth"));
 
 const port = process.env.PORT || 6005;
