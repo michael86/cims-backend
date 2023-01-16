@@ -40,7 +40,7 @@ module.exports.validateToken = (req, res, next) => {
 //This should only ever be called if we're 1000000000%!!!!! certain that this user is genuine
 module.exports.addToken = (email, payload) => {
   authenticatedUsers[email] = { ...payload };
-  console.log(authenticatedUsers);
+  console.log("addToken", authenticatedUsers);
 };
 
 module.exports.updateToken = (oldToken, newToken) => {};

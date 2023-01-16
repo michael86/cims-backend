@@ -13,6 +13,7 @@ const router = express.Router();
 const sha256 = require("sha256");
 const { addToken } = require("../middleware/tokens");
 const { genToken } = require("../utils");
+const { runQuery } = require("../utils/sql");
 
 router.put("/logout", async function (req, res) {
   await asyncMySQL();
@@ -107,19 +108,12 @@ router.put("/register", async function (req, res) {
     res.send({ status: 0, error: "Invalid registration" });
   }
 
-  const user = await asyncMySQL(createUser(), [
+  const { insertId: userId } = await runQuery(createUser(), [
     email,
     sha256(`${process.env.SALT}${password}`),
   ]);
 
-  if (user.affectedRows === 0) {
-    console.log("registration user error", user);
-    return;
-  }
-
-  const { insertId } = user;
-
-  const compRes = await asyncMySQL(createCompany(), [
+  const { insertId: companyId } = await runQuery(createCompany(), [
     company,
     companyStreet,
     companyCity,
@@ -128,21 +122,53 @@ router.put("/register", async function (req, res) {
     companyCountry,
   ]);
 
-  if (compRes.affectedRows === 0) {
-    console.log("registration company error", user);
+  if (!userId || !companyId) {
+    console.log("failed to insert user or company on registration");
+    res.status(500).send({ status: 0 });
     return;
   }
 
-  const connection = await asyncMySQL(connectUserCompany(), [
-    user.insertId,
-    compRes.insertId,
-  ]);
+  const userCompRes = await runQuery(connectUserCompany(), [userId, companyId]);
 
-  if (connection.affectedRows === 0) {
-    console.log("registration company connection error", company);
+  if (!userCompRes) {
+    //We don't need to destruct anything out of this, so just make sure we were success
+    console.log("failed to connect user to company on registration");
+    res.status(500).send({ status: 0 });
+    return;
   }
 
-  res.send({ code: 1 });
+  const token = genToken();
+
+  const { insertId: tokenId } = await runQuery(insertUserToken(), [token]);
+
+  const { insertId: connection } = await runQuery(insertUserTokenConnection(), [
+    userId,
+    tokenId,
+  ]);
+
+  addToken(email, {
+    userId,
+    token,
+    tokenId,
+    connection,
+  });
+
+  console.log("res.send(");
+
+  res.send({
+    status: 1,
+    data: {
+      user: { email, token, authenticated: true },
+      company: {
+        name: company,
+        street: companyStreet,
+        city: companyCity,
+        county: companyCounty,
+        postcode: companyPostcode,
+        country: companyCountry,
+      },
+    },
+  });
 });
 
 module.exports = router;
