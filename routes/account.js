@@ -153,8 +153,6 @@ router.put("/register", async function (req, res) {
     connection,
   });
 
-  console.log("res.send(");
-
   res.send({
     status: 1,
     data: {

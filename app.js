@@ -1,5 +1,9 @@
 const express = require("express");
-const { authenticate, validateToken } = require("./middleware/tokens");
+const {
+  authenticate,
+  validateToken,
+  initTokenCache,
+} = require("./middleware/tokens");
 const app = express();
 const cors = require("cors");
 
@@ -12,6 +16,9 @@ app.use(cors());
 app.use("/account", require("./routes/account"));
 app.use("/auth", validateToken, require("./routes/auth"));
 
-const port = process.env.PORT || 6005;
-
-app.listen(6005, () => console.log(`listening port ${port}`));
+initTokenCache().then(() => {
+  const port = process.env.PORT || 6005;
+  app.listen(6005, async () => {
+    console.log(`listening port ${port}`);
+  });
+});

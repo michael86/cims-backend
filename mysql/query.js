@@ -28,6 +28,16 @@ const queries = {
   insertUserTokenConnection: () => {
     return `INSERT INTO user_token (user, token) VALUES (?, ?);`;
   },
+
+  initCache: () => {
+    return `SELECT id, email FROM users`;
+  },
+
+  select: (location, targets, selector) => {
+    return `SELECT ${targets.join(", ")} FROM ${location} ${
+      selector && `WHERE ${selector} LIKE ?`
+    }`;
+  },
 };
 
 module.exports = queries;

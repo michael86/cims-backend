@@ -1,4 +1,6 @@
+const { select } = require("../../mysql/query");
 const { genToken } = require("../../utils");
+const { runQuery } = require("../../utils/sql");
 
 const authenticatedUsers = {};
 
@@ -41,6 +43,39 @@ module.exports.validateToken = (req, res, next) => {
 module.exports.addToken = (email, payload) => {
   authenticatedUsers[email] = { ...payload };
   console.log("addToken", authenticatedUsers);
+};
+
+module.exports.initTokenCache = async () => {
+  await runQuery(select("users", ["email", "id"])).then(async (res) => {
+    for (const user of res) {
+      const { id: userId, email } = user;
+
+      const [connection] = await runQuery(
+        select("user_token", ["token", "id"], "user"),
+        [userId]
+      );
+
+      if (!connection) {
+        console.log("user not logged in");
+        continue;
+      }
+
+      const { token: tokenId, id: connectionId } = connection;
+
+      const [userToken] = await runQuery(select("tokens", ["token"], "id"), [
+        tokenId,
+      ]);
+
+      const { token } = userToken;
+
+      this.addToken(email, {
+        userId,
+        token,
+        tokenId,
+        connection: connectionId,
+      });
+    }
+  });
 };
 
 module.exports.updateToken = (oldToken, newToken) => {};
