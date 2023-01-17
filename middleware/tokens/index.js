@@ -46,7 +46,7 @@ module.exports.validateToken = (req, res, next) => {
 //This should only ever be called if we're 1000000000%!!!!! certain that this user is genuine
 module.exports.addToken = (email, payload) => {
   authenticatedUsers[email] = { ...payload };
-  console.log("addToken", authenticatedUsers);
+  // console.log("addToken", authenticatedUsers);
 };
 
 module.exports.initTokenCache = async () => {
@@ -59,10 +59,7 @@ module.exports.initTokenCache = async () => {
         [userId]
       );
 
-      if (!connection) {
-        console.log("user not logged in");
-        continue;
-      }
+      if (!connection) continue;
 
       const { token: tokenId, id: connectionId } = connection;
 

@@ -6,7 +6,7 @@ module.exports.runQuery = async (query, data) => {
     const res = await asyncMySQL(query, data);
 
     if (res.affectedRows === 0) {
-      console.log("runQuery", res);
+      console.log("runQuery error", res);
       return;
     }
 
@@ -22,15 +22,13 @@ module.exports.updateToken = async (location, values, target) => {
       update(location, values, target)
     );
 
-    console.log("affected", affectedRows);
-
     if (!affectedRows) {
       return;
     }
 
     return true;
   } catch (err) {
-    console.log("auth error", err);
+    console.error("auth error", err);
     res.status({ status: 500 }).send({ status: 0 });
   }
 };
