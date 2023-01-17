@@ -1,21 +1,28 @@
 const express = require("express");
 
-const { updateToken } = require("../mysql/query");
+const { updateToken, update } = require("../mysql/query");
+const { runQuery } = require("../utils/sql");
 
 const router = express.Router();
 
-//If user makes it here, they passed the authe middleware
-
+//If user makes it here, they passed the auth middleware
 router.get("/", async function (req, res) {
-  console.log("passed", req.headers);
+  const { newToken: token, tokenId } = req.headers;
+
   try {
+    const { affectedRows } = await runQuery(
+      update("tokens", [["token", `'${token}'`]], ["id", tokenId])
+    );
+
+    if (!affectedRows) {
+      res.status(500).send({ status: 0 });
+    }
   } catch (err) {
-    console.error(err);
-    res.status({ status: 500 });
-    res.send({ status: 500 });
+    console.log("auth error", err);
+    res.status({ status: 500 }).send({ status: 0 });
   }
 
-  res.send({ status: 1, token: req.headers.newToken });
+  res.send({ status: 1, token });
 });
 
 module.exports = router;

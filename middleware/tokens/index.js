@@ -26,7 +26,11 @@ module.exports.validateToken = (req, res, next) => {
   for (const user in authenticatedUsers) {
     if (authenticatedUsers[user].token === token) {
       const newToken = genToken();
+
       req.headers.newToken = newToken;
+      req.headers.userId = authenticatedUsers[user].userId;
+      req.headers.tokenId = authenticatedUsers[user].tokenId;
+      req.headers.connection = authenticatedUsers[user].connection;
       authenticatedUsers[user].token = newToken;
 
       next();

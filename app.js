@@ -16,6 +16,7 @@ app.use(cors());
 app.use("/account", require("./routes/account"));
 app.use("/auth", validateToken, require("./routes/auth"));
 
+//This works, however, as we redirect the user to a protected route on registration the auth route needs to store the new tokend
 initTokenCache().then(() => {
   const port = process.env.PORT || 6005;
   app.listen(6005, async () => {

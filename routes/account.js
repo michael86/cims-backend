@@ -63,20 +63,9 @@ router.put("/login", async function (req, res) {
       status: 1,
       token,
       email,
-      // data: {
-      //   token,
-      //    id,
-      //    email,
-      //    company,
-      //    address,
-      //    city,
-      //    county,
-      //    postcode,
-      //    country,
-      // },
     });
   } catch (error) {
-    console.log(error);
+    console.log("log in route error: ", error);
     res.send({ status: -1, error: "Login failed" });
   }
 });

@@ -38,6 +38,16 @@ const queries = {
       selector && `WHERE ${selector} LIKE ?`
     }`;
   },
+
+  //This makes me cry
+  update: (location, targets, selector) => {
+    return `UPDATE ${location} SET 
+              ${targets.map(
+                (target) =>
+                  `${target[0]} = ${target[1]}${targets.length > 1 ? ", " : ""}`
+              )} 
+                WHERE ${selector[0]} = ${selector[1]}`;
+  },
 };
 
 module.exports = queries;
