@@ -7,11 +7,13 @@ const {
   createUser,
   createCompany,
   connectUserCompany,
+  deleteFrom,
+  update,
 } = require("../mysql/query");
 
 const router = express.Router();
 const sha256 = require("sha256");
-const { addToken } = require("../middleware/tokens");
+const { addToken, getTokenCreds } = require("../middleware/tokens");
 const { genToken } = require("../utils");
 const { runQuery } = require("../utils/sql");
 
@@ -45,18 +47,21 @@ router.put("/login", async function (req, res) {
 
     const token = genToken();
 
-    const tokenInsert = await asyncMySQL(insertUserToken(), [token]);
+    const { tokenId } = getTokenCreds(email);
 
-    const connectRes = await asyncMySQL(insertUserTokenConnection(), [
-      user[0].id,
-      tokenInsert.insertId,
-    ]);
+    const result = await runQuery(
+      update("tokens", [["token", `'${token}'`]], ["id", tokenId])
+    );
+
+    if (!result) {
+      console.log("error logging user in");
+      res.status(500).send();
+    }
 
     addToken(email, {
       userId: user[0].id,
       token,
-      tokenId: tokenInsert.insertId,
-      connection: connectRes.insertId,
+      tokenId: tokenId,
     });
 
     res.send({
@@ -156,6 +161,28 @@ router.put("/register", async function (req, res) {
       },
     },
   });
+});
+
+router.delete("/logout", async function (req, res) {
+  const { token } = req.headers;
+  const { email } = req.body;
+
+  if (!token || !email) {
+    res.status(400).send({ status: 0 });
+    return;
+  }
+
+  const result = await runQuery(
+    update("tokens", [["token", "null"]], ["token", `'${token}'`])
+  );
+
+  if (!result) {
+    console.log("error updating token on logout");
+    res.status(500).send();
+    return;
+  }
+
+  res.send({ data: "yeet" });
 });
 
 module.exports = router;

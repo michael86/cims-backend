@@ -4,7 +4,7 @@ const router = express.Router();
 
 //If user makes it here, they passed the auth middleware
 router.get("/", async function (req, res) {
-  const { newToken: token, tokenId } = req.headers;
+  const { newToken: token, tokenId, email } = req.headers;
 
   const update = await updateToken(
     "tokens",
@@ -12,7 +12,9 @@ router.get("/", async function (req, res) {
     ["id", tokenId]
   );
 
-  update ? res.send({ status: 1, token }) : res.status(500).send({ status: 0 });
+  update
+    ? res.send({ status: 1, token, email })
+    : res.status(500).send({ status: 0 });
 });
 
 module.exports = router;

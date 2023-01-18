@@ -31,6 +31,7 @@ module.exports.validateToken = (req, res, next) => {
       req.headers.userId = authenticatedUsers[user].userId;
       req.headers.tokenId = authenticatedUsers[user].tokenId;
       req.headers.connection = authenticatedUsers[user].connection;
+      req.headers.email = user;
       authenticatedUsers[user].token = newToken;
 
       next();
@@ -59,8 +60,6 @@ module.exports.initTokenCache = async () => {
         [userId]
       );
 
-      if (!connection) continue;
-
       const { token: tokenId, id: connectionId } = connection;
 
       const [userToken] = await runQuery(select("tokens", ["token"], "id"), [
@@ -73,10 +72,11 @@ module.exports.initTokenCache = async () => {
         userId,
         token,
         tokenId,
-        connection: connectionId,
       });
     }
+
+    console.log("auth ", authenticatedUsers);
   });
 };
 
-module.exports.updateToken = (oldToken, newToken) => {};
+module.exports.getTokenCreds = (email) => authenticatedUsers[email];

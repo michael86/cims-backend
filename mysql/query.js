@@ -48,6 +48,10 @@ const queries = {
               )} 
                 WHERE ${selector[0]} = ${selector[1]}`;
   },
+
+  deleteFrom: (location, [key, value]) => {
+    console.log(key, value);
+  },
 };
 
 module.exports = queries;
