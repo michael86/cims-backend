@@ -69,6 +69,7 @@ router.put("/login", async function (req, res) {
       token,
       email,
     });
+    
   } catch (error) {
     console.log("log in route error: ", error);
     res.send({ status: -1, error: "Login failed" });

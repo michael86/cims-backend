@@ -15,6 +15,7 @@ app.use(cors());
 
 app.use("/account", require("./routes/account"));
 app.use("/auth", validateToken, require("./routes/auth"));
+app.use("/invoice", validateToken, require("./routes/invoices"));
 
 //This works, however, as we redirect the user to a protected route on registration the auth route needs to store the new tokend
 initTokenCache().then(() => {

@@ -33,13 +33,14 @@ module.exports.validateToken = (req, res, next) => {
       req.headers.connection = authenticatedUsers[user].connection;
       req.headers.email = user;
       authenticatedUsers[user].token = newToken;
-
+      console.log("next");
       next();
 
       return;
     }
   }
 
+  console.log("token not found/sent");
   res.send({ status: 0 });
   return;
 };
