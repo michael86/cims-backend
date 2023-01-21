@@ -8,11 +8,11 @@ router.put("/add", async function (req, res) {
   const { items, company, specifics } = req.body;
 
   if (!items || !company || !specifics) {
-    res.status(400).send({ status: 0 });
+    res.status(400).send({ status: 0, token });
     return;
   }
 
-  const companyRes = await runQuery(
+  const { insertId: companyInsertId } = await runQuery(
     insert("invoice_company", [
       "contact",
       "name",
@@ -25,7 +25,34 @@ router.put("/add", async function (req, res) {
     Object.values(company)
   );
 
-  console.log("companyRes", companyRes);
+  if (!companyInsertId) {
+    res.status(500).send({ status: 0, token });
+    return;
+  }
+
+  const { insertId: specificsInsertId } = await runQuery(
+    insert("invoice_specifics", [
+      "billing_date",
+      "due_date",
+      "order_number",
+      "footer",
+    ]),
+    Object.values(specifics)
+  );
+
+  if (!specificsInsertId) {
+    res.status(500).send({ status: 0, token });
+  }
+
+  // const { insertId: specificsInsertId } = await runQuery(
+  //   insert("invoice_specifics", [
+  //     "billing_date",
+  //     "due_date",
+  //     "order_number",
+  //     "footer",
+  //   ]),
+  //   Object.values(specifics)
+  // );
 
   const update = await updateToken(
     "tokens",
