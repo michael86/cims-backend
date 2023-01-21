@@ -39,6 +39,12 @@ const queries = {
     }`;
   },
 
+  insert: (location, columns) => {
+    return `INSERT INTO ${location} (${columns.join(
+      ", "
+    )}) VALUES (${columns.map(() => "?")});`;
+  },
+
   //This makes me cry
   update: (location, targets, selector) => {
     return `UPDATE ${location} SET 
