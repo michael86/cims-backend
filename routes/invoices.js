@@ -44,6 +44,59 @@ router.put("/add", async function (req, res) {
     res.status(500).send({ status: 0, token });
   }
 
+  const itemIds = [];
+  for (const item of items) {
+    const { insertId: itemId } = await runQuery(
+      insert("invoice_items", [
+        "sku",
+        "description",
+        "quantity",
+        "price",
+        "tax",
+      ]),
+      [item.item, item.description, item.quantity, item.price, item.tax]
+    );
+
+    if (!itemId) {
+      res.status(500).send({ status: 0, token });
+      return;
+    }
+
+    itemIds.push(itemId);
+  }
+
+  //Begin relationship entries
+
+  const { insertId: userRelationship } = await runQuery(
+    insert("user_invoices", ["user_id", "invoice_id"]),
+    [userId, companyInsertId]
+  );
+
+  if (!userRelationship) {
+    res.status(500).send({ status: 0, token });
+  }
+
+  const { insertId: specificsRelationship } = await runQuery(
+    insert("invoice_specific", ["invoice_id", "specific_id"]),
+    [companyInsertId, specificsInsertId]
+  );
+
+  if (!specificsRelationship) {
+    res.status(500).send({ status: 0, token });
+  }
+
+  for (const itemId of itemIds) {
+    console.log("itemId", itemId);
+    const { insertId: itemInsertId } = await runQuery(
+      insert("invoice_item", ["invoice_id", "item_id"]),
+      [companyInsertId, itemId]
+    );
+
+    if (!itemInsertId) {
+      res.status(500).send({ status: 0, token });
+    }
+  }
+
   // const { insertId: specificsInsertId } = await runQuery(
   //   insert("invoice_specifics", [
   //     "billing_date",
@@ -54,11 +107,7 @@ router.put("/add", async function (req, res) {
   //   Object.values(specifics)
   // );
 
-  const update = await updateToken(
-    "tokens",
-    [["token", `'${token}'`]],
-    ["id", tokenId]
-  );
+  await updateToken("tokens", [["token", `'${token}'`]], ["id", tokenId]);
 
   res.send({ status: 1, token });
 });
