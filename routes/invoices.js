@@ -97,19 +97,16 @@ router.put("/add", async function (req, res) {
     }
   }
 
-  // const { insertId: specificsInsertId } = await runQuery(
-  //   insert("invoice_specifics", [
-  //     "billing_date",
-  //     "due_date",
-  //     "order_number",
-  //     "footer",
-  //   ]),
-  //   Object.values(specifics)
-  // );
-
   await updateToken("tokens", [["token", `'${token}'`]], ["id", tokenId]);
 
   res.send({ status: 1, token });
+});
+
+router.get("/get", async function (req, res) {
+  console.log("get");
+
+  console.log("get sending", req.headers.newToken);
+  res.send({ status: 1, token: req.headers.newToken });
 });
 
 module.exports = router;

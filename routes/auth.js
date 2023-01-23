@@ -12,6 +12,7 @@ router.get("/", async function (req, res) {
     ["id", tokenId]
   );
 
+  console.log("auth sending", token);
   update
     ? res.send({ status: 1, token, email })
     : res.status(500).send({ status: 0 });

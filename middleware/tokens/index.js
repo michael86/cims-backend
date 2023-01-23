@@ -22,6 +22,7 @@ module.exports.authenticate = (req, res, next) => {
 
 module.exports.validateToken = (req, res, next) => {
   const { token } = req.headers;
+  console.log("validate token", token);
 
   for (const user in authenticatedUsers) {
     if (authenticatedUsers[user].token === token) {
@@ -33,7 +34,6 @@ module.exports.validateToken = (req, res, next) => {
       req.headers.connection = authenticatedUsers[user].connection;
       req.headers.email = user;
       authenticatedUsers[user].token = newToken;
-      console.log("next");
       next();
 
       return;
