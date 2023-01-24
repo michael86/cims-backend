@@ -12,6 +12,8 @@ router.get("/", async function (req, res) {
     ["id", tokenId]
   );
 
+  console.log("auth header", req.headers);
+
   console.log("auth sending", token);
   update
     ? res.send({ status: 1, token, email })

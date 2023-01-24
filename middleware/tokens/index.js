@@ -22,7 +22,6 @@ module.exports.authenticate = (req, res, next) => {
 
 module.exports.validateToken = (req, res, next) => {
   const { token } = req.headers;
-  console.log("validate token", token);
 
   for (const user in authenticatedUsers) {
     if (authenticatedUsers[user].token === token) {
@@ -46,10 +45,8 @@ module.exports.validateToken = (req, res, next) => {
 };
 
 //This should only ever be called if we're 1000000000%!!!!! certain that this user is genuine
-module.exports.addToken = (email, payload) => {
-  authenticatedUsers[email] = { ...payload };
-  // console.log("addToken", authenticatedUsers);
-};
+module.exports.addToken = (email, payload) =>
+  (authenticatedUsers[email] = { ...payload });
 
 module.exports.initTokenCache = async () => {
   await runQuery(select("users", ["email", "id"])).then(async (res) => {

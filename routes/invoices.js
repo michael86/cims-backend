@@ -103,10 +103,10 @@ router.put("/add", async function (req, res) {
 });
 
 router.get("/get", async function (req, res) {
-  console.log("get");
+  const { newToken: token, userId } = req.headers;
+  console.log("userId", userId);
 
-  console.log("get sending", req.headers.newToken);
-  res.send({ status: 1, token: req.headers.newToken });
+  res.send({ status: 1, token });
 });
 
 module.exports = router;
