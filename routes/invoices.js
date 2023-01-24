@@ -1,9 +1,10 @@
 const express = require("express");
 const {
-  update,
-  insert,
   select,
-  selectUserInvoices,
+  insert,
+  selectInvoiceCompSpecs,
+  selectInvoiceItemIds,
+  selectUserInvoiceIds,
 } = require("../mysql/query");
 const { updateToken, runQuery } = require("../utils/sql");
 const router = express.Router();
@@ -110,13 +111,59 @@ router.put("/add", async function (req, res) {
 router.get("/get", async function (req, res) {
   const { newToken: token, userId } = req.headers;
 
-  const invoices = await runQuery(selectUserInvoices(userId));
+  const invoices = await runQuery(selectUserInvoiceIds(userId));
 
-  console.log("invoices", invoices);
+  //Run checks to see what happens when user has no invoices. Is it undefined or empty array?
+  if (!invoices) {
+    res.send({ status: 1, token });
+    return;
+  }
 
-  console.log("sending new token", token);
+  const data = [];
 
-  res.send({ status: 1, token });
+  for (const id of invoices) {
+    const [companySpecifics] = await runQuery(selectInvoiceCompSpecs(), [
+      id.invoice_id,
+    ]);
+
+    if (!companySpecifics) continue; //Something broke cause my code is broke and everything just feels broken!!
+
+    const invoice = {
+      id: id.invoice_id,
+      contact: companySpecifics.contact,
+      name: companySpecifics.name,
+      address: companySpecifics.address,
+      city: companySpecifics.city,
+      state: companySpecifics.state,
+      country: companySpecifics.country,
+      postcode: companySpecifics.postcode,
+      billingDate: companySpecifics.billing_date, // need to convert to unix in sql
+      dueDate: companySpecifics.due_date, //need to convert to unix in sql
+      order_number: companySpecifics.order_number,
+      footer: companySpecifics.footer,
+      items: [],
+    };
+
+    const items = await runQuery(selectInvoiceItemIds(), [id.invoice_id]);
+
+    for (const item of items) {
+      const itemData = await runQuery(
+        select(
+          "invoice_items",
+          ["sku", "description", "quantity", "price", "tax"],
+          "id"
+        ),
+
+        [item.item_id]
+      );
+
+      invoice.items.push({ ...itemData });
+    }
+
+    data.push(invoice);
+  }
+
+  res.send({ status: 1, token, data });
 });
 
 module.exports = router;

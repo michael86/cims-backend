@@ -35,15 +35,16 @@ module.exports.validateToken = async (req, res, next) => {
       req.headers.email = user;
       authenticatedUsers[user].token = newToken;
 
-      const update = await updateToken(
+      const updateRes = await updateToken(
         "tokens",
         [["token", `'${newToken}'`]],
         ["id", tokenId]
       );
 
-      if (!update) {
+      if (!updateRes) {
         console.log("error updating user token in middleware", newToken);
       }
+
       next();
 
       return;
