@@ -1,5 +1,10 @@
 const express = require("express");
-const { update, insert } = require("../mysql/query");
+const {
+  update,
+  insert,
+  select,
+  selectUserInvoices,
+} = require("../mysql/query");
 const { updateToken, runQuery } = require("../utils/sql");
 const router = express.Router();
 
@@ -104,7 +109,12 @@ router.put("/add", async function (req, res) {
 
 router.get("/get", async function (req, res) {
   const { newToken: token, userId } = req.headers;
-  console.log("userId", userId);
+
+  const invoices = await runQuery(selectUserInvoices(userId));
+
+  console.log("invoices", invoices);
+
+  console.log("sending new token", token);
 
   res.send({ status: 1, token });
 });

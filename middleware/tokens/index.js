@@ -1,6 +1,6 @@
 const { select } = require("../../mysql/query");
 const { genToken } = require("../../utils");
-const { runQuery } = require("../../utils/sql");
+const { runQuery, updateToken } = require("../../utils/sql");
 
 const authenticatedUsers = {};
 
@@ -20,19 +20,30 @@ module.exports.authenticate = (req, res, next) => {
   next();
 };
 
-module.exports.validateToken = (req, res, next) => {
+module.exports.validateToken = async (req, res, next) => {
   const { token } = req.headers;
 
   for (const user in authenticatedUsers) {
     if (authenticatedUsers[user].token === token) {
       const newToken = genToken();
 
+      const { userId, tokenId, connection } = authenticatedUsers[user];
       req.headers.newToken = newToken;
-      req.headers.userId = authenticatedUsers[user].userId;
-      req.headers.tokenId = authenticatedUsers[user].tokenId;
-      req.headers.connection = authenticatedUsers[user].connection;
+      req.headers.userId = userId;
+      req.headers.tokenId = tokenId;
+      req.headers.connection = connection;
       req.headers.email = user;
       authenticatedUsers[user].token = newToken;
+
+      const update = await updateToken(
+        "tokens",
+        [["token", `'${newToken}'`]],
+        ["id", tokenId]
+      );
+
+      if (!update) {
+        console.log("error updating user token in middleware", newToken);
+      }
       next();
 
       return;

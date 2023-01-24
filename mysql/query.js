@@ -21,6 +21,10 @@ const queries = {
             ${like} LIKE ?;`;
   },
 
+  selectUserInvoices: (userId) => {
+    return `SELECT invoice_id FROM user_invoices WHERE user_id LIKE ${userId}`;
+  },
+
   insertUserToken: () => {
     return `INSERT INTO tokens (token) VALUES(?);`;
   },

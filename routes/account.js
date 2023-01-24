@@ -69,7 +69,6 @@ router.put("/login", async function (req, res) {
       token,
       email,
     });
-    
   } catch (error) {
     console.log("log in route error: ", error);
     res.send({ status: -1, error: "Login failed" });
@@ -166,9 +165,8 @@ router.put("/register", async function (req, res) {
 
 router.delete("/logout", async function (req, res) {
   const { token } = req.headers;
-  const { email } = req.body;
 
-  if (!token || !email) {
+  if (!token) {
     res.status(400).send({ status: 0 });
     return;
   }
@@ -178,7 +176,9 @@ router.delete("/logout", async function (req, res) {
   );
 
   if (!result) {
-    console.log("error updating token on logout");
+    console.log("error updating token on logout", result);
+    console.log("token received", token);
+
     res.status(500).send();
     return;
   }
