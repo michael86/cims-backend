@@ -122,14 +122,16 @@ router.get("/get", async function (req, res) {
   const data = [];
 
   for (const id of invoices) {
+    console.log("id", id.invoice_id);
     const [companySpecifics] = await runQuery(selectInvoiceCompSpecs(), [
+      id.invoice_id,
       id.invoice_id,
     ]);
 
     if (!companySpecifics) continue; //Something broke cause my code is broke and everything just feels broken!!
 
+    console.log("comp specs", companySpecifics);
     const invoice = {
-      id: id.invoice_id,
       contact: companySpecifics.contact,
       name: companySpecifics.name,
       address: companySpecifics.address,
@@ -157,12 +159,13 @@ router.get("/get", async function (req, res) {
         [item.item_id]
       );
 
-      invoice.items.push({ ...itemData });
+      invoice.items.push({ ...itemData[0] });
     }
 
     data.push(invoice);
   }
-
+  // //
+  console.log("data", data);
   res.send({ status: 1, token, data });
 });
 

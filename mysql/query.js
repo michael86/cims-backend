@@ -26,12 +26,13 @@ const queries = {
 
   selectInvoiceCompSpecs: () =>
     `SELECT 
-	    invoice_company.contact, invoice_company.name, invoice_company.address, invoice_company.city, invoice_company.state, invoice_company.country, invoice_company.postcode,
+	  invoice_company.contact, invoice_company.name, invoice_company.address, invoice_company.city, invoice_company.state, invoice_company.country, invoice_company.postcode,
       invoice_specific.specific_id,
       invoice_specifics.billing_date, invoice_specifics.due_date, invoice_specifics.order_number, invoice_specifics.footer
       FROM invoice_company
-      JOIN invoice_specific ON ? = invoice_specific.invoice_id
-      JOIN invoice_specifics ON invoice_specifics.id = invoice_specific.specific_id
+      JOIN invoice_specific ON  invoice_specific.invoice_id = ?
+      JOIN invoice_specifics ON invoice_specifics.id = invoice_specific.specific_id 
+      WHERE invoice_company.id = ?;
       `,
 
   selectInvoiceItemIds: () =>
