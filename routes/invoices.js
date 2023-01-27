@@ -1,4 +1,5 @@
 const express = require("express");
+const niceInvoice = require("nice-invoice");
 const {
   select,
   insert,
@@ -8,6 +9,8 @@ const {
 } = require("../mysql/query");
 const { updateToken, runQuery } = require("../utils/sql");
 const router = express.Router();
+const fs = require("fs");
+const path = require("node:path");
 
 router.put("/add", async function (req, res) {
   const { newToken: token, tokenId, userId } = req.headers;
@@ -97,7 +100,6 @@ router.put("/add", async function (req, res) {
   }
 
   for (const itemId of itemIds) {
-    console.log("itemId", itemId);
     const { insertId: itemInsertId } = await runQuery(
       insert("invoice_item", ["invoice_id", "item_id"]),
       [companyInsertId, itemId]
@@ -127,7 +129,6 @@ router.get("/get", async function (req, res) {
   const data = [];
 
   for (const id of invoices) {
-    console.log("id", id.invoice_id);
     const [companySpecifics] = await runQuery(selectInvoiceCompSpecs(), [
       id.invoice_id,
       id.invoice_id,
@@ -135,8 +136,8 @@ router.get("/get", async function (req, res) {
 
     if (!companySpecifics) continue; //Something broke cause my code is broke and everything just feels broken!!
 
-    console.log("comp specs", companySpecifics);
     const invoice = {
+      id: id.invoice_id,
       contact: companySpecifics.contact,
       name: companySpecifics.name,
       address: companySpecifics.address,
@@ -169,9 +170,93 @@ router.get("/get", async function (req, res) {
 
     data.push(invoice);
   }
-  // //
-  console.log("data", data);
+
   res.send({ status: 1, token, data });
+});
+
+router.get("/gen-pdf/:id", async function (req, res) {
+  const { newToken: token } = req.headers;
+  let { id } = req.params;
+
+  id = Number(id);
+  if (isNaN(id)) {
+    res.status(400).send({ status: 0, token });
+    return;
+  }
+
+  const [invoiceData] = await runQuery(selectInvoiceCompSpecs(), [id, id]);
+
+  const itemsData = await runQuery(selectInvoiceItemIds(), [id]);
+  const items = [];
+  for (const i of itemsData) {
+    const [itemData] = await runQuery(
+      select(
+        "invoice_items",
+        ["sku", "description", "quantity", "price", "tax"],
+        "id"
+      ),
+      [i.item_id]
+    );
+
+    items.push(
+      ({ item: itemData.sku, description, quantity, price, tax } = itemData)
+    );
+  }
+
+  const invoiceDetail = {
+    shipping: {
+      name: `${invoiceData.contact} - ${invoiceData.name}`,
+      address: invoiceData.address,
+      city: invoiceData.city,
+      state: invoiceData.state,
+      country: invoiceData.country,
+      postal_code: invoiceData.postcode,
+    },
+    items,
+    subtotal: 111,
+    total: 222,
+    order_number: invoiceData.order_number,
+    header: {
+      company_name: "Creekview Electronics",
+      company_logo: "logo.png",
+      company_address: "Unit 2 Buckwins Square, Basildon, Essex, SS13 2BJ",
+    },
+    footer: {
+      text: invoiceData.footer,
+    },
+    currency_symbol: "$",
+    date: {
+      billing_date: invoiceData.billing_date,
+      due_date: invoiceData.due_date,
+    },
+  };
+
+  const fileName = `${invoiceData.contact.replace(" ", "")}-${
+    invoiceData.name
+  }.pdf`;
+  const filePath = path.join(__dirname, "..", "public/invoices", fileName);
+
+  niceInvoice(invoiceDetail, filePath);
+
+  // try {
+  //   if (fs.existsSync(filePath)) {
+  //     console.log(`exists ${filePath}`);
+  //     res.setHeader(
+  //       "Content-disposition",
+  //       "attachment; filename=jsonFile.json"
+  //     );
+  //     res.setHeader("Content-Type", "text/json");
+  //     res.download(filePath, function (err) {
+  //       if (err) {
+  //         console.log(err);
+  //       }
+  //     });
+  //   }
+  // } catch (err) {
+  //   console.error(err);
+  // }
+
+  res.send({ status: 1, token, fileName });
 });
 
 module.exports = router;
