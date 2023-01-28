@@ -16,6 +16,14 @@ const queries = {
             VALUES (?, ?);`;
   },
 
+  getUserCompany: () => {
+    return `SELECT user_company.company_id,
+                   companies.name, companies.address, companies.city, companies.county, companies.postcode, companies.country
+                     FROM user_company
+                       JOIN companies ON companies.id = user_company.company_id
+                         WHERE user_company.user_id = ?`;
+  },
+
   getUserCreds: (creds, like) => {
     return `SELECT ${creds.join(", ")} FROM users WHERE 
             ${like} LIKE ?;`;

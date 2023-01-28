@@ -7,7 +7,7 @@ const {
   createUser,
   createCompany,
   connectUserCompany,
-  deleteFrom,
+  getUserCompany,
   update,
 } = require("../mysql/query");
 
@@ -33,13 +33,13 @@ router.put("/login", async function (req, res) {
 
   try {
     //Get rest of users details via joining
-    const user = await asyncMySQL(getUserCreds(["password", "id"], "email"), [
+    const [user] = await runQuery(getUserCreds(["password", "id"], "email"), [
       email,
     ]);
 
     const shaPass = sha256(`${process.env.SALT}${password}`);
 
-    if (!user[0] || shaPass !== user[0].password) {
+    if (!user || shaPass !== user.password) {
       //Add some sort of check here to catch brute force
       res.send({ status: 2 });
       return;
@@ -58,8 +58,16 @@ router.put("/login", async function (req, res) {
       res.status(500).send();
     }
 
+    const [company] = await runQuery(getUserCompany(), [user.id]);
+
+    if (!company) {
+      console.log("unable to get user company on log in, user id: ", user.id);
+      res.status(500).send({ status: 0 });
+      return;
+    }
+
     addToken(email, {
-      userId: user[0].id,
+      userId: user.id,
       token,
       tokenId: tokenId,
     });
@@ -68,6 +76,7 @@ router.put("/login", async function (req, res) {
       status: 1,
       token,
       email,
+      company,
     });
   } catch (error) {
     console.log("log in route error: ", error);
