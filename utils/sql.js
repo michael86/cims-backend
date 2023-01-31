@@ -12,7 +12,8 @@ module.exports.runQuery = async (query, data) => {
 
     return res;
   } catch (err) {
-    console.error(err);
+    console.error("er4rr", err);
+    if (err.code) return err.code;
   }
 };
 

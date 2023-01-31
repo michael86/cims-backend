@@ -9,6 +9,7 @@ const {
   connectUserCompany,
   getUserCompany,
   update,
+  select,
 } = require("../mysql/query");
 
 const router = express.Router();
@@ -111,10 +112,17 @@ router.put("/register", async function (req, res) {
     res.send({ status: 0, error: "Invalid registration" });
   }
 
-  const { insertId: userId } = await runQuery(createUser(), [
+  const userRes = await runQuery(createUser(), [
     email,
     sha256(`${process.env.SALT}${password}`),
   ]);
+
+  if (userRes === "ER_DUP_ENTRY") {
+    res.send({ status: 2 });
+    return;
+  }
+
+  const { insertId: userId } = userRes;
 
   const { insertId: companyId } = await runQuery(createCompany(), [
     company,
@@ -193,6 +201,22 @@ router.delete("/logout", async function (req, res) {
   }
 
   res.send({ data: "yeet" });
+});
+
+router.put("/forgot-password", async function (req, res) {
+  const { email } = req.body;
+
+  if (!email) {
+    res.status(400).send({ status: 0 });
+    return;
+  }
+
+  const resEmail = await runQuery(select("users", ["email"], "email"), [email]);
+  if (!resEmail.length) {
+    //No email was found, however set status to 1 still as we don't want the user knowing if it's a valid email
+    res.status({ status: 1 });
+    return;
+  }
 });
 
 module.exports = router;
