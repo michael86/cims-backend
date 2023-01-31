@@ -17,6 +17,8 @@ const sha256 = require("sha256");
 const { addToken, getTokenCreds } = require("../middleware/tokens");
 const { genToken } = require("../utils");
 const { runQuery } = require("../utils/sql");
+const { sendEmail } = require("../utils/sendInBlue");
+const { forgotPassword } = require("../emails/forgot-password");
 
 router.put("/logout", async function (req, res) {
   await asyncMySQL();
@@ -217,6 +219,15 @@ router.put("/forgot-password", async function (req, res) {
     res.status({ status: 1 });
     return;
   }
+
+  const params = { token: "Made just for you!" };
+
+  const emailSent = await sendEmail({
+    receivers: [email],
+    subject: "forgotPassword",
+    htmlContent: forgotPassword,
+    params,
+  });
 });
 
 module.exports = router;
