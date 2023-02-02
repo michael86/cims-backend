@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 25, 2023 at 09:35 PM
+-- Generation Time: Feb 02, 2023 at 07:58 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -193,6 +193,37 @@ CREATE TABLE `locations` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `reset_tokens`
+--
+
+CREATE TABLE `reset_tokens` (
+  `id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `reset_tokens`
+--
+
+INSERT INTO `reset_tokens` (`id`, `token`) VALUES
+(1, 'UUbaib$*Cy\"BdF7q6B-$\"3QH213-^0y8K29xHz)-h7wqoj6qdiH1675358212058'),
+(2, '^fsiC(WiV!7ZBnfuY9&J9Y143JCxw$0QeQ$lRI72+Zpv&Hu3l781675358225536'),
+(3, 'UlgrUbQz0fhF*C^AfIn7-ys3yt7m*VK^Yo+kn5Ay£BRUvNf4MJO1675358340207'),
+(4, 'e%MpW!W3I-DhqlaSG^yBf5Tto7F0EY2iHy(4s\"LghUA2Axi9)xk1675358383860'),
+(5, 'Fl&9nVq1+$$SZ6cuDtD953F3pH^ts%mfyr)bHTC8Xnxt*y-5^6a1675358409506'),
+(6, 'IBaArWTCfDv2jfEJkZfa9A9sOs5jS1FJest1EIA54dTraBY6qLp1675358754642'),
+(7, 'Gell1tol3YaM8aQ12pBR4THRvi84HzTwlEKKohSOHWls4AgDqQ21675358839093'),
+(8, 'I5AD2va1bUhWemsBXRoJEasJmigRJNqfS3PM4He3exUBdho6FrE1675358922160'),
+(9, 'msyzDPrCcV1h8f9jx1koHeXuDNjcKPaeESapHFL3IP2cLez9sxZ1675358941229'),
+(10, 'CvCutja1YdlMFvLf62SfLPIgA5rVlf0jHdiRtfu3ZZY66txPIsg1675363883286'),
+(11, 'fhegH52HLNETfg3zXjqJsIXNNja4dwB7pQB2yKSycySxTPPSr7k1675364022696'),
+(12, 'r9V8Wa2lD8hczuqfLsSMcIle8usoXFzH1znUlIWSweOABhY0PfS1675364038787'),
+(13, 'GrjPEvjtlXd3KVZuHlQtKQi4xvoiGosafMsXfJ1CiFeYf6H8ga61675364111574'),
+(14, 'eDg2ZzKLRdN0wlO8KzCoTOUsMfpoafNoairaffJe2TcGz3apJfm1675364169800');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `stock`
 --
 
@@ -300,6 +331,29 @@ INSERT INTO `user_invoices` (`id`, `user_id`, `invoice_id`, `date`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `user_reset`
+--
+
+CREATE TABLE `user_reset` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `token_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_reset`
+--
+
+INSERT INTO `user_reset` (`id`, `user_id`, `token_id`) VALUES
+(1, 84, 10),
+(2, 84, 11),
+(3, 84, 12),
+(4, 84, 13),
+(5, 84, 14);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user_stock`
 --
 
@@ -375,6 +429,12 @@ ALTER TABLE `locations`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `reset_tokens`
+--
+ALTER TABLE `reset_tokens`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `stock`
 --
 ALTER TABLE `stock`
@@ -409,6 +469,12 @@ ALTER TABLE `user_company`
 -- Indexes for table `user_invoices`
 --
 ALTER TABLE `user_invoices`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `user_reset`
+--
+ALTER TABLE `user_reset`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -470,6 +536,12 @@ ALTER TABLE `locations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `reset_tokens`
+--
+ALTER TABLE `reset_tokens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT for table `stock`
 --
 ALTER TABLE `stock`
@@ -504,6 +576,12 @@ ALTER TABLE `user_company`
 --
 ALTER TABLE `user_invoices`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `user_reset`
+--
+ALTER TABLE `user_reset`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `user_stock`

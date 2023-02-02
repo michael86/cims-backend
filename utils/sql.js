@@ -2,6 +2,7 @@ const asyncMySQL = require("../mysql/connection");
 const { update } = require("../mysql/query");
 
 module.exports.runQuery = async (query, data) => {
+  
   try {
     const res = await asyncMySQL(query, data);
 

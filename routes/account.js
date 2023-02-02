@@ -10,6 +10,7 @@ const {
   getUserCompany,
   update,
   select,
+  insert,
 } = require("../mysql/query");
 
 const router = express.Router();
@@ -213,14 +214,38 @@ router.put("/forgot-password", async function (req, res) {
     return;
   }
 
-  const resEmail = await runQuery(select("users", ["email"], "email"), [email]);
-  if (!resEmail.length) {
+  const [userRes] = await runQuery(select("users", ["id", "email"], "email"), [
+    email,
+  ]);
+
+  if (!userRes) {
     //No email was found, however set status to 1 still as we don't want the user knowing if it's a valid email
     res.status({ status: 1 });
     return;
   }
 
-  const params = { token: "Made just for you!" };
+  const token = genToken(50, false);
+
+  const tokenRes = await runQuery(insert("reset_tokens", ["token"]), [token]);
+
+  if (!tokenRes) {
+    res.status(500).send({ status: 0 });
+    return;
+  }
+
+  const { insertId: tokenId } = tokenRes;
+
+  const relationship = await runQuery(
+    insert("user_reset", ["user_id", "token_id"]),
+    [userRes.id, tokenId]
+  );
+  if (!relationship) {
+    res.status(500).send({ status: 0 });
+    return;
+  }
+  const params = {
+    route: `${process.env.ROOT}/reset-password?token=${token}&email=${userRes.email}`,
+  };
 
   const emailSent = await sendEmail({
     receivers: [email],
