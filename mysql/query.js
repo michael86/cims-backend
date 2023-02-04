@@ -75,9 +75,13 @@ const queries = {
     return `UPDATE ${location} SET 
               ${targets.map(
                 (target) =>
-                  `${target[0]} = ${target[1]}${targets.length > 1 ? ", " : ""}`
+                  //Set to value received or ? for prepped statement
+                  `\`${target[0]}\` = ${target[1] ? target[1] : "?"}${
+                    // Do we have mulktiple updates? If so add , else ''
+                    targets.length > 1 ? ", " : ""
+                  }`
               )} 
-                WHERE ${selector[0]} = ${selector[1]}`;
+                WHERE ${selector[0]} = ${selector[1] ? selector[1] : "?"}`;
   },
 
   deleteFrom: (location, [key, value]) => {

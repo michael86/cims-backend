@@ -255,4 +255,49 @@ router.put("/forgot-password", async function (req, res) {
   });
 });
 
+router.patch(
+  "/reset-password/:token/:email/:password",
+  async function (req, res) {
+    const { token, email, password } = req.params;
+
+    if (!token || !email) {
+      res.status(400).send({ status: 0 });
+      return;
+    }
+
+    const [tokenRes] = await runQuery(select("reset_tokens", ["id"], "token"), [
+      token,
+    ]);
+
+    const [userRes] = await runQuery(select("users", ["id"], "email"), [email]);
+
+    const [relationRes] = await runQuery(
+      select("user_reset", ["user_id"], "token_id"),
+      [tokenRes.id]
+    );
+
+    //Something didn't match up or the token received didn't match the email issued to. So stop here.
+    if (
+      !tokenRes ||
+      !userRes ||
+      !relationRes ||
+      relationRes?.user_id !== userRes.id
+    ) {
+      console.log("didn't match");
+      res.send({ status: 0 });
+      return;
+    }
+
+    const updateRes = await runQuery(
+      update("users", [["password"]], ["email"]),
+      [sha256(`${process.env.SALT}${password}`), email]
+    );
+
+    if (!updateRes) {
+      res.status(500).send({ status: 0 });
+    }
+    res.send({ status: 1 });
+  }
+);
+
 module.exports = router;
