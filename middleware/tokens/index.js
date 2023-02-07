@@ -84,8 +84,6 @@ module.exports.initTokenCache = async () => {
         tokenId,
       });
     }
-
-    console.log("auth ", authenticatedUsers);
   });
 };
 

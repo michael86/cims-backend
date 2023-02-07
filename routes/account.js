@@ -17,7 +17,11 @@ const router = express.Router();
 const sha256 = require("sha256");
 const { addToken, getTokenCreds } = require("../middleware/tokens");
 const { genToken } = require("../utils");
-const { runQuery } = require("../utils/sql");
+const {
+  runQuery,
+  createUserResetToken,
+  updateUserResetToken,
+} = require("../utils/sql");
 const { sendEmail } = require("../utils/sendInBlue");
 const { forgotPassword } = require("../emails/forgot-password");
 
@@ -196,9 +200,6 @@ router.delete("/logout", async function (req, res) {
   );
 
   if (!result) {
-    console.log("error updating token on logout", result);
-    console.log("token received", token);
-
     res.status(500).send();
     return;
   }
@@ -214,11 +215,11 @@ router.put("/forgot-password", async function (req, res) {
     return;
   }
 
-  const [userRes] = await runQuery(select("users", ["id", "email"], "email"), [
+  const [user] = await runQuery(select("users", ["id", "email"], "email"), [
     email,
   ]);
 
-  if (!userRes) {
+  if (!user) {
     //No email was found, however set status to 1 still as we don't want the user knowing if it's a valid email
     res.status({ status: 1 });
     return;
@@ -226,25 +227,22 @@ router.put("/forgot-password", async function (req, res) {
 
   const token = genToken(50, false);
 
-  const tokenRes = await runQuery(insert("reset_tokens", ["token"]), [token]);
-
-  if (!tokenRes) {
-    res.status(500).send({ status: 0 });
-    return;
-  }
-
-  const { insertId: tokenId } = tokenRes;
-
-  const relationship = await runQuery(
-    insert("user_reset", ["user_id", "token_id"]),
-    [userRes.id, tokenId]
+  const relation = await runQuery(
+    select("user_reset", ["token_id"], "user_id"),
+    [user.id]
   );
-  if (!relationship) {
+
+  const created = relation.length
+    ? await updateUserResetToken(token, relation)
+    : await createUserResetToken(token, user);
+
+  if (!created) {
     res.status(500).send({ status: 0 });
     return;
   }
+
   const params = {
-    route: `${process.env.ROOT}/reset-password?token=${token}&email=${userRes.email}`,
+    route: `${process.env.ROOT}/reset-password?token=${token}&email=${email}`,
   };
 
   const emailSent = await sendEmail({
@@ -275,6 +273,12 @@ router.patch(
       token,
     ]);
 
+    if (!tokenRes) {
+      console.log("token not found, forbidden");
+      res.status(403).send({ status: 0 });
+      return;
+    }
+
     const [userRes] = await runQuery(select("users", ["id"], "email"), [email]);
 
     const [relationRes] = await runQuery(
@@ -289,7 +293,6 @@ router.patch(
       !relationRes ||
       relationRes?.user_id !== userRes.id
     ) {
-      console.log("didn't match");
       res.send({ status: 0 });
       return;
     }
