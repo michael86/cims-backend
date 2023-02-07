@@ -253,6 +253,12 @@ router.put("/forgot-password", async function (req, res) {
     htmlContent: forgotPassword,
     params,
   });
+
+  if (!emailSent) {
+    res.status(500).send({ status: 0 });
+  }
+
+  res.send({ status: 1 });
 });
 
 router.patch(

@@ -11,22 +11,19 @@ module.exports.sendEmail = async (payload) => {
     return { name: "John Doe", email };
   });
 
-  console.log("sending", htmlContent);
-  new SibApiV3Sdk.TransactionalEmailsApi()
-    .sendTransacEmail({
-      subject: subject,
-      sender: { email: "support@cims.co.uk", name: "Support" },
-      replyTo: { email: "do-not-reply@cims.co.uk", name: "do-not-reply" },
-      to: receiptants,
-      htmlContent,
-      params,
-    })
-    .then(
-      function (data) {
-        console.log(data);
-      },
-      function (error) {
-        console.error(error);
-      }
-    );
+  const mail = new SibApiV3Sdk.TransactionalEmailsApi();
+  const result = await mail.sendTransacEmail({
+    subject: subject,
+    sender: { email: "support@cims.co.uk", name: "Support" },
+    replyTo: { email: "do-not-reply@cims.co.uk", name: "do-not-reply" },
+    to: receiptants,
+    htmlContent,
+    params,
+  });
+  if (!result.messageId) {
+    console.log("error sending mail", result);
+    return false;
+    1;
+  }
+  return true;
 };
