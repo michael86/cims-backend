@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 02, 2023 at 07:58 PM
+-- Generation Time: Feb 12, 2023 at 02:19 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -71,7 +71,13 @@ INSERT INTO `invoice_company` (`id`, `contact`, `name`, `address`, `city`, `stat
 (1, 'Lynda', 'evapo', 'unit 34 state square', 'basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-01-24 21:41:53'),
 (2, 'Richard Smith', 'creekview', 'unit 2 Buckwins square', 'Basildon', 'Essex', 'SS13 2BJ', 'United Kingdom', '2023-01-24 21:43:03'),
 (3, 'Russel', 'The Jump', '123 fake street', 'london', 'dreamland', 'swfhu', 'zimbabwa', '2023-01-25 18:27:02'),
-(4, 'Sophia', 'Crumbles Pedicures', '75 Great Oxcroft', 'Leeds', 'Yorkshire', 'LS10 2HP', 'UK', '2023-01-25 20:28:57');
+(4, 'Sophia', 'Crumbles Pedicures', '75 Great Oxcroft', 'Leeds', 'Yorkshire', 'LS10 2HP', 'UK', '2023-01-25 20:28:57'),
+(5, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:08:55'),
+(6, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:14:27'),
+(7, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:14:50'),
+(8, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:15:32'),
+(9, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:16:40'),
+(10, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:18:48');
 
 -- --------------------------------------------------------
 
@@ -97,7 +103,13 @@ INSERT INTO `invoice_item` (`id`, `invoice_id`, `item_id`, `date`) VALUES
 (4, 2, 4, '2023-01-24 21:43:03'),
 (5, 3, 5, '2023-01-25 18:27:02'),
 (6, 4, 6, '2023-01-25 20:28:57'),
-(7, 4, 7, '2023-01-25 20:28:57');
+(7, 4, 7, '2023-01-25 20:28:57'),
+(8, 5, 8, '2023-02-12 13:08:55'),
+(9, 6, 9, '2023-02-12 13:14:27'),
+(10, 8, 10, '2023-02-12 13:15:32'),
+(11, 9, 11, '2023-02-12 13:16:40'),
+(12, 10, 12, '2023-02-12 13:18:48'),
+(13, 10, 13, '2023-02-12 13:18:48');
 
 -- --------------------------------------------------------
 
@@ -126,7 +138,13 @@ INSERT INTO `invoice_items` (`id`, `sku`, `description`, `quantity`, `price`, `t
 (4, 'web design', 'UX design for creekview', 1, 500, 5, '2023-01-24 21:43:03'),
 (5, 'pencile', 'lead pencil', 10, 1, 0, '2023-01-25 18:27:02'),
 (6, 'Pedicure', 'Naill cut, file, paint', 1, 12, 0, '2023-01-25 20:28:57'),
-(7, 'hair cut', 'Fresh trim', 1, 30, 0, '2023-01-25 20:28:57');
+(7, 'hair cut', 'Fresh trim', 1, 30, 0, '2023-01-25 20:28:57'),
+(8, '123', '123', 123, 123, 132, '2023-02-12 13:08:55'),
+(9, '123', '123', 1233, 123, 13, '2023-02-12 13:14:27'),
+(10, '15', '15', 15, 15, 15, '2023-02-12 13:15:32'),
+(11, '15', '15', 15, 15, 15, '2023-02-12 13:16:40'),
+(12, '15', '15', 15, 15, 15, '2023-02-12 13:18:48'),
+(13, '15', '15', 15, 15, 15, '2023-02-12 13:18:48');
 
 -- --------------------------------------------------------
 
@@ -149,7 +167,12 @@ INSERT INTO `invoice_specific` (`id`, `invoice_id`, `specific_id`, `date`) VALUE
 (1, 1, 1, '2023-01-24 21:41:53'),
 (2, 2, 2, '2023-01-24 21:43:03'),
 (3, 3, 3, '2023-01-25 18:27:02'),
-(4, 4, 4, '2023-01-25 20:28:57');
+(4, 4, 4, '2023-01-25 20:28:57'),
+(5, 5, 5, '2023-02-12 13:08:55'),
+(6, 6, 6, '2023-02-12 13:14:27'),
+(7, 8, 7, '2023-02-12 13:15:32'),
+(8, 9, 8, '2023-02-12 13:16:40'),
+(9, 10, 9, '2023-02-12 13:18:48');
 
 -- --------------------------------------------------------
 
@@ -159,8 +182,8 @@ INSERT INTO `invoice_specific` (`id`, `invoice_id`, `specific_id`, `date`) VALUE
 
 CREATE TABLE `invoice_specifics` (
   `id` int(11) NOT NULL,
-  `billing_date` date NOT NULL,
-  `due_date` date NOT NULL,
+  `billing_date` int(11) NOT NULL,
+  `due_date` int(11) NOT NULL,
   `order_number` varchar(256) NOT NULL,
   `footer` varchar(256) NOT NULL,
   `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -171,10 +194,15 @@ CREATE TABLE `invoice_specifics` (
 --
 
 INSERT INTO `invoice_specifics` (`id`, `billing_date`, `due_date`, `order_number`, `footer`, `date_added`) VALUES
-(1, '2023-01-31', '2023-01-24', 'For some vape juice', 'invoice 1', '2023-01-24 21:41:53'),
-(2, '2023-02-10', '2023-01-24', 'For Richard Website', 'Order 2', '2023-01-24 21:43:03'),
-(3, '2023-01-26', '2023-01-25', 'To Russel from Micael', 'FJDIs434344', '2023-01-25 18:27:02'),
-(4, '2057-04-30', '2057-04-30', 'For Sophia', '987654', '2023-01-25 20:28:57');
+(1, 20230131, 20230124, 'For some vape juice', 'invoice 1', '2023-01-24 21:41:53'),
+(2, 20230210, 20230124, 'For Richard Website', 'Order 2', '2023-01-24 21:43:03'),
+(3, 20230126, 20230125, 'To Russel from Micael', 'FJDIs434344', '2023-01-25 18:27:02'),
+(4, 20570430, 20570430, 'For Sophia', '987654', '2023-01-25 20:28:57'),
+(5, 0, 0, '123', '123', '2023-02-12 13:08:55'),
+(6, 0, 0, '123', '123', '2023-02-12 13:14:27'),
+(7, 0, 0, '15', '15', '2023-02-12 13:15:32'),
+(8, 2147483647, -1579046400, '15', '15', '2023-02-12 13:16:40'),
+(9, 519523200, 522115200, '15', '15', '2023-02-12 13:18:48');
 
 -- --------------------------------------------------------
 
@@ -206,20 +234,7 @@ CREATE TABLE `reset_tokens` (
 --
 
 INSERT INTO `reset_tokens` (`id`, `token`) VALUES
-(1, 'UUbaib$*Cy\"BdF7q6B-$\"3QH213-^0y8K29xHz)-h7wqoj6qdiH1675358212058'),
-(2, '^fsiC(WiV!7ZBnfuY9&J9Y143JCxw$0QeQ$lRI72+Zpv&Hu3l781675358225536'),
-(3, 'UlgrUbQz0fhF*C^AfIn7-ys3yt7m*VK^Yo+kn5Ay£BRUvNf4MJO1675358340207'),
-(4, 'e%MpW!W3I-DhqlaSG^yBf5Tto7F0EY2iHy(4s\"LghUA2Axi9)xk1675358383860'),
-(5, 'Fl&9nVq1+$$SZ6cuDtD953F3pH^ts%mfyr)bHTC8Xnxt*y-5^6a1675358409506'),
-(6, 'IBaArWTCfDv2jfEJkZfa9A9sOs5jS1FJest1EIA54dTraBY6qLp1675358754642'),
-(7, 'Gell1tol3YaM8aQ12pBR4THRvi84HzTwlEKKohSOHWls4AgDqQ21675358839093'),
-(8, 'I5AD2va1bUhWemsBXRoJEasJmigRJNqfS3PM4He3exUBdho6FrE1675358922160'),
-(9, 'msyzDPrCcV1h8f9jx1koHeXuDNjcKPaeESapHFL3IP2cLez9sxZ1675358941229'),
-(10, 'CvCutja1YdlMFvLf62SfLPIgA5rVlf0jHdiRtfu3ZZY66txPIsg1675363883286'),
-(11, 'fhegH52HLNETfg3zXjqJsIXNNja4dwB7pQB2yKSycySxTPPSr7k1675364022696'),
-(12, 'r9V8Wa2lD8hczuqfLsSMcIle8usoXFzH1znUlIWSweOABhY0PfS1675364038787'),
-(13, 'GrjPEvjtlXd3KVZuHlQtKQi4xvoiGosafMsXfJ1CiFeYf6H8ga61675364111574'),
-(14, 'eDg2ZzKLRdN0wlO8KzCoTOUsMfpoafNoairaffJe2TcGz3apJfm1675364169800');
+(51, 'qt2Oiv57aIL3gCO0eTsbmJzHtsglbceJUKfs03sM4WzHAyr6rG51676206192771');
 
 -- --------------------------------------------------------
 
@@ -264,7 +279,7 @@ CREATE TABLE `tokens` (
 --
 
 INSERT INTO `tokens` (`id`, `token`) VALUES
-(70, 'PK!TG1yu&pZP4S5b8KOQhS0*jVAXaIhjiDEEX-hxF$yuX$jM&C61674678541516');
+(71, 'SepAyS2c£)TWSxOlso0-p(qA+4YzQ4X3&£tcq!t4H\"c(Z3j6+HS1676207928853');
 
 -- --------------------------------------------------------
 
@@ -284,7 +299,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `date`) VALUES
-(84, 'michael8t6@gmail.com', '7fee8b1ff1733876febc0d525ae88c5f28f605c08d11c61c109af63b05b4bf03', '2023-01-18 21:02:27');
+(84, 'michael8t6@gmail.com', '7fee8b1ff1733876febc0d525ae88c5f28f605c08d11c61c109af63b05b4bf03', '2023-02-12 12:50:19');
 
 -- --------------------------------------------------------
 
@@ -326,7 +341,12 @@ INSERT INTO `user_invoices` (`id`, `user_id`, `invoice_id`, `date`) VALUES
 (1, 84, 1, '2023-01-24 21:41:53'),
 (2, 84, 2, '2023-01-24 21:43:03'),
 (3, 84, 3, '2023-01-25 18:27:02'),
-(4, 84, 4, '2023-01-25 20:28:57');
+(4, 84, 4, '2023-01-25 20:28:57'),
+(5, 84, 5, '2023-02-12 13:08:55'),
+(6, 84, 6, '2023-02-12 13:14:27'),
+(7, 84, 8, '2023-02-12 13:15:32'),
+(8, 84, 9, '2023-02-12 13:16:40'),
+(9, 84, 10, '2023-02-12 13:18:48');
 
 -- --------------------------------------------------------
 
@@ -345,11 +365,7 @@ CREATE TABLE `user_reset` (
 --
 
 INSERT INTO `user_reset` (`id`, `user_id`, `token_id`) VALUES
-(1, 84, 10),
-(2, 84, 11),
-(3, 84, 12),
-(4, 84, 13),
-(5, 84, 14);
+(42, 84, 51);
 
 -- --------------------------------------------------------
 
@@ -380,7 +396,7 @@ CREATE TABLE `user_token` (
 --
 
 INSERT INTO `user_token` (`id`, `user`, `token`) VALUES
-(52, 84, 70);
+(53, 84, 71);
 
 --
 -- Indexes for dumped tables
@@ -503,31 +519,31 @@ ALTER TABLE `companies`
 -- AUTO_INCREMENT for table `invoice_company`
 --
 ALTER TABLE `invoice_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `invoice_items`
 --
 ALTER TABLE `invoice_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `invoice_specific`
 --
 ALTER TABLE `invoice_specific`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `invoice_specifics`
 --
 ALTER TABLE `invoice_specifics`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `locations`
@@ -539,7 +555,7 @@ ALTER TABLE `locations`
 -- AUTO_INCREMENT for table `reset_tokens`
 --
 ALTER TABLE `reset_tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `stock`
@@ -557,7 +573,7 @@ ALTER TABLE `stock_location`
 -- AUTO_INCREMENT for table `tokens`
 --
 ALTER TABLE `tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -575,13 +591,13 @@ ALTER TABLE `user_company`
 -- AUTO_INCREMENT for table `user_invoices`
 --
 ALTER TABLE `user_invoices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `user_reset`
 --
 ALTER TABLE `user_reset`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `user_stock`
@@ -593,7 +609,7 @@ ALTER TABLE `user_stock`
 -- AUTO_INCREMENT for table `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

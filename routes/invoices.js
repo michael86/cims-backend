@@ -44,6 +44,8 @@ router.put("/add", async function (req, res) {
     new Date(specifics.billingDate).getTime() / 1000
   );
 
+  console.log(specifics);
+
   const { insertId: specificsInsertId } = await runQuery(
     insert("invoice_specifics", [
       "due_date",
