@@ -188,7 +188,9 @@ router.post("/gen-pdf", async function (req, res) {
   const [invoiceData] = await runQuery(selectInvoiceCompSpecs(), [id, id]);
 
   const itemsData = await runQuery(selectInvoiceItemIds(), [id]);
+
   const items = [];
+  console.log("start items");
   for (const i of itemsData) {
     const [itemData] = await runQuery(
       select(
@@ -199,11 +201,18 @@ router.post("/gen-pdf", async function (req, res) {
       [i.item_id]
     );
 
-    items.push(
-      ({ item: itemData.sku, description, quantity, price, tax } = itemData)
-    );
+    console.log(itemData.sku);
+    items.push({
+      item: itemData.sku,
+      description: itemData.description,
+      quantity: itemData.quantity,
+      price: itemData.price,
+      tax: itemData,
+    });
+    console.log("item done");
   }
 
+  console.log(items);
   const invoiceDetail = {
     shipping: {
       name: `${invoiceData.contact} - ${invoiceData.name}`,
@@ -214,8 +223,7 @@ router.post("/gen-pdf", async function (req, res) {
       postal_code: invoiceData.postcode,
     },
     items,
-    subtotal: 111,
-    total: 222,
+    total: 2,
     order_number: invoiceData.order_number,
     header: {
       company_name: company.name,
@@ -225,7 +233,7 @@ router.post("/gen-pdf", async function (req, res) {
     footer: {
       text: invoiceData.footer,
     },
-    currency_symbol: "$",
+    currency_symbol: "£",
     date: {
       billing_date: invoiceData.billing_date,
       due_date: invoiceData.due_date,
