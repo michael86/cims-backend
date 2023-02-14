@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 12, 2023 at 02:19 PM
+-- Generation Time: Feb 14, 2023 at 09:28 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -48,6 +48,43 @@ INSERT INTO `companies` (`id`, `name`, `address`, `city`, `county`, `postcode`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `history`
+--
+
+CREATE TABLE `history` (
+  `id` int(11) NOT NULL,
+  `date` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `price` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `history_location`
+--
+
+CREATE TABLE `history_location` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `value` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `history_locations`
+--
+
+CREATE TABLE `history_locations` (
+  `id` int(11) NOT NULL,
+  `history_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `invoice_company`
 --
 
@@ -77,7 +114,15 @@ INSERT INTO `invoice_company` (`id`, `contact`, `name`, `address`, `city`, `stat
 (7, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:14:50'),
 (8, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:15:32'),
 (9, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:16:40'),
-(10, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:18:48');
+(10, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:18:48'),
+(11, 'Kiri', 'Kiri munrooooo', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 14:02:45'),
+(12, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 14:52:05'),
+(13, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:22:12'),
+(14, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:23:20'),
+(15, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'dsad', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:24:11'),
+(16, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:26:33'),
+(17, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:29:11'),
+(18, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:31:18');
 
 -- --------------------------------------------------------
 
@@ -109,7 +154,17 @@ INSERT INTO `invoice_item` (`id`, `invoice_id`, `item_id`, `date`) VALUES
 (10, 8, 10, '2023-02-12 13:15:32'),
 (11, 9, 11, '2023-02-12 13:16:40'),
 (12, 10, 12, '2023-02-12 13:18:48'),
-(13, 10, 13, '2023-02-12 13:18:48');
+(13, 10, 13, '2023-02-12 13:18:48'),
+(14, 11, 14, '2023-02-12 14:02:45'),
+(15, 12, 15, '2023-02-12 14:52:05'),
+(16, 12, 16, '2023-02-12 14:52:05'),
+(17, 13, 17, '2023-02-12 15:22:12'),
+(18, 14, 18, '2023-02-12 15:23:20'),
+(19, 15, 19, '2023-02-12 15:24:11'),
+(20, 15, 20, '2023-02-12 15:24:11'),
+(21, 16, 21, '2023-02-12 15:26:33'),
+(22, 17, 22, '2023-02-12 15:29:11'),
+(23, 18, 23, '2023-02-12 15:31:18');
 
 -- --------------------------------------------------------
 
@@ -144,7 +199,17 @@ INSERT INTO `invoice_items` (`id`, `sku`, `description`, `quantity`, `price`, `t
 (10, '15', '15', 15, 15, 15, '2023-02-12 13:15:32'),
 (11, '15', '15', 15, 15, 15, '2023-02-12 13:16:40'),
 (12, '15', '15', 15, 15, 15, '2023-02-12 13:18:48'),
-(13, '15', '15', 15, 15, 15, '2023-02-12 13:18:48');
+(13, '15', '15', 15, 15, 15, '2023-02-12 13:18:48'),
+(14, 'love', 'Not easy loving you', 0, 1000, 0, '2023-02-12 14:02:45'),
+(15, '123', '123', 123, 124, 12, '2023-02-12 14:52:05'),
+(16, '123', '123', 123, 124, 12, '2023-02-12 14:52:05'),
+(17, '123', '123', 1233, 123, 123, '2023-02-12 15:22:12'),
+(18, '12', '12', 12, 12, 1, '2023-02-12 15:23:20'),
+(19, '111', '1', 11, 11, 11, '2023-02-12 15:24:11'),
+(20, '111', '1', 11, 11, 11, '2023-02-12 15:24:11'),
+(21, '12', '12', 12, 12, 12, '2023-02-12 15:26:33'),
+(22, '4', '4', 4, 4, 4, '2023-02-12 15:29:11'),
+(23, '1', '1', 1, 1, 1, '2023-02-12 15:31:18');
 
 -- --------------------------------------------------------
 
@@ -172,7 +237,15 @@ INSERT INTO `invoice_specific` (`id`, `invoice_id`, `specific_id`, `date`) VALUE
 (6, 6, 6, '2023-02-12 13:14:27'),
 (7, 8, 7, '2023-02-12 13:15:32'),
 (8, 9, 8, '2023-02-12 13:16:40'),
-(9, 10, 9, '2023-02-12 13:18:48');
+(9, 10, 9, '2023-02-12 13:18:48'),
+(10, 11, 10, '2023-02-12 14:02:45'),
+(11, 12, 11, '2023-02-12 14:52:05'),
+(12, 13, 12, '2023-02-12 15:22:12'),
+(13, 14, 13, '2023-02-12 15:23:20'),
+(14, 15, 14, '2023-02-12 15:24:11'),
+(15, 16, 15, '2023-02-12 15:26:33'),
+(16, 17, 16, '2023-02-12 15:29:11'),
+(17, 18, 17, '2023-02-12 15:31:18');
 
 -- --------------------------------------------------------
 
@@ -202,7 +275,15 @@ INSERT INTO `invoice_specifics` (`id`, `billing_date`, `due_date`, `order_number
 (6, 0, 0, '123', '123', '2023-02-12 13:14:27'),
 (7, 0, 0, '15', '15', '2023-02-12 13:15:32'),
 (8, 2147483647, -1579046400, '15', '15', '2023-02-12 13:16:40'),
-(9, 519523200, 522115200, '15', '15', '2023-02-12 13:18:48');
+(9, 519523200, 522115200, '15', '15', '2023-02-12 13:18:48'),
+(10, 1676160000, 1676246400, 'For loving me', 's3x1', '2023-02-12 14:02:45'),
+(11, 519523200, 524793600, '123', '123', '2023-02-12 14:52:05'),
+(12, 1675296000, 1643760000, '123', '123', '2023-02-12 15:22:12'),
+(13, -2147483648, -2147483648, '12', '12', '2023-02-12 15:23:20'),
+(14, -2147483648, -2147483648, '111', '11', '2023-02-12 15:24:11'),
+(15, -2147483648, 2147483647, '12', '12', '2023-02-12 15:26:33'),
+(16, 519523200, 519523200, '44', '444', '2023-02-12 15:29:11'),
+(17, -2147483648, -2147483648, '1', '1', '2023-02-12 15:31:18');
 
 -- --------------------------------------------------------
 
@@ -212,10 +293,8 @@ INSERT INTO `invoice_specifics` (`id`, `billing_date`, `due_date`, `order_number
 
 CREATE TABLE `locations` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `sku` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `name` varchar(255) NOT NULL,
-  `value` varchar(255) NOT NULL
+  `value` int(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -254,10 +333,22 @@ CREATE TABLE `stock` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `stock_location`
+-- Table structure for table `stock_histories`
 --
 
-CREATE TABLE `stock_location` (
+CREATE TABLE `stock_histories` (
+  `id` int(11) NOT NULL,
+  `stock_id` int(11) NOT NULL,
+  `history_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `stock_locations`
+--
+
+CREATE TABLE `stock_locations` (
   `id` int(11) NOT NULL,
   `stock_id` int(11) NOT NULL,
   `location_id` int(11) NOT NULL
@@ -279,7 +370,7 @@ CREATE TABLE `tokens` (
 --
 
 INSERT INTO `tokens` (`id`, `token`) VALUES
-(71, 'SepAyS2c£)TWSxOlso0-p(qA+4YzQ4X3&£tcq!t4H\"c(Z3j6+HS1676207928853');
+(71, '1BVe(I£H!uxSCiHS8Qu9V\"!l5rN(AT0£7r16hL_ut71mdH!u_g01676405174346');
 
 -- --------------------------------------------------------
 
@@ -346,7 +437,15 @@ INSERT INTO `user_invoices` (`id`, `user_id`, `invoice_id`, `date`) VALUES
 (6, 84, 6, '2023-02-12 13:14:27'),
 (7, 84, 8, '2023-02-12 13:15:32'),
 (8, 84, 9, '2023-02-12 13:16:40'),
-(9, 84, 10, '2023-02-12 13:18:48');
+(9, 84, 10, '2023-02-12 13:18:48'),
+(10, 84, 11, '2023-02-12 14:02:45'),
+(11, 84, 12, '2023-02-12 14:52:05'),
+(12, 84, 13, '2023-02-12 15:22:12'),
+(13, 84, 14, '2023-02-12 15:23:20'),
+(14, 84, 15, '2023-02-12 15:24:11'),
+(15, 84, 16, '2023-02-12 15:26:33'),
+(16, 84, 17, '2023-02-12 15:29:11'),
+(17, 84, 18, '2023-02-12 15:31:18');
 
 -- --------------------------------------------------------
 
@@ -409,6 +508,24 @@ ALTER TABLE `companies`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `history`
+--
+ALTER TABLE `history`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `history_location`
+--
+ALTER TABLE `history_location`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `history_locations`
+--
+ALTER TABLE `history_locations`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `invoice_company`
 --
 ALTER TABLE `invoice_company`
@@ -457,9 +574,15 @@ ALTER TABLE `stock`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `stock_location`
+-- Indexes for table `stock_histories`
 --
-ALTER TABLE `stock_location`
+ALTER TABLE `stock_histories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `stock_locations`
+--
+ALTER TABLE `stock_locations`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -516,34 +639,52 @@ ALTER TABLE `companies`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
+-- AUTO_INCREMENT for table `history`
+--
+ALTER TABLE `history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `history_location`
+--
+ALTER TABLE `history_location`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `history_locations`
+--
+ALTER TABLE `history_locations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `invoice_company`
 --
 ALTER TABLE `invoice_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `invoice_items`
 --
 ALTER TABLE `invoice_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `invoice_specific`
 --
 ALTER TABLE `invoice_specific`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `invoice_specifics`
 --
 ALTER TABLE `invoice_specifics`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `locations`
@@ -564,9 +705,15 @@ ALTER TABLE `stock`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `stock_location`
+-- AUTO_INCREMENT for table `stock_histories`
 --
-ALTER TABLE `stock_location`
+ALTER TABLE `stock_histories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `stock_locations`
+--
+ALTER TABLE `stock_locations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -591,7 +738,7 @@ ALTER TABLE `user_company`
 -- AUTO_INCREMENT for table `user_invoices`
 --
 ALTER TABLE `user_invoices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `user_reset`

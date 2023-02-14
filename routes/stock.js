@@ -20,16 +20,15 @@ const validateData = (payload) => {
 
   const validateLocations = (locations) => {
     const specialCharReg = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    let valid = true;
     for (const location of locations) {
       const { name, value } = location;
-      let valid = true;
       if (!name || !value) {
         valid = false;
         break;
       }
 
       if (name.match(specialCharReg) || value.match(specialCharReg)) {
-        console.log("matched");
         valid = false;
         break;
       }
@@ -54,12 +53,9 @@ const validateData = (payload) => {
   )
     return false;
 
-  let valid = true;
+  if (!validateLocations(locations)) return false;
 
-  if (!validateLocations(locations)) {
-    res.status(400).send({ status: 0, token });
-    return;
-  }
+  let valid = true;
 
   for (const his of history) {
     const { date, qty, price, locations } = his;
@@ -91,11 +87,13 @@ router.post("/add", function (req, res) {
   const { data } = req.body;
 
   if (!validateData(data)) {
+    console.log("data not valid");
     res.status(400).send({ status: 0, token });
     return;
   }
 
-  console.log("stock add");
+  console.log(data);
+
   res.send({ status: 1, token });
 });
 
