@@ -20,7 +20,7 @@ const validateData = (payload) => {
   } = payload;
 
   const validateLocations = (locations) => {
-    const specialCharReg = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    const specialCharReg = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
     let valid = true;
     for (const location of locations) {
       const { name, value } = location;
@@ -98,22 +98,76 @@ const isSkuUsed = async (userId, sku) => {
 
 const poundsToPennies = (amount) => Math.floor(parseFloat(amount) * 100);
 
-const addCompanyToItem = async (data) => {
+const getCompanyId = async (data) => {
   const company = {
     name: data.company,
-    street: data.companyStreet,
-    city: data.companyCity,
-    county: data.companyCounty,
-    country: data.companyCountry,
     postcode: data.companyPostcode,
   };
 
-  const [doesCompanyExists] = await runQuery(
+  const [compRes] = await runQuery(
     select("companies", ["id"], ["name", "postcode"]),
     [company.name, company.postcode]
   );
 
-  if (doesCompanyExists) return doesCompanyExists;
+  return compRes?.id || undefined;
+};
+
+const addCompanytoItem = async (data, itemId, companyId) => {
+  const company = Object.values({
+    company: data.company,
+    companyStreet: data.companyStreet,
+    companyCity: data.companyCity,
+    companyCounty: data.companyCounty,
+    companyPostcode: data.companyPostcode,
+    companyCountry: data.companyCountry,
+  });
+
+  //something is missing... If legal request was made, this will always be 6, so just stop here.
+  if (!companyId) {
+    const { insertId: id } = await runQuery(
+      insert("companies", [
+        "name",
+        "address",
+        "city",
+        "county",
+        "postcode",
+        "country",
+      ]),
+      [...company]
+    );
+
+    if (!id) return;
+
+    companyId = id;
+  }
+
+  const { insertId: relationship } = await runQuery(
+    insert("stock_company", ["stock_id", "company_id"]),
+    [itemId, companyId]
+  );
+
+  if (!relationship) return;
+
+  return true;
+};
+
+const addLocationstoItem = async (locations, itemId) => {
+  for (const location of locations) {
+    const { insertId: locId } = await runQuery(
+      insert("locations", ["name", "value"]),
+      [location.name, location.value]
+    );
+
+    if (!locId) return;
+
+    const { insertId: relationship } = await runQuery(
+      insert("stock_locations", ["stock_id", "location_id"]),
+      [itemId, locId]
+    );
+
+    if (!relationship) return;
+  }
+  return true;
 };
 
 const addItemToUser = async (data) => {
@@ -129,7 +183,16 @@ const addItemToUser = async (data) => {
     return;
   }
 
-  const companyId = addCompanyToItem(data);
+  const compRel = await addCompanytoItem(
+    data,
+    itemId,
+    await getCompanyId(data)
+  );
+
+  if (!compRel) return;
+
+  const locationRel = await addLocationstoItem(locations, itemId);
+  if (!locationRel) return;
 };
 
 router.post("/add", async function (req, res) {
@@ -158,6 +221,7 @@ router.post("/add", async function (req, res) {
   }
 
   const added = await addItemToUser(data);
+
   res.send({ status: 1, token });
 });
 

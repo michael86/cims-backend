@@ -63,13 +63,11 @@ const queries = {
       selector &&
       `WHERE ${
         typeof selector === "string"
-          ? `${selector} LIKE ?`
+          ? `${selector} = ?`
           : selector
               .map(
                 (select, index) =>
-                  `${select} LIKE ? ${
-                    index === selector.length - 1 ? "" : "AND"
-                  }`
+                  `${select} = ? ${index === selector.length - 1 ? "" : "AND"}`
               )
               .join(" ")
       }`
