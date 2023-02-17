@@ -170,7 +170,7 @@ const addLocationstoItem = async (locations, itemId) => {
   return true;
 };
 
-const addItemToUser = async (data) => {
+const addItemToUser = async (data, userId) => {
   const { sku, qty, price, locations, history } = data;
 
   const { insertId: itemId } = await runQuery(
@@ -182,6 +182,13 @@ const addItemToUser = async (data) => {
     res.status(500).send({ status: 0, token });
     return;
   }
+
+  const { insertId: relation } = await runQuery(
+    insert("user_stock", ["user_id", "stock_id"]),
+    [userId, itemId]
+  );
+
+  if (!relation) return;
 
   const compRel = await addCompanytoItem(
     data,
@@ -220,7 +227,7 @@ router.post("/add", async function (req, res) {
     return;
   }
 
-  const added = await addItemToUser(data);
+  const added = await addItemToUser(data, userId);
 
   res.send({ status: 1, token });
 });
