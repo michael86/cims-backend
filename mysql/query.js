@@ -60,7 +60,19 @@ const queries = {
 
   select: (location, targets, selector) => {
     return `SELECT ${targets.join(", ")} FROM ${location} ${
-      selector && `WHERE ${selector} LIKE ?`
+      selector &&
+      `WHERE ${
+        typeof selector === "string"
+          ? `${selector} LIKE ?`
+          : selector
+              .map(
+                (select, index) =>
+                  `${select} LIKE ? ${
+                    index === selector.length - 1 ? "" : "AND"
+                  }`
+              )
+              .join(" ")
+      }`
     }`;
   },
 

@@ -98,6 +98,24 @@ const isSkuUsed = async (userId, sku) => {
 
 const poundsToPennies = (amount) => Math.floor(parseFloat(amount) * 100);
 
+const addCompanyToItem = async (data) => {
+  const company = {
+    company: data.company,
+    companyStreet: data.companyStreet,
+    companyCity: data.companyCity,
+    companyCounty: data.companyCounty,
+    companyCountry: data.companyCountry,
+    companyPostcode: data.companyPostcode,
+  };
+
+  console.log(select("companies", ["id"], ["name", "postcode"]));
+
+  const doesCompanyExists = await runQuery(
+    select("companies", ["id"], ["name", "postcode"]),
+    [company, companyPostcode]
+  );
+};
+
 const addItemToUser = async (data) => {
   const { sku, qty, price, locations, history } = data;
 
@@ -110,14 +128,8 @@ const addItemToUser = async (data) => {
     res.status(500).send({ status: 0, token });
     return;
   }
-  const company = {
-    company: data.company,
-    companyStreet: data.companyStreet,
-    companyCity: data.companyCity,
-    companyCounty: data.companyCounty,
-    companyCountry: data.companyCountry,
-    companyPostcode: data.companyPostcode,
-  };
+
+  const companyId = addCompanyToItem(data);
 };
 
 router.post("/add", async function (req, res) {
