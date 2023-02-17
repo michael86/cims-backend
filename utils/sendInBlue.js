@@ -5,6 +5,7 @@ SibApiV3Sdk.ApiClient.instance.authentications["api-key"].apiKey =
 
 module.exports.sendEmail = async (payload) => {
   const { receivers, subject, htmlContent, params } = payload;
+
   //project_directory/emailBuilder.js
 
   const receiptants = receivers.map((email) => {

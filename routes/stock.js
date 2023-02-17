@@ -1,5 +1,6 @@
-const { Router } = require("express");
 const express = require("express");
+const { select, insert } = require("../mysql/query");
+const { runQuery } = require("../utils/sql");
 const router = express.Router();
 
 const validateData = (payload) => {
@@ -82,18 +83,69 @@ const validateData = (payload) => {
   return valid;
 };
 
-router.post("/add", function (req, res) {
-  const { newToken: token } = req.headers;
+const isSkuUsed = async (userId, sku) => {
+  const [stockIds] = await runQuery(
+    select("user_stock", ["stock_id"], "user_id"),
+    [userId]
+  );
+
+  //if the user doesn't have any stock relationships
+  //return true as no need to validate sku hasn't been used
+  if (!stockIds) return true;
+
+  return true;
+};
+
+const poundsToPennies = (amount) => Math.floor(parseFloat(amount) * 100);
+
+const addItemToUser = async (data) => {
+  const { sku, qty, price, locations, history } = data;
+
+  const { insertId: itemId } = await runQuery(
+    insert("stock", ["sku", "quantity", "price", "image_name", "free_issue"]),
+    [sku, qty, poundsToPennies(price), "null", false]
+  );
+
+  if (!itemId) {
+    res.status(500).send({ status: 0, token });
+    return;
+  }
+  const company = {
+    company: data.company,
+    companyStreet: data.companyStreet,
+    companyCity: data.companyCity,
+    companyCounty: data.companyCounty,
+    companyCountry: data.companyCountry,
+    companyPostcode: data.companyPostcode,
+  };
+};
+
+router.post("/add", async function (req, res) {
+  const { newToken: token, email } = req.headers;
   const { data } = req.body;
 
-  if (!validateData(data)) {
-    console.log("data not valid");
+  if (!validateData(data) || !email) {
     res.status(400).send({ status: 0, token });
     return;
   }
 
-  console.log(data);
+  const { sku } = data;
 
+  const [{ id: userId }] = await runQuery(select("users", ["id"], "email"), [
+    email,
+  ]);
+
+  if (!userId) {
+    res.status(400).send({ status: 1, token });
+    return;
+  }
+
+  if (!(await isSkuUsed(userId, sku))) {
+    res.send({ status: 2, token });
+    return;
+  }
+
+  const added = await addItemToUser(data);
   res.send({ status: 1, token });
 });
 
