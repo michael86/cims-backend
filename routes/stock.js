@@ -100,20 +100,20 @@ const poundsToPennies = (amount) => Math.floor(parseFloat(amount) * 100);
 
 const addCompanyToItem = async (data) => {
   const company = {
-    company: data.company,
-    companyStreet: data.companyStreet,
-    companyCity: data.companyCity,
-    companyCounty: data.companyCounty,
-    companyCountry: data.companyCountry,
-    companyPostcode: data.companyPostcode,
+    name: data.company,
+    street: data.companyStreet,
+    city: data.companyCity,
+    county: data.companyCounty,
+    country: data.companyCountry,
+    postcode: data.companyPostcode,
   };
 
-  console.log(select("companies", ["id"], ["name", "postcode"]));
-
-  const doesCompanyExists = await runQuery(
+  const [doesCompanyExists] = await runQuery(
     select("companies", ["id"], ["name", "postcode"]),
-    [company, companyPostcode]
+    [company.name, company.postcode]
   );
+
+  if (doesCompanyExists) return doesCompanyExists;
 };
 
 const addItemToUser = async (data) => {
