@@ -192,8 +192,32 @@ const addItemToUser = async (data, userId) => {
   return itemId;
 };
 
-const addHistoryToItem = async (data, itemId) => {
-  console.log(data);
+const addHistoryToItem = async ([data], itemId) => {
+  const date = Math.floor(Date.now() / 1000);
+
+  const { insertId: historyId } = await runQuery(
+    insert("history", ["date", "quantity", "price"]),
+    [date, data.qty, poundsToPennies(data.price)]
+  );
+
+  if (!historyId) return;
+
+  for (const location of data.locations) {
+    const { insertId: locId } = await runQuery(
+      insert("locations", ["name", "value"]),
+      [location.name, location.value]
+    );
+
+    if (!locId) return;
+
+    const { insertId: relationship } = await runQuery(
+      insert("history_locations", ["history_id", "location_id"]),
+      [historyId, locId]
+    );
+
+    if (!relationship) return;
+  }
+  return;
 };
 
 router.post("/add", async function (req, res) {
@@ -236,7 +260,7 @@ router.post("/add", async function (req, res) {
   if (!locationRel) return;
 
   const historyRel = await addHistoryToItem(history, itemId);
-  if (!historyRel) return;
+  // if (!historyRel) return;
 
   res.send({ status: 1, token });
 });
