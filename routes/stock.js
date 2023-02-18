@@ -192,6 +192,10 @@ const addItemToUser = async (data, userId) => {
   return itemId;
 };
 
+const addHistoryToItem = async (data, itemId) => {
+  console.log(data);
+};
+
 router.post("/add", async function (req, res) {
   const { newToken: token, email } = req.headers;
   const { data } = req.body;
@@ -231,7 +235,9 @@ router.post("/add", async function (req, res) {
   const locationRel = await addLocationstoItem(locations, itemId);
   if (!locationRel) return;
 
-  console.log("add history herre");
+  const historyRel = await addHistoryToItem(history, itemId);
+  if (!historyRel) return;
+
   res.send({ status: 1, token });
 });
 
