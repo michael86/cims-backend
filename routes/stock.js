@@ -265,4 +265,107 @@ router.post("/add", async function (req, res) {
   res.send({ status: 1, token });
 });
 
+router.get("/get", async function (req, res) {
+  const { newToken: token, email } = req.headers;
+
+  if (!email) {
+    res.end();
+    return;
+  }
+
+  const [{ id: user }] = await runQuery(select("users", ["id"], "email"), [
+    email,
+  ]);
+
+  if (!user) {
+    res.end();
+    return;
+  }
+
+  const stockIds = await runQuery(
+    select("user_stock", ["stock_id AS stockId"], "user_id"),
+    [user]
+  );
+
+  //handle if user has no stock
+  if (!stockIds) {
+    res.send({ status: 1, stock: [] });
+    return;
+  }
+
+  const stock = [];
+  try {
+    for (const index of stockIds) {
+      const { stockId: id } = index;
+
+      const [itemDetails] = await runQuery(
+        select(
+          "stock",
+          ["sku", "quantity", "price", "free_issue AS freeIssue"],
+          "id"
+        ),
+        [id]
+      );
+
+      const item = { ...itemDetails };
+      item.locations = [];
+
+      //gen locations
+      const locIds = await runQuery(
+        select("stock_locations", ["location_id AS id"], "stock_id"),
+        [id]
+      );
+
+      for (const location of locIds) {
+        const currentLoc = await runQuery(
+          select("locations", ["name", "value"], "id"),
+          [location.id]
+        );
+
+        for (const index of currentLoc) {
+          item.locations.push({ ...index });
+        }
+      }
+
+      item.history = [];
+      const historyIds = await runQuery(
+        select("stock_histories", ["history_id AS id"], "stock_id"),
+        [id]
+      );
+      for (const hisId of historyIds) {
+        const { id } = hisId;
+        const [history] = await runQuery(
+          select("history", ["date", "quantity", "price"], "id"),
+          [id]
+        );
+        const entry = { ...history };
+        entry.location = [];
+
+        const hisLocId = await runQuery(
+          select("history_locations", ["location_id AS id"], "history_id"),
+          [id]
+        );
+
+        for (const index of hisLocId) {
+          const { id } = index;
+
+          const [currentLoc] = await runQuery(
+            select("locations", ["name", "value"], "id"),
+            [id]
+          );
+          entry.location.push({ ...currentLoc });
+        }
+        item.history.push(entry);
+      }
+
+      stock.push(item);
+    }
+  } catch (e) {
+    console.log(e);
+  }
+
+  console.log(stock);
+  res.send({ status: 1, token, stock });
+});
+
 module.exports = router;
