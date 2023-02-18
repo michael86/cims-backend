@@ -189,6 +189,13 @@ const addHistoryToItem = async ([data], itemId) => {
 
   if (!historyId) return;
 
+  const { insertId: histRelation } = await runQuery(
+    insert("stock_histories", ["stock_id", "history_id"]),
+    [itemId, historyId]
+  );
+
+  if (!histRelation) return;
+
   for (const location of data.locations) {
     const { insertId: locId } = await runQuery(
       insert("locations", ["name", "value"]),
