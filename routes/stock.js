@@ -83,19 +83,6 @@ const validateData = (payload) => {
   return valid;
 };
 
-const isSkuUsed = async (userId, sku) => {
-  const [stockIds] = await runQuery(
-    select("user_stock", ["stock_id"], "user_id"),
-    [userId]
-  );
-
-  //if the user doesn't have any stock relationships
-  //return true as no need to validate sku hasn't been used
-  if (!stockIds) return true;
-
-  return true;
-};
-
 const poundsToPennies = (amount) => Math.floor(parseFloat(amount) * 100);
 
 const getCompanyId = async (data) => {
@@ -171,17 +158,17 @@ const addLocationstoItem = async (locations, itemId) => {
 };
 
 const addItemToUser = async (data, userId) => {
-  const { sku, qty, price, locations, history } = data;
+  const { sku, qty, price } = data;
 
-  const { insertId: itemId } = await runQuery(
+  const itemRes = await runQuery(
     insert("stock", ["sku", "quantity", "price", "image_name", "free_issue"]),
     [sku, qty, poundsToPennies(price), "null", false]
   );
 
-  if (!itemId) {
-    res.status(500).send({ status: 0, token });
-    return;
-  }
+  if (!itemRes) return;
+
+  if (itemRes === "ER_DUP_ENTRY") return itemRes;
+  const { insertId: itemId } = itemRes;
 
   const { insertId: relation } = await runQuery(
     insert("user_stock", ["user_id", "stock_id"]),
@@ -217,50 +204,56 @@ const addHistoryToItem = async ([data], itemId) => {
 
     if (!relationship) return;
   }
-  return;
+  return true;
 };
 
+//Any where there's a res.end is because the user may be up to no good.
+//Prob refactor that to be middleware when we add validation
 router.post("/add", async function (req, res) {
   const { newToken: token, email } = req.headers;
   const { data } = req.body;
   const { locations, history } = data;
 
-  if (!validateData(data) || !email) {
-    res.status(400).send({ status: 0, token });
-    return;
-  }
-
-  const { sku } = data;
+  if (!validateData(data) || !email) return;
 
   const [{ id: userId }] = await runQuery(select("users", ["id"], "email"), [
     email,
   ]);
 
-  if (!userId) {
-    res.status(400).send({ status: 1, token });
+  if (!userId) return;
+
+  const itemId = await addItemToUser(data, userId);
+
+  if (!itemId) {
+    res.end();
     return;
   }
-
-  if (!(await isSkuUsed(userId, sku))) {
+  if (itemId === "ER_DUP_ENTRY") {
     res.send({ status: 2, token });
     return;
   }
-
-  const itemId = await addItemToUser(data, userId);
-  if (!itemId) return;
 
   const compRel = await addCompanytoItem(
     data,
     itemId,
     await getCompanyId(data)
   );
-  if (!compRel) return;
+  if (!compRel) {
+    res.end();
+    return;
+  }
 
   const locationRel = await addLocationstoItem(locations, itemId);
-  if (!locationRel) return;
+  if (!locationRel) {
+    res.end();
+    return;
+  }
 
   const historyRel = await addHistoryToItem(history, itemId);
-  // if (!historyRel) return;
+  if (!historyRel) {
+    res.end();
+    return;
+  }
 
   res.send({ status: 1, token });
 });

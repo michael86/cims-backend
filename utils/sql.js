@@ -12,7 +12,7 @@ module.exports.runQuery = async (query, data) => {
 
     return res;
   } catch (err) {
-    console.error("sql error", err);
+    // console.error("sql error", err);
     if (err.code) return err.code;
   }
 };
