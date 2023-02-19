@@ -301,7 +301,13 @@ router.get("/get", async function (req, res) {
       const [itemDetails] = await runQuery(
         select(
           "stock",
-          ["sku", "quantity", "price", "free_issue AS freeIssue"],
+          [
+            "sku",
+            "quantity",
+            "price",
+            "free_issue AS freeIssue",
+            "UNIX_TIMESTAMP(date) AS dateCreated",
+          ],
           "id"
         ),
         [id]
