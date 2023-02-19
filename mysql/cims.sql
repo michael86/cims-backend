@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 18, 2023 at 10:36 AM
+-- Generation Time: Feb 19, 2023 at 10:01 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -43,28 +43,9 @@ CREATE TABLE `companies` (
 --
 
 INSERT INTO `companies` (`id`, `name`, `address`, `city`, `county`, `postcode`, `country`, `date`) VALUES
-(32, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-01-18 21:02:27'),
-(33, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 18:54:39'),
-(34, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:01:23'),
-(35, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:14:41'),
-(36, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:15:15'),
-(37, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:15:41'),
-(38, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:17:54'),
-(39, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:18:17'),
-(40, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:18:51'),
-(41, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:20:27'),
-(42, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'United Kingdom', 'ss15 5ae', '2023-02-17 19:22:10'),
-(43, 'creekviewfdsafsdf', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-17 19:25:20'),
-(44, 'crumble', '27 wickhay', 'Basildon', 'essex', 'ss13 269', 'United Kingdom', '2023-02-17 20:36:44'),
-(45, 'crumbleffff', '27 wickhay', 'Basildon', 'essex', 'ss13 269', 'United Kingdom', '2023-02-17 20:56:07'),
-(46, 'creekviewccccccccccccccccc', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-17 21:00:29'),
-(47, 'creekviewcccccccccccccccccadsadsadasd', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-17 21:04:35'),
-(48, 'creekviewcccccccccccccccccadsaddfgdfgdgdfsadasd', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-17 21:11:36'),
-(49, 'creekviewcccdddccccccccccccccadsaddfgdfgdgdfsadasd', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-17 21:12:03'),
-(50, 'cvbcbvreekviewcccdddccccccccccccccadsaddfgdfgdgdfsadasd', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-17 21:12:50'),
-(51, 'cvbcbcvvcvreekviewcccdddccccccccccccccadsaddfgdfgdgdfsadasd', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-17 21:13:13'),
-(52, 'dominoes', 'unit 45 Triangle Parade', 'Laindon', 'essex', 'ss11 2aa', 'United Kingdom', '2023-02-17 21:18:48'),
-(53, 'some Company', '111 fake street', 'disney land', 'some county', 'somepostcode', 'some country', '2023-02-17 21:28:36');
+(32, 'dominoes', 'unit 45 Triangle Parade', 'Laindon', 'essex', 'ss11 2aa', 'United Kingdom', '2023-02-18 11:01:34'),
+(54, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-18 11:04:50'),
+(55, 'photomechanical', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-18 11:07:18');
 
 -- --------------------------------------------------------
 
@@ -79,6 +60,14 @@ CREATE TABLE `history` (
   `price` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `history`
+--
+
+INSERT INTO `history` (`id`, `date`, `quantity`, `price`) VALUES
+(1, 1676840181, 12345, 1299),
+(2, 1676840212, 12, 8000);
+
 -- --------------------------------------------------------
 
 --
@@ -90,6 +79,14 @@ CREATE TABLE `history_locations` (
   `history_id` int(11) NOT NULL,
   `location_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `history_locations`
+--
+
+INSERT INTO `history_locations` (`id`, `history_id`, `location_id`) VALUES
+(1, 1, 2),
+(2, 2, 4);
 
 -- --------------------------------------------------------
 
@@ -316,7 +313,10 @@ CREATE TABLE `locations` (
 --
 
 INSERT INTO `locations` (`id`, `name`, `value`) VALUES
-(1, '1', '1');
+(1, '1', '2'),
+(2, '1', '2'),
+(3, 'shelf', 'A3'),
+(4, 'shelf', 'A3');
 
 -- --------------------------------------------------------
 
@@ -348,15 +348,17 @@ CREATE TABLE `stock` (
   `quantity` int(11) NOT NULL,
   `price` int(11) NOT NULL,
   `image_name` varchar(255) NOT NULL,
-  `free_issue` tinyint(1) NOT NULL
+  `free_issue` tinyint(1) NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `stock`
 --
 
-INSERT INTO `stock` (`id`, `sku`, `quantity`, `price`, `image_name`, `free_issue`) VALUES
-(1, 'Nappies', 5, 199, 'null', 0);
+INSERT INTO `stock` (`id`, `sku`, `quantity`, `price`, `image_name`, `free_issue`, `date`) VALUES
+(1, 'Nappies', 12345, 1299, 'null', 0, '2023-02-19 20:56:21'),
+(2, 'cocaine', 12, 8000, 'null', 0, '2023-02-19 20:56:52');
 
 -- --------------------------------------------------------
 
@@ -375,7 +377,8 @@ CREATE TABLE `stock_company` (
 --
 
 INSERT INTO `stock_company` (`id`, `stock_id`, `company_id`) VALUES
-(1, 1, 32);
+(1, 1, 54),
+(2, 2, 54);
 
 -- --------------------------------------------------------
 
@@ -388,6 +391,14 @@ CREATE TABLE `stock_histories` (
   `stock_id` int(11) NOT NULL,
   `history_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `stock_histories`
+--
+
+INSERT INTO `stock_histories` (`id`, `stock_id`, `history_id`) VALUES
+(1, 1, 1),
+(2, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -406,7 +417,8 @@ CREATE TABLE `stock_locations` (
 --
 
 INSERT INTO `stock_locations` (`id`, `stock_id`, `location_id`) VALUES
-(1, 1, 1);
+(1, 1, 1),
+(2, 2, 3);
 
 -- --------------------------------------------------------
 
@@ -424,7 +436,7 @@ CREATE TABLE `tokens` (
 --
 
 INSERT INTO `tokens` (`id`, `token`) VALUES
-(71, '+_2Zxi\"dMyrIwEyWBzeiA^Z6hDEj\"H2-GQE*E+idQhzUcKsJ&C01676712953681');
+(71, 'A1g0UQ66+j4BL^$k%+4LHSF%0l0h-HeDPLoIMt2ZcFtqP%ST6m41676840213998');
 
 -- --------------------------------------------------------
 
@@ -538,7 +550,8 @@ CREATE TABLE `user_stock` (
 --
 
 INSERT INTO `user_stock` (`id`, `user_id`, `stock_id`) VALUES
-(1, 84, 1);
+(1, 84, 1),
+(2, 84, 2);
 
 -- --------------------------------------------------------
 
@@ -627,7 +640,8 @@ ALTER TABLE `reset_tokens`
 -- Indexes for table `stock`
 --
 ALTER TABLE `stock`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `sku` (`sku`);
 
 --
 -- Indexes for table `stock_company`
@@ -699,19 +713,19 @@ ALTER TABLE `user_token`
 -- AUTO_INCREMENT for table `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `history_locations`
 --
 ALTER TABLE `history_locations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `invoice_company`
@@ -747,7 +761,7 @@ ALTER TABLE `invoice_specifics`
 -- AUTO_INCREMENT for table `locations`
 --
 ALTER TABLE `locations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `reset_tokens`
@@ -759,25 +773,25 @@ ALTER TABLE `reset_tokens`
 -- AUTO_INCREMENT for table `stock`
 --
 ALTER TABLE `stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `stock_company`
 --
 ALTER TABLE `stock_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `stock_histories`
 --
 ALTER TABLE `stock_histories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `stock_locations`
 --
 ALTER TABLE `stock_locations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tokens`
@@ -813,7 +827,7 @@ ALTER TABLE `user_reset`
 -- AUTO_INCREMENT for table `user_stock`
 --
 ALTER TABLE `user_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `user_token`
