@@ -73,7 +73,7 @@ router.put("/login", async function (req, res) {
       res.status(500).send({ status: 0 });
       return;
     }
-
+    console.log("rerm");
     addToken(email, {
       userId: user.id,
       token,

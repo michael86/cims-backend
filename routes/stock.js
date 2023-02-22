@@ -1,5 +1,5 @@
 const express = require("express");
-const { select, insert } = require("../mysql/query");
+const { select, insert, update, patchItem } = require("../mysql/query");
 const { runQuery } = require("../utils/sql");
 const router = express.Router();
 
@@ -265,6 +265,7 @@ router.post("/add", async function (req, res) {
   res.send({ status: 1, token });
 });
 
+//update to take in a query param called history (bool), this can then be used to decide if we should return with histort
 router.get("/get", async function (req, res) {
   const { newToken: token, email } = req.headers;
 
@@ -314,6 +315,7 @@ router.get("/get", async function (req, res) {
       );
 
       const item = { ...itemDetails };
+      item.id = id;
       item.locations = [];
 
       //gen locations
@@ -374,4 +376,26 @@ router.get("/get", async function (req, res) {
   res.send({ status: 1, token, stock });
 });
 
+router.patch("/update", async function (req, res) {
+  const { newToken: token, email } = req.headers;
+  const { data, history } = req.body;
+  const { locations: updateLocations } = req.query;
+
+  const updateLocation = (locations) => {
+    console.log(locations);
+  };
+
+  const updateItem = await runQuery(
+    patchItem(["sku", "quantity", "price", "image_name", "free_issue"], ["id"]),
+    [data.sku, data.qty, poundsToPennies(data.price), "null", 0, data.id]
+  );
+
+  if (!updateItem.affectedRows) {
+    res.status(500).send({ status: 0, token });
+  }
+
+  updateLocations && updateLocation(data.location);
+
+  res.send({ status: 1, token });
+});
 module.exports = router;

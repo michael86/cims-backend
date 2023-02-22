@@ -94,8 +94,13 @@ const queries = {
                 WHERE ${selector[0]} = ${selector[1] ? selector[1] : "?"}`;
   },
 
-  deleteFrom: (location, [key, value]) => {
-    console.log(key, value);
+  patchItem: (items, selectors) => {
+    return `UPDATE stock SET ${items
+      .map(
+        (item, index) => `${item} = ?${index !== items.length - 1 ? "," : ""} `
+      )
+      .join("")} 
+            WHERE  ${selectors.map((selector) => `${selector} = ?`)}`;
   },
 };
 
