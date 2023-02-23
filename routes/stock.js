@@ -279,7 +279,7 @@ const getLocations = async (id) => {
     );
 
     for (const index of currentLoc) {
-      locations.push({ ...index });
+      locations.push({ ...index, id: location.id });
     }
   }
 
