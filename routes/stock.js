@@ -322,7 +322,7 @@ const getHistory = async (id) => {
 
   return history;
 };
-//update to take in a query param called history (bool), this can then be used to decide if we should return with histort
+
 router.get("/get", async function (req, res) {
   const { newToken: token, email } = req.headers;
   const { history, locations } = req.query;
