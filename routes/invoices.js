@@ -45,7 +45,6 @@ router.put("/add", async function (req, res) {
   );
 
   console.log(specifics);
-
   const { insertId: specificsInsertId } = await runQuery(
     insert("invoice_specifics", [
       "due_date",
@@ -53,11 +52,17 @@ router.put("/add", async function (req, res) {
       "order_number",
       "footer",
     ]),
-    Object.values(specifics)
+    [
+      specifics.dueDate,
+      specifics.billingDate,
+      specifics.orderNumber,
+      specifics.footer,
+    ]
   );
 
   if (!specificsInsertId) {
     res.status(500).send({ status: 0, token });
+    return;
   }
 
   const itemIds = [];
@@ -70,7 +75,7 @@ router.put("/add", async function (req, res) {
         "price",
         "tax",
       ]),
-      [item.item, item.description, item.quantity, item.price, item.tax]
+      [item.name, item.description, item.quantity, item.price, item.tax]
     );
 
     if (!itemId) {
