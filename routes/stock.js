@@ -14,7 +14,6 @@ const validateData = (payload) => {
     companyCounty,
     companyCountry,
     companyPostcode,
-    dateCreated,
     locations,
     history,
   } = payload;
@@ -48,7 +47,6 @@ const validateData = (payload) => {
     !companyCounty ||
     !companyCountry ||
     !companyPostcode ||
-    !dateCreated ||
     !locations ||
     !history
   )
@@ -59,17 +57,8 @@ const validateData = (payload) => {
   let valid = true;
 
   for (const his of history) {
-    const { date, qty, price, locations } = his;
-    if (!date || !qty || !price || !locations) {
-      valid = false;
-      break;
-    }
-
-    if (
-      typeof date !== "number" ||
-      isNaN(Number(qty)) ||
-      isNaN(Number(price))
-    ) {
+    const { qty, price, locations } = his;
+    if (!qty || !price || !locations) {
       valid = false;
       break;
     }
@@ -166,8 +155,8 @@ const addItemToUser = async (data, userId) => {
   );
 
   if (!itemRes) return;
-
   if (itemRes === "ER_DUP_ENTRY") return itemRes;
+
   const { insertId: itemId } = itemRes;
 
   const { insertId: relation } = await runQuery(
@@ -180,11 +169,9 @@ const addItemToUser = async (data, userId) => {
 };
 
 const addHistoryToItem = async ([data], itemId) => {
-  const date = Math.floor(Date.now() / 1000);
-
   const { insertId: historyId } = await runQuery(
-    insert("history", ["date", "quantity", "price"]),
-    [date, data.qty, poundsToPennies(data.price)]
+    insert("history", ["quantity", "price"]),
+    [data.qty, poundsToPennies(data.price)]
   );
 
   if (!historyId) return;
@@ -296,9 +283,14 @@ const getHistory = async (id) => {
   for (const hisId of historyIds) {
     const { id } = hisId;
     const [history] = await runQuery(
-      select("history", ["date", "quantity", "price"], "id"),
+      select(
+        "history",
+        ["quantity", "price", "UNIX_TIMESTAMP(date_added) AS dateAdded"],
+        "id"
+      ),
       [id]
     );
+
     const entry = { ...history };
     entry.location = [];
 
