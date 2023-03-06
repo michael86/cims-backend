@@ -1,5 +1,5 @@
 const express = require("express");
-const { select, insert, update, patchItem } = require("../mysql/query");
+const { select, insert, update, patchItem, remove } = require("../mysql/query");
 const { runQuery } = require("../utils/sql");
 const { getLocationsToDelete, getLocationsToInsert } = require("../utils");
 const router = express.Router();
@@ -385,17 +385,40 @@ router.get("/get", async function (req, res) {
 });
 
 router.patch("/update", async function (req, res) {
-  const { newToken: token, email } = req.headers;
+  const { newToken: token } = req.headers;
   const { data, history } = req.body;
   const { locations: updateLocs } = req.query;
 
-  const updateLocations = (newLocs, oldLocs) => {
-    // workout what ones we need to delete
-    // workout what ones we need to insert
-
-    const idsToDelete = getLocationsToDelete(newLocs, oldLocs);
+  const updateLocations = async (newLocs, oldLocs) => {
+    const locationsToDelete = getLocationsToDelete(newLocs, oldLocs);
     const locationsToInsert = getLocationsToInsert(newLocs, oldLocs);
-    console.log("locationsToInsert", locationsToInsert);
+
+    //Delete current locations
+    for (const id of locationsToDelete) {
+      const res = await runQuery(remove("stock_locations", "location_id"), [
+        id,
+      ]);
+
+      if (!res.affectedRows) return false;
+    }
+
+    for (const location of locationsToInsert) {
+      const { insertId } = await runQuery(
+        insert("locations", ["name", "value"]),
+        [location.name, location.value]
+      );
+
+      if (!insertId) return false;
+
+      const { insertId: relationId } = await runQuery(
+        insert("stock_locations", ["stock_id", "location_id"]),
+        [data.id, insertId]
+      );
+
+      if (!relationId) return false;
+    }
+
+    return true;
   };
 
   const updateItem = await runQuery(
@@ -407,7 +430,17 @@ router.patch("/update", async function (req, res) {
     res.status(500).send({ status: 0, token });
   }
 
-  updateLocs && updateLocations(data.locations, history.locations);
+  if (+updateLocs) {
+    const locRes = await updateLocations(data.locations, history.locations);
+
+    if (!locRes) {
+      res
+        .status(500)
+        .send({ status: 0, error: "failed to updated locations." });
+
+      return;
+    }
+  }
 
   res.send({ status: 1, token });
 });

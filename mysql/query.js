@@ -102,6 +102,10 @@ const queries = {
       .join("")} 
             WHERE  ${selectors.map((selector) => `${selector} = ?`)}`;
   },
+
+  remove: (table, selector) => {
+    return `DELETE FROM ${table} WHERE ${selector} = ?`;
+  },
 };
 
 module.exports = queries;
