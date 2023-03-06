@@ -1,6 +1,7 @@
 const express = require("express");
 const { select, insert, update, patchItem } = require("../mysql/query");
 const { runQuery } = require("../utils/sql");
+const { getLocationsToDelete, getLocationsToInsert } = require("../utils");
 const router = express.Router();
 
 const validateData = (payload) => {
@@ -386,10 +387,15 @@ router.get("/get", async function (req, res) {
 router.patch("/update", async function (req, res) {
   const { newToken: token, email } = req.headers;
   const { data, history } = req.body;
-  const { locations: updateLocations } = req.query;
+  const { locations: updateLocs } = req.query;
 
-  const updateLocation = (locations) => {
-    console.log(locations);
+  const updateLocations = (newLocs, oldLocs) => {
+    // workout what ones we need to delete
+    // workout what ones we need to insert
+
+    const idsToDelete = getLocationsToDelete(newLocs, oldLocs);
+    const locationsToInsert = getLocationsToInsert(newLocs, oldLocs);
+    console.log("locationsToInsert", locationsToInsert);
   };
 
   const updateItem = await runQuery(
@@ -401,7 +407,7 @@ router.patch("/update", async function (req, res) {
     res.status(500).send({ status: 0, token });
   }
 
-  updateLocations && updateLocation(data.location);
+  updateLocs && updateLocations(data.locations, history.locations);
 
   res.send({ status: 1, token });
 });
