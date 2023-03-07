@@ -426,8 +426,14 @@ router.patch("/update", async function (req, res) {
     [data.sku, data.qty, poundsToPennies(data.price), "null", 0, data.id]
   );
 
+  if (updateItem === "ER_DUP_ENTRY") {
+    res.send({ status: 3, token });
+    return;
+  }
+
   if (!updateItem.affectedRows) {
     res.status(500).send({ status: 0, token });
+    return;
   }
 
   if (+updateLocs) {
