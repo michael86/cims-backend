@@ -1,5 +1,13 @@
 const express = require("express");
-const { select, insert, update, patchItem, remove } = require("../mysql/query");
+const {
+  select,
+  insert,
+  patchItem,
+  remove,
+  insertHistory,
+  createHistoryRelation,
+  createHistoryLocRelation,
+} = require("../mysql/query");
 const { runQuery } = require("../utils/sql");
 const { getLocationsToDelete, getLocationsToInsert } = require("../utils");
 const router = express.Router();
@@ -421,6 +429,33 @@ router.patch("/update", async function (req, res) {
     return true;
   };
 
+  const createHistory = async (history) => {
+    //insert sku, quantity, price into history
+
+    const historyRes = await runQuery(insertHistory(), [
+      history.sku,
+      history.quantity,
+      history.price,
+    ]);
+
+    //create relation to stock_histories
+    const relationRes = await runQuery(createHistoryRelation(), [
+      history.id,
+      historyRes.insertId,
+    ]);
+
+    //create relations between history_locations
+    console.log(history.locations);
+    for (const location of history.locations) {
+      const locRes = await runQuery(createHistoryLocRelation(), [
+        historyRes.insertId,
+        location.id,
+      ]);
+
+      console.log(locRes);
+    }
+  };
+
   const updateItem = await runQuery(
     patchItem(["sku", "quantity", "price", "image_name", "free_issue"], ["id"]),
     [data.sku, data.qty, poundsToPennies(data.price), "null", 0, data.id]
@@ -447,6 +482,16 @@ router.patch("/update", async function (req, res) {
       return;
     }
   }
+
+  createHistory(history);
+
+  res.send({ status: 1, token });
+});
+
+router.delete("/delete", async function (req, res) {
+  const { newToken: token } = req.headers;
+
+  console.log("delete");
 
   res.send({ status: 1, token });
 });

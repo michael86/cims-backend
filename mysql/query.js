@@ -106,6 +106,17 @@ const queries = {
   remove: (table, selector) => {
     return `DELETE FROM ${table} WHERE ${selector} = ?`;
   },
+
+  insertHistory: () => {
+    return `INSERT INTO history (sku, quantity, price) VALUES (?, ?, ?)`;
+  },
+
+  createHistoryRelation: () => {
+    return `INSERT INTO stock_histories (stock_id, history_id) VALUES (?, ?)`;
+  },
+  createHistoryLocRelation: () => {
+    return `INSERT INTO history_locations (history_id, location_id) VALUES (?, ?)`;
+  },
 };
 
 module.exports = queries;
