@@ -1,17 +1,17 @@
 const queries = {
-  createUser: () => {
+  insertUser: () => {
     return `INSERT INTO users 
                 (email, password)
                      VALUES
                         (?, ?);`;
   },
 
-  createCompany: () => {
+  insertCompany: () => {
     return `INSERT INTO companies (name, address, city, county, postcode, country) 
             VALUES (?, ?, ?, ?, ?, ?);`;
   },
 
-  connectUserCompany: () => {
+  insertUserCompanyRelation: () => {
     return `INSERT INTO user_company (user_id, company_id) 
             VALUES (?, ?);`;
   },
@@ -50,7 +50,7 @@ const queries = {
     return `INSERT INTO tokens (token) VALUES(?);`;
   },
 
-  insertUserTokenConnection: () => {
+  insertUserTokenRelation: () => {
     return `INSERT INTO user_token (user, token) VALUES (?, ?);`;
   },
 

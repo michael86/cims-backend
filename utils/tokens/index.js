@@ -1,12 +1,39 @@
-module.exports.genToken = (count = 50, includeSpecial = true) => {
-  let letters = `abcdefghijklmnopqrstuvwxyzABCDEFGHIHJKLMNOPQRSTUVWXYZ1234567890${
-    includeSpecial && '!"£$%^&*()_+-'
-  }`;
+const queries = require("../../mysql/query");
+const { runQuery } = require("../sql");
 
-  let token = "";
-  for (let i = 0; i <= count; i++) {
-    token += letters.charAt(Math.floor(Math.random() * letters.length));
-  }
+const utils = {
+  genToken: (count = 50, includeSpecial = true) => {
+    let letters = `abcdefghijklmnopqrstuvwxyzABCDEFGHIHJKLMNOPQRSTUVWXYZ1234567890${
+      includeSpecial && '!"£$%^&*()_+-'
+    }`;
 
-  return (token += Date.now());
+    let token = "";
+    for (let i = 0; i <= count; i++) {
+      token += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+
+    return (token += Date.now());
+  },
+
+  createUserToken: async (userId) => {
+    try {
+      const token = utils.genToken();
+
+      const { insertId: tokenId } = await runQuery(queries.insertUserToken(), [
+        token,
+      ]);
+
+      const { insertId: connection } = await runQuery(
+        queries.insertUserTokenRelation(),
+        [userId, tokenId]
+      );
+
+      return { userId, value: token, tokenId, connection };
+    } catch (err) {
+      console.log("error creating user token", err);
+      return null;
+    }
+  },
 };
+
+module.exports = utils;

@@ -1,23 +1,13 @@
 const express = require("express");
-const asyncMySQL = require("../mysql/connection");
-const {
-  getUserCreds,
-  insertUserToken,
-  insertUserTokenConnection,
-  createUser,
-  createCompany,
-  connectUserCompany,
-  getUserCompany,
-  update,
-  select,
-} = require("../mysql/query");
+const { getUserCompany, update, select } = require("../mysql/query");
 
-const { patchUserToken } = require("../utils/account");
+const utils = require("../utils/account");
+const compUtils = require("../utils/company");
+const tokenUtils = require("../utils/tokens");
 
 const router = express.Router();
 const sha256 = require("sha256");
 
-const { addToken } = require("../middleware/tokens");
 const { genToken } = require("../utils");
 
 const {
@@ -29,11 +19,9 @@ const {
 const { sendEmail } = require("../utils/sendInBlue");
 
 const { forgotPassword } = require("../emails/forgot-password");
-
-router.put("/logout", async function (req, res) {
-  await asyncMySQL();
-  res.send({ status: 1 });
-});
+const {
+  GetExtendedContactDetailsStatisticsUnsubscriptionsUserUnsubscription,
+} = require("sib-api-v3-sdk");
 
 router.put("/login", async function (req, res) {
   const { email, password } = req.body;
@@ -43,26 +31,22 @@ router.put("/login", async function (req, res) {
     return;
   }
 
-  const [user] = await runQuery(getUserCreds(["password", "id"], "email"), [
-    email,
-  ]);
+  const userId = await utils.validateUserLogin(email, password);
 
-  const shaPass = sha256(`${process.env.SALT}${password}`);
-  if (!user || shaPass !== user.password) {
-    //Add some sort of check here to catch brute force
+  if (!userId) {
     res.send({ status: 2 });
     return;
   }
 
-  const token = await patchUserToken(email, user.id);
+  const token = await utils.patchUserToken(email, userId);
   if (!token) {
     res.status(500).send({ status: 0 });
     return;
   }
 
-  const [company] = await runQuery(getUserCompany(), [user.id]);
+  const [company] = await runQuery(getUserCompany(), [userId]);
   if (!company) {
-    console.log("unable to get user company on log in, user id: ", user.id);
+    console.log("unable to get user company on log in, user id: ", userId);
     res.status(500).send({ status: 0 });
     return;
   }
@@ -76,95 +60,45 @@ router.put("/login", async function (req, res) {
 });
 
 router.put("/register", async function (req, res) {
-  const {
-    email,
-    password,
-    company,
-    companyStreet,
-    companyCity,
-    companyCounty,
-    companyPostcode,
-    companyCountry,
-    pricePlan,
-  } = req.body.data;
-
-  if (
-    !email ||
-    !password ||
-    !company ||
-    !companyStreet ||
-    !companyCity ||
-    !companyCounty ||
-    !companyPostcode ||
-    !companyCountry ||
-    typeof pricePlan !== "number"
-  ) {
-    res.send({ status: 0, error: "Invalid registration" });
+  const account = await utils.validateRegistrationData(req.body.data);
+  if (!account) {
+    res.status(400).send({ status: 0 });
+    return;
   }
 
-  const userRes = await runQuery(createUser(), [
-    email,
-    sha256(`${process.env.SALT}${password}`),
-  ]);
-
-  if (userRes === "ER_DUP_ENTRY") {
+  const user = await utils.createUser(account);
+  if (user === "ER_DUP_ENTRY") {
     res.send({ status: 2 });
     return;
   }
-
-  const { insertId: userId } = userRes;
-
-  const { insertId: companyId } = await runQuery(createCompany(), [
-    company,
-    companyStreet,
-    companyCity,
-    companyCounty,
-    companyPostcode,
-    companyCountry,
-  ]);
-
-  if (!userId || !companyId) {
-    console.log("failed to insert user or company on registration");
-    res.status(500).send({ status: 0 });
+  if (!user) {
+    res.status(500).send({ status: 3 });
     return;
   }
 
-  const userCompRes = await runQuery(connectUserCompany(), [userId, companyId]);
-
-  if (!userCompRes) {
-    //We don't need to destruct anything out of this, so just make sure we were success
-    console.log("failed to connect user to company on registration");
-    res.status(500).send({ status: 0 });
+  const company = await compUtils.registerUserCompany(account, user.insertId);
+  if (!company) {
+    res.status(500).send({ status: 3 });
     return;
   }
 
-  const token = genToken();
-
-  const { insertId: tokenId } = await runQuery(insertUserToken(), [token]);
-
-  const { insertId: connection } = await runQuery(insertUserTokenConnection(), [
-    userId,
-    tokenId,
-  ]);
-
-  addToken(email, {
-    userId,
-    token,
-    tokenId,
-    connection,
-  });
+  const token = await tokenUtils.createUserToken(user.insertId);
+  if (!token) {
+    res.status(500).send({ status: 3 });
+    return;
+  }
 
   res.send({
     status: 1,
     data: {
-      user: { email, token, authenticated: true },
+      user: { email: account.email, token: token.value, authenticated: true },
       company: {
-        name: company,
-        street: companyStreet,
-        city: companyCity,
-        county: companyCounty,
-        postcode: companyPostcode,
-        country: companyCountry,
+        name: account.company,
+        street: account.companyStreet,
+        city: account.companyCity,
+        county: account.companyCounty,
+        postcode: account.companyPostcode,
+        country: account.companyCountry,
       },
     },
   });
