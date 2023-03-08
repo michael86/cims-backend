@@ -1,5 +1,5 @@
 const { select } = require("../../mysql/query");
-const { genToken } = require("../../utils");
+const { genToken } = require("../../utils/tokens");
 const { runQuery, updateToken } = require("../../utils/sql");
 
 const authenticatedUsers = {};

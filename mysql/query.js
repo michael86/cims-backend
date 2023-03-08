@@ -54,6 +54,9 @@ const queries = {
     return `INSERT INTO user_token (user, token) VALUES (?, ?);`;
   },
 
+  patchUserToken: () => {
+    return `UPDATE tokens SET token = ? WHERE id = ?`;
+  },
   initCache: () => {
     return `SELECT id, email FROM users`;
   },

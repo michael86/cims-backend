@@ -1,5 +1,5 @@
-const asyncMySQL = require("../mysql/connection");
-const { update, insert } = require("../mysql/query");
+const asyncMySQL = require("../../mysql/connection");
+const { update, insert } = require("../../mysql/query");
 
 module.exports.runQuery = async (query, data) => {
   try {

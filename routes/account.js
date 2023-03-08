@@ -10,24 +10,28 @@ const {
   getUserCompany,
   update,
   select,
-  insert,
 } = require("../mysql/query");
+
+const { patchUserToken } = require("../utils/account");
 
 const router = express.Router();
 const sha256 = require("sha256");
-const { addToken, getTokenCreds } = require("../middleware/tokens");
+
+const { addToken } = require("../middleware/tokens");
 const { genToken } = require("../utils");
+
 const {
   runQuery,
   createUserResetToken,
   updateUserResetToken,
 } = require("../utils/sql");
+
 const { sendEmail } = require("../utils/sendInBlue");
+
 const { forgotPassword } = require("../emails/forgot-password");
 
 router.put("/logout", async function (req, res) {
   await asyncMySQL();
-
   res.send({ status: 1 });
 });
 
@@ -39,57 +43,36 @@ router.put("/login", async function (req, res) {
     return;
   }
 
-  try {
-    //Get rest of users details via joining
-    const [user] = await runQuery(getUserCreds(["password", "id"], "email"), [
-      email,
-    ]);
+  const [user] = await runQuery(getUserCreds(["password", "id"], "email"), [
+    email,
+  ]);
 
-    const shaPass = sha256(`${process.env.SALT}${password}`);
-
-    if (!user || shaPass !== user.password) {
-      //Add some sort of check here to catch brute force
-      res.send({ status: 2 });
-      return;
-    }
-
-    const token = genToken();
-
-    const { tokenId } = getTokenCreds(email);
-
-    const result = await runQuery(
-      update("tokens", [["token", `'${token}'`]], ["id", tokenId])
-    );
-
-    if (!result) {
-      console.log("error logging user in");
-      res.status(500).send();
-    }
-
-    const [company] = await runQuery(getUserCompany(), [user.id]);
-
-    if (!company) {
-      console.log("unable to get user company on log in, user id: ", user.id);
-      res.status(500).send({ status: 0 });
-      return;
-    }
-    console.log("rerm");
-    addToken(email, {
-      userId: user.id,
-      token,
-      tokenId: tokenId,
-    });
-
-    res.send({
-      status: 1,
-      token,
-      email,
-      company,
-    });
-  } catch (error) {
-    console.log("log in route error: ", error);
-    res.send({ status: -1, error: "Login failed" });
+  const shaPass = sha256(`${process.env.SALT}${password}`);
+  if (!user || shaPass !== user.password) {
+    //Add some sort of check here to catch brute force
+    res.send({ status: 2 });
+    return;
   }
+
+  const token = await patchUserToken(email, user.id);
+  if (!token) {
+    res.status(500).send({ status: 0 });
+    return;
+  }
+
+  const [company] = await runQuery(getUserCompany(), [user.id]);
+  if (!company) {
+    console.log("unable to get user company on log in, user id: ", user.id);
+    res.status(500).send({ status: 0 });
+    return;
+  }
+
+  res.send({
+    status: 1,
+    token,
+    email,
+    company,
+  });
 });
 
 router.put("/register", async function (req, res) {
