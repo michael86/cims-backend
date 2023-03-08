@@ -28,7 +28,7 @@ const utils = {
         [userId, tokenId]
       );
 
-      return { userId, value: token, tokenId, connection };
+      return { value: token, id: tokenId, connection };
     } catch (err) {
       console.log("error creating user token", err);
       return null;

@@ -22,6 +22,7 @@ const { forgotPassword } = require("../emails/forgot-password");
 const {
   GetExtendedContactDetailsStatisticsUnsubscriptionsUserUnsubscription,
 } = require("sib-api-v3-sdk");
+const { addToken } = require("../middleware/tokens");
 
 router.put("/login", async function (req, res) {
   const { email, password } = req.body;
@@ -87,6 +88,12 @@ router.put("/register", async function (req, res) {
     res.status(500).send({ status: 3 });
     return;
   }
+
+  addToken(account.email, {
+    userId: user.insertId,
+    token: token.value,
+    tokenId: token.id,
+  });
 
   res.send({
     status: 1,
