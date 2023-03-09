@@ -35,11 +35,7 @@ module.exports.validateToken = async (req, res, next) => {
       req.headers.email = user;
       authenticatedUsers[user].token = newToken;
 
-      const updateRes = await updateToken(
-        "tokens",
-        [["token", `'${newToken}'`]],
-        ["id", tokenId]
-      );
+      const updateRes = await updateToken("tokens", [["token", `'${newToken}'`]], ["id", tokenId]);
 
       if (!updateRes) {
         console.log("error updating user token in middleware", newToken);
@@ -57,24 +53,18 @@ module.exports.validateToken = async (req, res, next) => {
 };
 
 //This should only ever be called if we're 1000000000%!!!!! certain that this user is genuine
-module.exports.addToken = (email, payload) =>
-  (authenticatedUsers[email] = { ...payload });
+module.exports.addToken = (email, payload) => (authenticatedUsers[email] = { ...payload });
 
 module.exports.initTokenCache = async () => {
   await runQuery(select("users", ["email", "id"])).then(async (res) => {
     for (const user of res) {
       const { id: userId, email } = user;
 
-      const [connection] = await runQuery(
-        select("user_token", ["token", "id"], "user"),
-        [userId]
-      );
+      const [connection] = await runQuery(select("user_token", ["token", "id"], "user"), [userId]);
 
       const { token: tokenId, id: connectionId } = connection;
 
-      const [userToken] = await runQuery(select("tokens", ["token"], "id"), [
-        tokenId,
-      ]);
+      const [userToken] = await runQuery(select("tokens", ["token"], "id"), [tokenId]);
 
       const { token } = userToken;
 
@@ -87,4 +77,9 @@ module.exports.initTokenCache = async () => {
   });
 };
 
-module.exports.getTokenCreds = (email) => authenticatedUsers[email];
+module.exports.getTokenCreds = (email, token) =>
+  token
+    ? authenticatedUsers[email].token === token
+      ? authenticatedUsers[email]
+      : null
+    : authenticatedUsers[email];

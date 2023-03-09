@@ -38,6 +38,42 @@ const utils = {
       return;
     }
   },
+
+  deleteUserToken: async ({ tokenId }, res) => {
+    try {
+      const result = await runQuery(queries.patchUserToken(), [null, tokenId]);
+
+      if (!result) {
+        res.status(500).send({ status: 0 });
+        return;
+      }
+
+      return result;
+    } catch (err) {
+      console.log(`error updating user token ${tokenId} \n ${err}`);
+    }
+  },
+
+  createResetToken: async (user, res) => {
+    try {
+      const token = utils.genToken(50, false);
+
+      const [tokenId] = await runQuery(queries.getResetRelation(), [user.id]);
+
+      const created = tokenId
+        ? await updateUserResetToken(token, relation)
+        : await createUserResetToken(token, user);
+
+      if (!created) {
+        res.status(500).send({ status: 0 });
+        return;
+      }
+    } catch (err) {
+      console.log(`error creating user reset token \n user: ${user} \n error: ${err}`);
+      res.status(500).send({ status: 0 });
+      return;
+    }
+  },
 };
 
 module.exports = utils;

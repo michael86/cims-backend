@@ -10,7 +10,7 @@ const { runQuery, createUserResetToken, updateUserResetToken } = require("../uti
 
 const { sendEmail } = require("../utils/sendInBlue");
 const { forgotPassword } = require("../emails/forgot-password");
-const { addToken } = require("../middleware/tokens");
+const { addToken, getTokenCreds } = require("../middleware/tokens");
 
 router.put("/login", async function (req, res) {
   const { email, password } = req.body;
@@ -76,20 +76,17 @@ router.put("/register", async function (req, res) {
 
 router.delete("/logout", async function (req, res) {
   const { token } = req.headers;
+  const { email } = req.body;
 
-  if (!token) {
+  if (!token || !email) {
     res.status(400).send({ status: 0 });
     return;
   }
 
-  const result = await runQuery(update("tokens", [["token", "null"]], ["token", `'${token}'`]));
+  const result = await tokenUtils.deleteUserToken(getTokenCreds(email, token), res);
+  if (!result) return;
 
-  if (!result) {
-    res.status(500).send();
-    return;
-  }
-
-  res.send({ data: "yeet" });
+  res.send({ status: 1 });
 });
 
 router.put("/forgot-password", async function (req, res) {
@@ -100,26 +97,11 @@ router.put("/forgot-password", async function (req, res) {
     return;
   }
 
-  const [user] = await runQuery(select("users", ["id", "email"], "email"), [email]);
+  const user = await utils.getUserDetails(["id", "email"], ["email", email], res);
+  if (!user) return;
 
-  if (!user) {
-    //No email was found, however set status to 1 still as we don't want the user knowing if it's a valid email
-    res.status({ status: 1 });
-    return;
-  }
-
-  const token = genToken(50, false);
-
-  const relation = await runQuery(select("user_reset", ["token_id"], "user_id"), [user.id]);
-
-  const created = relation.length
-    ? await updateUserResetToken(token, relation)
-    : await createUserResetToken(token, user);
-
-  if (!created) {
-    res.status(500).send({ status: 0 });
-    return;
-  }
+  const token = await tokenUtils.createResetToken(user, res);
+  if (!token) return;
 
   const params = {
     route: `${process.env.ROOT}/reset-password?token=${token}&email=${email}`,

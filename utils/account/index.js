@@ -87,6 +87,28 @@ const utils = {
       return;
     }
   },
+
+  //any time we fail here, we still send 1 as a status as we don't want a malicious user knowing if request was partially successful.
+  getUserDetails: async (targets, identifiers, res) => {
+    try {
+      const [user] = await runQuery(queries.selectUserCreds([...targets], identifiers[0]), [
+        identifiers[1],
+      ]);
+
+      if (!user) {
+        res.status({ status: 1 });
+        return;
+      }
+
+      return { ...user };
+    } catch (err) {
+      console.log(
+        `error getting user details \n targets: ${targets} \n identifiers: ${identifiers} \n error: ${err}`
+      );
+      res.status({ status: 1 });
+      return;
+    }
+  },
 };
 
 module.exports = utils;

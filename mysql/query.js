@@ -24,7 +24,7 @@ const queries = {
                          WHERE user_company.user_id = ?`;
   },
 
-  getUserCreds: (creds, like) => {
+  selectUserCreds: (creds, like) => {
     return `SELECT ${creds.join(", ")} FROM users WHERE 
             ${like} LIKE ?;`;
   },
@@ -112,6 +112,9 @@ const queries = {
   },
   createHistoryLocRelation: () => {
     return `INSERT INTO history_locations (history_id, location_id) VALUES (?, ?)`;
+  },
+  getResetRelation: () => {
+    return `SELECT token_id AS value FROM user_reset WHERE user_id = ?`;
   },
 };
 
