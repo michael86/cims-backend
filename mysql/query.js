@@ -16,7 +16,7 @@ const queries = {
             VALUES (?, ?);`;
   },
 
-  getUserCompany: () => {
+  selectUserCompany: () => {
     return `SELECT user_company.company_id,
                    companies.name, companies.address, companies.city, companies.county, companies.postcode, companies.country
                      FROM user_company
@@ -68,19 +68,14 @@ const queries = {
         typeof selector === "string"
           ? `${selector} = ?`
           : selector
-              .map(
-                (select, index) =>
-                  `${select} = ? ${index === selector.length - 1 ? "" : "AND"}`
-              )
+              .map((select, index) => `${select} = ? ${index === selector.length - 1 ? "" : "AND"}`)
               .join(" ")
       }`
     }`;
   },
 
   insert: (location, columns) => {
-    return `INSERT INTO ${location} (${columns.join(
-      ", "
-    )}) VALUES (${columns.map(() => "?")});`;
+    return `INSERT INTO ${location} (${columns.join(", ")}) VALUES (${columns.map(() => "?")});`;
   },
 
   //This makes me cry
@@ -99,9 +94,7 @@ const queries = {
 
   patchItem: (items, selectors) => {
     return `UPDATE stock SET ${items
-      .map(
-        (item, index) => `${item} = ?${index !== items.length - 1 ? "," : ""} `
-      )
+      .map((item, index) => `${item} = ?${index !== items.length - 1 ? "," : ""} `)
       .join("")} 
             WHERE  ${selectors.map((selector) => `${selector} = ?`)}`;
   },

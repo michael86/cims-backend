@@ -15,23 +15,27 @@ const utils = {
     return (token += Date.now());
   },
 
-  createUserToken: async (userId) => {
+  createUserToken: async (userId, res) => {
     try {
       const token = utils.genToken();
 
-      const { insertId: tokenId } = await runQuery(queries.insertUserToken(), [
-        token,
+      const { insertId: tokenId } = await runQuery(queries.insertUserToken(), [token]);
+
+      const { insertId: connection } = await runQuery(queries.insertUserTokenRelation(), [
+        userId,
+        tokenId,
       ]);
 
-      const { insertId: connection } = await runQuery(
-        queries.insertUserTokenRelation(),
-        [userId, tokenId]
-      );
+      if (!tokenId || !connection) {
+        res.status(500).send({ status: 3 });
+        return;
+      }
 
       return { value: token, id: tokenId, connection };
     } catch (err) {
       console.log("error creating user token", err);
-      return null;
+      res.status(500).send({ status: 3 });
+      return;
     }
   },
 };

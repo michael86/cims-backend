@@ -3,41 +3,51 @@ const { genToken } = require("../tokens");
 const { getTokenCreds, addToken } = require("../../middleware/tokens");
 const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
-const compUtils = require("../company");
 
 const utils = {
-  validateUserLogin: async (email, password) => {
-    const [user] = await runQuery(
-      queries.getUserCreds(["password", "id"], "email"),
-      [email]
-    );
+  validateUserLogin: async (email, password, res) => {
+    try {
+      const [user] = await runQuery(queries.getUserCreds(["password", "id"], "email"), [email]);
 
-    const shaPass = sha256(`${process.env.SALT}${password}`);
-    return user && shaPass === user.password ? user.id : null;
+      if (user && sha256(`${process.env.SALT}${password}`) === user.password) return user.id;
+
+      res.send({ status: 2 });
+      return;
+    } catch (err) {
+      console.log(`error logging user (${email}) in: `, err);
+      res.status(500).send({ status: 2 });
+      return;
+    }
   },
 
-  patchUserToken: async (email, id) => {
+  patchUserToken: async (email, id, res) => {
     try {
       const token = genToken();
       const { tokenId } = getTokenCreds(email);
       const result = await runQuery(queries.patchUserToken(), [token, tokenId]);
 
-      result.affectedRows &&
-        addToken(email, {
-          userId: id,
-          token,
-          tokenId,
-        });
+      if (!result || !result.affectedRows) {
+        res.status(500).send({ status: 0 });
+        return;
+      }
 
-      return result.affectedRows ? token : null;
+      addToken(email, {
+        userId: id,
+        token,
+        tokenId,
+      });
+
+      return token;
     } catch (err) {
-      console.log(err);
+      console.log(`error patching user (${id}) token: `, err);
+      res.status(500).send({ status: 0 });
       return err;
     }
   },
 
-  validateRegistrationData: (data) => {
-    return data.email &&
+  validateRegistrationData: (data, res) => {
+    if (
+      data.email &&
       data.password &&
       data.company &&
       data.companyStreet &&
@@ -46,17 +56,36 @@ const utils = {
       data.companyPostcode &&
       data.companyCountry &&
       typeof data.pricePlan === "number"
-      ? { ...data }
-      : null;
+    )
+      return { ...data };
+
+    res.status(400).send({ status: 0 });
+    return;
   },
 
-  createUser: async (data) => {
-    const userRes = await runQuery(queries.insertUser(), [
-      data.email,
-      sha256(`${process.env.SALT}${data.password}`),
-    ]);
+  createUser: async (data, res) => {
+    try {
+      const userRes = await runQuery(queries.insertUser(), [
+        data.email,
+        sha256(`${process.env.SALT}${data.password}`),
+      ]);
 
-    return userRes;
+      if (userRes === "ER_DUP_ENTRY") {
+        res.send({ status: 2 });
+        return;
+      }
+
+      if (!userRes) {
+        res.status(500).send({ status: 3 });
+        return;
+      }
+
+      return userRes;
+    } catch (err) {
+      console.log("error creating user: ", err);
+      res.status(500).send({ status: 3 });
+      return;
+    }
   },
 };
 

@@ -1,27 +1,15 @@
 const express = require("express");
-const { getUserCompany, update, select } = require("../mysql/query");
-
+const { update, select } = require("../mysql/query");
 const utils = require("../utils/account");
 const compUtils = require("../utils/company");
 const tokenUtils = require("../utils/tokens");
-
 const router = express.Router();
 const sha256 = require("sha256");
-
 const { genToken } = require("../utils");
-
-const {
-  runQuery,
-  createUserResetToken,
-  updateUserResetToken,
-} = require("../utils/sql");
+const { runQuery, createUserResetToken, updateUserResetToken } = require("../utils/sql");
 
 const { sendEmail } = require("../utils/sendInBlue");
-
 const { forgotPassword } = require("../emails/forgot-password");
-const {
-  GetExtendedContactDetailsStatisticsUnsubscriptionsUserUnsubscription,
-} = require("sib-api-v3-sdk");
 const { addToken } = require("../middleware/tokens");
 
 router.put("/login", async function (req, res) {
@@ -32,25 +20,14 @@ router.put("/login", async function (req, res) {
     return;
   }
 
-  const userId = await utils.validateUserLogin(email, password);
+  const userId = await utils.validateUserLogin(email, password, res);
+  if (!userId) return;
 
-  if (!userId) {
-    res.send({ status: 2 });
-    return;
-  }
+  const company = await compUtils.getUserCompany(userId);
+  if (!company) return;
 
-  const token = await utils.patchUserToken(email, userId);
-  if (!token) {
-    res.status(500).send({ status: 0 });
-    return;
-  }
-
-  const [company] = await runQuery(getUserCompany(), [userId]);
-  if (!company) {
-    console.log("unable to get user company on log in, user id: ", userId);
-    res.status(500).send({ status: 0 });
-    return;
-  }
+  const token = await utils.patchUserToken(email, userId, res);
+  if (!token) return;
 
   res.send({
     status: 1,
@@ -61,33 +38,19 @@ router.put("/login", async function (req, res) {
 });
 
 router.put("/register", async function (req, res) {
-  const account = await utils.validateRegistrationData(req.body.data);
-  if (!account) {
-    res.status(400).send({ status: 0 });
-    return;
-  }
+  const account = await utils.validateRegistrationData(req.body.data, res);
+  if (!account) return;
 
-  const user = await utils.createUser(account);
-  if (user === "ER_DUP_ENTRY") {
-    res.send({ status: 2 });
-    return;
-  }
-  if (!user) {
-    res.status(500).send({ status: 3 });
-    return;
-  }
+  const user = await utils.createUser(account, res);
+  if (!user) return;
 
-  const company = await compUtils.registerUserCompany(account, user.insertId);
+  const company = await compUtils.registerUserCompany(account, user.insertId, res);
   if (!company) {
-    res.status(500).send({ status: 3 });
     return;
   }
 
-  const token = await tokenUtils.createUserToken(user.insertId);
-  if (!token) {
-    res.status(500).send({ status: 3 });
-    return;
-  }
+  const token = await tokenUtils.createUserToken(user.insertId, res);
+  if (!token) return;
 
   addToken(account.email, {
     userId: user.insertId,
@@ -119,9 +82,7 @@ router.delete("/logout", async function (req, res) {
     return;
   }
 
-  const result = await runQuery(
-    update("tokens", [["token", "null"]], ["token", `'${token}'`])
-  );
+  const result = await runQuery(update("tokens", [["token", "null"]], ["token", `'${token}'`]));
 
   if (!result) {
     res.status(500).send();
@@ -139,9 +100,7 @@ router.put("/forgot-password", async function (req, res) {
     return;
   }
 
-  const [user] = await runQuery(select("users", ["id", "email"], "email"), [
-    email,
-  ]);
+  const [user] = await runQuery(select("users", ["id", "email"], "email"), [email]);
 
   if (!user) {
     //No email was found, however set status to 1 still as we don't want the user knowing if it's a valid email
@@ -151,10 +110,7 @@ router.put("/forgot-password", async function (req, res) {
 
   const token = genToken(50, false);
 
-  const relation = await runQuery(
-    select("user_reset", ["token_id"], "user_id"),
-    [user.id]
-  );
+  const relation = await runQuery(select("user_reset", ["token_id"], "user_id"), [user.id]);
 
   const created = relation.length
     ? await updateUserResetToken(token, relation)
@@ -183,54 +139,43 @@ router.put("/forgot-password", async function (req, res) {
   res.send({ status: 1 });
 });
 
-router.patch(
-  "/reset-password/:token/:email/:password",
-  async function (req, res) {
-    const { token, email, password } = req.params;
+router.patch("/reset-password/:token/:email/:password", async function (req, res) {
+  const { token, email, password } = req.params;
 
-    if (!token || !email) {
-      res.status(400).send({ status: 0 });
-      return;
-    }
-
-    const [tokenRes] = await runQuery(select("reset_tokens", ["id"], "token"), [
-      token,
-    ]);
-
-    if (!tokenRes) {
-      console.log("token not found, forbidden");
-      res.status(403).send({ status: 0 });
-      return;
-    }
-
-    const [userRes] = await runQuery(select("users", ["id"], "email"), [email]);
-
-    const [relationRes] = await runQuery(
-      select("user_reset", ["user_id"], "token_id"),
-      [tokenRes.id]
-    );
-
-    //Something didn't match up or the token received didn't match the email issued to. So stop here.
-    if (
-      !tokenRes ||
-      !userRes ||
-      !relationRes ||
-      relationRes?.user_id !== userRes.id
-    ) {
-      res.send({ status: 0 });
-      return;
-    }
-
-    const updateRes = await runQuery(
-      update("users", [["password"]], ["email"]),
-      [sha256(`${process.env.SALT}${password}`), email]
-    );
-
-    if (!updateRes) {
-      res.status(500).send({ status: 0 });
-    }
-    res.send({ status: 1 });
+  if (!token || !email) {
+    res.status(400).send({ status: 0 });
+    return;
   }
-);
+
+  const [tokenRes] = await runQuery(select("reset_tokens", ["id"], "token"), [token]);
+
+  if (!tokenRes) {
+    console.log("token not found, forbidden");
+    res.status(403).send({ status: 0 });
+    return;
+  }
+
+  const [userRes] = await runQuery(select("users", ["id"], "email"), [email]);
+
+  const [relationRes] = await runQuery(select("user_reset", ["user_id"], "token_id"), [
+    tokenRes.id,
+  ]);
+
+  //Something didn't match up or the token received didn't match the email issued to. So stop here.
+  if (!tokenRes || !userRes || !relationRes || relationRes?.user_id !== userRes.id) {
+    res.send({ status: 0 });
+    return;
+  }
+
+  const updateRes = await runQuery(update("users", [["password"]], ["email"]), [
+    sha256(`${process.env.SALT}${password}`),
+    email,
+  ]);
+
+  if (!updateRes) {
+    res.status(500).send({ status: 0 });
+  }
+  res.send({ status: 1 });
+});
 
 module.exports = router;
