@@ -5,11 +5,7 @@ const compUtils = require("../utils/company");
 const tokenUtils = require("../utils/tokens");
 const router = express.Router();
 const sha256 = require("sha256");
-const { genToken } = require("../utils");
-const { runQuery, createUserResetToken, updateUserResetToken } = require("../utils/sql");
-
-const { sendEmail } = require("../utils/sendInBlue");
-const { forgotPassword } = require("../emails/forgot-password");
+const { runQuery } = require("../utils/sql");
 const { addToken, getTokenCreds } = require("../middleware/tokens");
 
 router.put("/login", async function (req, res) {
@@ -100,23 +96,8 @@ router.put("/forgot-password", async function (req, res) {
   const user = await utils.getUserDetails(["id", "email"], ["email", email], res);
   if (!user) return;
 
-  const token = await tokenUtils.createResetToken(user, res);
+  const token = await tokenUtils.updateResetToken(user, res);
   if (!token) return;
-
-  const params = {
-    route: `${process.env.ROOT}/reset-password?token=${token}&email=${email}`,
-  };
-
-  const emailSent = await sendEmail({
-    receivers: [email],
-    subject: "forgotPassword",
-    htmlContent: forgotPassword,
-    params,
-  });
-
-  if (!emailSent) {
-    res.status(500).send({ status: 0 });
-  }
 
   res.send({ status: 1 });
 });

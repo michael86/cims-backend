@@ -54,22 +54,63 @@ const utils = {
     }
   },
 
-  createResetToken: async (user, res) => {
+  createResetToken: async (token, userId) => {
+    try {
+      const tokenRes = await runQuery(queries.insertResetToken(), [token]);
+
+      if (!tokenRes?.affectedRows)
+        throw new Error(`Error inserting reset token ${token} \n res: ${tokenRes}`);
+
+      const relationship = await runQuery(queries.insertResetRelation(), [
+        userId,
+        tokenRes.insertId,
+      ]);
+
+      if (!relationship?.affectedRows)
+        throw new Error(`Error getting relationship ${relationship}`);
+
+      return true;
+    } catch (err) {
+      console.log(
+        `error creating user_reset token \n token: ${token} \n user: ${user} \n error: ${err}`
+      );
+      return;
+    }
+  },
+
+  patchResetToken: async (token, relation) => {
+    try {
+      const tokenRes = await runQuery(queries.patchResetToken(), [token, relation]);
+
+      if (!tokenRes?.affectedRows) throw new Error(`Error patching reset token ${tokenRes}`);
+
+      return true;
+    } catch (err) {
+      console.log(
+        `error patching user_reset token \n token: ${token} \n relation: ${relation} \n error: ${err}`
+      );
+      return;
+    }
+  },
+
+  updateResetToken: async ({ id: userId }, res) => {
     try {
       const token = utils.genToken(50, false);
 
-      const [tokenId] = await runQuery(queries.getResetRelation(), [user.id]);
+      const [tokenId] = await runQuery(queries.selectResetRelation(), [userId]);
 
       const created = tokenId
-        ? await updateUserResetToken(token, relation)
-        : await createUserResetToken(token, user);
+        ? await utils.patchResetToken(token, tokenId.value)
+        : await utils.createResetToken(token, userId);
 
       if (!created) {
         res.status(500).send({ status: 0 });
-        return;
+        throw new Error(`Error creating reset token ${created}`);
       }
+
+      return token;
     } catch (err) {
-      console.log(`error creating user reset token \n user: ${user} \n error: ${err}`);
+      console.log(`error creating user reset token \n user: ${userId} \n error: ${err}`);
       res.status(500).send({ status: 0 });
       return;
     }

@@ -113,8 +113,17 @@ const queries = {
   createHistoryLocRelation: () => {
     return `INSERT INTO history_locations (history_id, location_id) VALUES (?, ?)`;
   },
-  getResetRelation: () => {
+  selectResetRelation: () => {
     return `SELECT token_id AS value FROM user_reset WHERE user_id = ?`;
+  },
+  insertResetToken: () => {
+    return `INSERT INTO reset_tokens (token) VALUES (?)`;
+  },
+  patchResetToken: () => {
+    return `UPDATE reset_tokens SET token = ? WHERE id = ?`;
+  },
+  insertResetRelation: () => {
+    return `INSERT INTO user_reset (user_id, token_id) VALUES (?, ?)`;
   },
 };
 

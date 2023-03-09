@@ -19,9 +19,7 @@ module.exports.runQuery = async (query, data) => {
 
 module.exports.updateToken = async (location, values, target) => {
   try {
-    const { affectedRows } = await this.runQuery(
-      update(location, values, target)
-    );
+    const { affectedRows } = await this.runQuery(update(location, values, target));
 
     if (!affectedRows) {
       return;
@@ -32,26 +30,4 @@ module.exports.updateToken = async (location, values, target) => {
     console.error("auth error", err);
     res.status({ status: 500 }).send({ status: 0 });
   }
-};
-
-module.exports.createUserResetToken = async (token, user) => {
-  const tokenRes = await this.runQuery(insert("reset_tokens", ["token"]), [
-    token,
-  ]);
-
-  const relationship = await this.runQuery(
-    insert("user_reset", ["user_id", "token_id"]),
-    [user.id, tokenRes.insertId]
-  );
-
-  return relationship.insertId ? true : false;
-};
-
-module.exports.updateUserResetToken = async (token, [relation]) => {
-  const tokenRes = await this.runQuery(
-    update("reset_tokens", [["token"]], ["id"]),
-    [token, relation.token_id]
-  );
-
-  return tokenRes.affectedRows ? true : false;
 };
