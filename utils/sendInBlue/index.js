@@ -50,6 +50,8 @@ const utils = {
         res.send({ status: 1 });
         throw new Error("failed to send email");
       }
+
+      return true;
     } catch (err) {
       console.log(`Error sending reset password \n token: ${token} \n email: ${email} \n ${err}`);
       return;

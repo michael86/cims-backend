@@ -125,6 +125,30 @@ const queries = {
   insertResetRelation: () => {
     return `INSERT INTO user_reset (user_id, token_id) VALUES (?, ?)`;
   },
+  selectResetTokenId: () => {
+    return `SELECT id FROM reset_tokens WHERE token = ?`;
+  },
+  selectResetEmail: () => {
+    return `SELECT 
+              user_reset.user_id AS id, 
+              users.email
+                FROM user_reset 
+                  JOIN users ON user_reset.user_id = users.id
+                    WHERE token_id = ?`;
+  },
+
+  patchUser: (target) => {
+    return `UPDATE users SET ${target} = ? WHERE id = ?`;
+  },
 };
 
 module.exports = queries;
+
+// SELECT
+// 	  invoice_company.contact, invoice_company.name, invoice_company.address, invoice_company.city, invoice_company.state, invoice_company.country, invoice_company.postcode,
+//       invoice_specific.specific_id,
+//       invoice_specifics.billing_date, invoice_specifics.due_date, invoice_specifics.order_number, invoice_specifics.footer
+//       FROM invoice_company
+//       JOIN invoice_specific ON  invoice_specific.invoice_id = ?
+//       JOIN invoice_specifics ON invoice_specifics.id = invoice_specific.specific_id
+//       WHERE invoice_company.id = ?

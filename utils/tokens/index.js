@@ -115,6 +115,22 @@ const utils = {
       return;
     }
   },
+
+  getResetTokenId: async (token, res) => {
+    try {
+      const [tokenRes] = await runQuery(queries.selectResetTokenId(), [token]);
+
+      if (!tokenRes) {
+        res.status(403).send({ status: 0 });
+        return;
+      }
+
+      return tokenRes.id;
+    } catch (err) {
+      console.log(`Error getting reset_token id \n token: ${token} \n error: ${err}`);
+      return;
+    }
+  },
 };
 
 module.exports = utils;

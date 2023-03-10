@@ -1,12 +1,12 @@
 const express = require("express");
-const { update, select } = require("../mysql/query");
+const router = express.Router();
+
+const { addToken, getTokenCreds } = require("../middleware/tokens");
+
 const utils = require("../utils/account");
 const compUtils = require("../utils/company");
 const tokenUtils = require("../utils/tokens");
-const router = express.Router();
-const sha256 = require("sha256");
-const { runQuery } = require("../utils/sql");
-const { addToken, getTokenCreds } = require("../middleware/tokens");
+const { sendResetPassEmail } = require("../utils/sendInBlue");
 
 router.put("/login", async function (req, res) {
   const { email, password } = req.body;
@@ -99,6 +99,9 @@ router.put("/forgot-password", async function (req, res) {
   const token = await tokenUtils.updateResetToken(user, res);
   if (!token) return;
 
+  const sent = await sendResetPassEmail(token, email, res);
+  if (!sent) return;
+
   res.send({ status: 1 });
 });
 
@@ -110,34 +113,15 @@ router.patch("/reset-password/:token/:email/:password", async function (req, res
     return;
   }
 
-  const [tokenRes] = await runQuery(select("reset_tokens", ["id"], "token"), [token]);
+  const resetId = await tokenUtils.getResetTokenId(token, res);
+  if (!resetId) return;
 
-  if (!tokenRes) {
-    console.log("token not found, forbidden");
-    res.status(403).send({ status: 0 });
-    return;
-  }
+  const userId = await utils.validateUserResetToken(email, resetId, res);
+  if (!userId) return;
 
-  const [userRes] = await runQuery(select("users", ["id"], "email"), [email]);
+  const updated = await utils.updateUserPassword(userId, password, res);
+  if (!updated) return;
 
-  const [relationRes] = await runQuery(select("user_reset", ["user_id"], "token_id"), [
-    tokenRes.id,
-  ]);
-
-  //Something didn't match up or the token received didn't match the email issued to. So stop here.
-  if (!tokenRes || !userRes || !relationRes || relationRes?.user_id !== userRes.id) {
-    res.send({ status: 0 });
-    return;
-  }
-
-  const updateRes = await runQuery(update("users", [["password"]], ["email"]), [
-    sha256(`${process.env.SALT}${password}`),
-    email,
-  ]);
-
-  if (!updateRes) {
-    res.status(500).send({ status: 0 });
-  }
   res.send({ status: 1 });
 });
 
