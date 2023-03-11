@@ -4,21 +4,11 @@ const { runQuery } = require("../sql");
 const utils = {
   registerUserCompany: async (data, userId, res) => {
     try {
-      const { insertId } = await runQuery(queries.insertCompany(), [
-        data.company,
-        data.companyStreet,
-        data.companyCity,
-        data.companyCounty,
-        data.companyPostcode,
-        data.companyCountry,
-      ]);
+      const insertId = utils.insertCompany(data);
+      if (!insertId) return;
 
       const relation = await runQuery(queries.insertUserCompanyRelation(), [userId, insertId]);
-
-      if (!insertId || !relation) {
-        res.status(500).send({ status: 3 });
-        return;
-      }
+      if (!relation) throw new Error(`Error creating userCompanyRelation: ${relation}`);
 
       return insertId;
     } catch (err) {
@@ -31,17 +21,36 @@ const utils = {
   getUserCompany: async (id, res) => {
     try {
       const [company] = await runQuery(queries.selectUserCompany(), [id]);
-
-      if (!company) {
-        console.log("unable to get user company on log in, user id: ", id);
-        res.status(500).send({ status: 0 });
-        return;
-      }
+      if (!company) throw new Error(`unable to get user company on log in, user id: ${id}`);
 
       return company;
     } catch (err) {
-      console.log(`error selecting userCompany (${id}): `, err);
+      console.log(`error selecting userCompany: `, err);
       res.status(500).send({ status: 0 });
+      return;
+    }
+  },
+
+  insertCompany: async (data, res, returnToken = false) => {
+    try {
+      const insertId = await runQuery(queries.insertCompany(), [
+        data.company,
+        data.companyStreet,
+        data.companyCity,
+        data.companyCounty,
+        data.companyPostcode,
+        data.companyCountry,
+      ]);
+
+      if (!insertId.affectedRows) throw new Error(`insert Id invalid: ${insertId}`);
+
+      return insertId;
+    } catch (err) {
+      console.log(`Error inserting company \n data: ${data} \n err: ${err}`);
+
+      returnToken
+        ? res.status(500).send({ status: 0, token: res.headers.newToken })
+        : res && res.status(500).send({ status: 0 });
       return;
     }
   },

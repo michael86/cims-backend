@@ -1,4 +1,12 @@
 const queries = {
+  insertInvoiceSpecifics: () => {
+    return `INSERT INTO invoice_specifics (due_date, billing_date, order_number, footer) VALUES (?, ?, ?, ?);`;
+  },
+
+  insertInvoiceItems: () => {
+    return `INSERT INTO invoice_items (sku, description, quantity, price, tax) VALUES (?, ?, ?, ?, ?)`;
+  },
+
   insertUser: () => {
     return `INSERT INTO users 
                 (email, password)
@@ -92,6 +100,10 @@ const queries = {
                 WHERE ${selector[0]} = ${selector[1] ? selector[1] : "?"}`;
   },
 
+  insertStock: () => {
+    return `INSERT INTO stock (sku, description, quantity, price, tax) VALUES (?, ?, ?, ?, ?)`;
+  },
+
   patchItem: (items, selectors) => {
     return `UPDATE stock SET ${items
       .map((item, index) => `${item} = ?${index !== items.length - 1 ? "," : ""} `)
@@ -143,12 +155,3 @@ const queries = {
 };
 
 module.exports = queries;
-
-// SELECT
-// 	  invoice_company.contact, invoice_company.name, invoice_company.address, invoice_company.city, invoice_company.state, invoice_company.country, invoice_company.postcode,
-//       invoice_specific.specific_id,
-//       invoice_specifics.billing_date, invoice_specifics.due_date, invoice_specifics.order_number, invoice_specifics.footer
-//       FROM invoice_company
-//       JOIN invoice_specific ON  invoice_specific.invoice_id = ?
-//       JOIN invoice_specifics ON invoice_specifics.id = invoice_specific.specific_id
-//       WHERE invoice_company.id = ?
