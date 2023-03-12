@@ -51,76 +51,65 @@ const utils = {
     }
   },
 
-  createResetToken: async (token, userId) => {
+  createResetToken: async (token, id) => {
     try {
-      const tokenRes = await runQuery(queries.insertResetToken(), [token]);
+      const tokenRes = await runQuery(queries.tokens.insertResetToken(), [token]);
 
-      if (!tokenRes?.affectedRows)
-        throw new Error(`Error inserting reset token ${token} \n res: ${tokenRes}`);
+      if (!tokenRes?.affectedRows) throw new Error(tokenRes);
 
-      const relationship = await runQuery(queries.insertResetRelation(), [
-        userId,
+      const relationship = await runQuery(queries.tokens.insertResetRelation(), [
+        id,
         tokenRes.insertId,
       ]);
 
-      if (!relationship?.affectedRows)
-        throw new Error(`Error getting relationship ${relationship}`);
+      if (!relationship?.affectedRows) throw new Error(relationship);
 
       return true;
     } catch (err) {
-      console.log(
-        `error creating user_reset token \n token: ${token} \n user: ${user} \n error: ${err}`
-      );
-      return;
+      console.log(`Error createResetToken \n token: ${token} \n id: ${id} \n error: ${err}`);
+      return err;
     }
   },
 
   patchResetToken: async (token, relation) => {
     try {
-      const tokenRes = await runQuery(queries.patchResetToken(), [token, relation]);
+      const tokenRes = await runQuery(queries.tokens.patchResetToken(), [token, relation]);
 
       if (!tokenRes?.affectedRows) throw new Error(`Error patching reset token ${tokenRes}`);
 
       return true;
     } catch (err) {
       console.log(
-        `error patching user_reset token \n token: ${token} \n relation: ${relation} \n error: ${err}`
+        `error patchResetToken \n token: ${token} \n relation: ${relation} \n error: ${err}`
       );
-      return;
+      return err;
     }
   },
 
-  updateResetToken: async ({ id: userId }, res) => {
+  updateResetToken: async ({ id: userId }) => {
     try {
       const token = utils.genToken(50, false);
 
-      const [tokenId] = await runQuery(queries.selectResetRelation(), [userId]);
+      const [tokenId] = await runQuery(queries.tokens.selectResetRelation(), [userId]);
 
       const created = tokenId
         ? await utils.patchResetToken(token, tokenId.value)
         : await utils.createResetToken(token, userId);
 
-      if (!created) {
-        res.status(500).send({ status: 0 });
-        throw new Error(`Error creating reset token ${created}`);
-      }
+      if (!created) throw new Error(created);
 
       return token;
     } catch (err) {
       console.log(`error creating user reset token \n user: ${userId} \n error: ${err}`);
-      res.status(500).send({ status: 0 });
       return;
     }
   },
 
   getResetTokenId: async (token, res) => {
     try {
-      const [tokenRes] = await runQuery(queries.selectResetTokenId(), [token]);
+      const [tokenRes] = await runQuery(queries.tokens.selectResetId(), [token]);
 
-      if (!tokenRes) {
-        res.status(403).send({ status: 0 });
-        return;
-      }
+      if (!tokenRes?.id) throw new Error(tokenRes);
 
       return tokenRes.id;
     } catch (err) {

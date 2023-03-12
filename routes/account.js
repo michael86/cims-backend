@@ -122,16 +122,22 @@ router.put("/forgot-password", async function (req, res) {
     return;
   }
 
-  const user = await utils.getUserDetails(["id", "email"], ["email", email], res);
-  if (!user) return;
+  try {
+    const user = await utils.getUserDetails(["id", "email"], ["email", email]);
+    if (!user) return;
 
-  const token = await tokenUtils.updateResetToken(user, res);
-  if (!token) return;
+    const token = await tokenUtils.updateResetToken(user);
+    if (!token) return;
 
-  const sent = await sendResetPassEmail(token, email, res);
-  if (!sent) return;
+    const sent = await sendResetPassEmail(token, email);
+    if (!sent) return;
 
-  res.send({ status: 1 });
+    res.send({ status: 1 });
+  } catch (err) {
+    console.log(`Error sending forgot pass\n${err}`);
+    //We send a valid response to make a malicious user think an email has been sent.
+    res.send({ status: 1 });
+  }
 });
 
 router.patch("/reset-password/:token/:email/:password", async function (req, res) {
@@ -141,17 +147,28 @@ router.patch("/reset-password/:token/:email/:password", async function (req, res
     res.status(400).send({ status: 0 });
     return;
   }
+  try {
+    const resetId = await tokenUtils.getResetTokenId(token);
+    if (!resetId) throw new Error(resetId);
 
-  const resetId = await tokenUtils.getResetTokenId(token, res);
-  if (!resetId) return;
+    const user = await utils.validateUserResetToken(email, resetId);
 
-  const userId = await utils.validateUserResetToken(email, resetId, res);
-  if (!userId) return;
+    //Failed validation.
+    if (user === 0) {
+      res.send({ status: 0 });
+      return;
+    }
 
-  const updated = await utils.updateUserPassword(userId, password, res);
-  if (!updated) return;
+    if (!user) throw new Error(user);
 
-  res.send({ status: 1 });
+    const updated = await utils.updateUserPassword(user, password);
+    if (!updated) throw new Error(updated);
+
+    res.send({ status: 1 });
+  } catch (err) {
+    console.log(`Error updating forgot password\n${err}`);
+    res.status(500).send();
+  }
 });
 
 module.exports = router;

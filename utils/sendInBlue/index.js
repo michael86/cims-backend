@@ -32,7 +32,7 @@ const utils = {
     }
   },
 
-  sendResetPassEmail: async (token, email, res) => {
+  sendResetPassEmail: async (token, email) => {
     try {
       const params = {
         route: `${process.env.ROOT}/reset-password?token=${token}&email=${email}`,
@@ -45,11 +45,7 @@ const utils = {
         params,
       });
 
-      if (!emailSent) {
-        //Send 1, to make malicious user think email sent
-        res.send({ status: 1 });
-        throw new Error("failed to send email");
-      }
+      if (!emailSent) throw new Error("failed to send email");
 
       return true;
     } catch (err) {
