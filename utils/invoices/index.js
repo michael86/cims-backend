@@ -18,8 +18,7 @@ const utils = {
 
       return result.insertId;
     } catch (err) {
-      console.log(`error in invoice utils
-      ${err}
+      console.log(`${err}\n
       specifics: ${specifics}`);
       return;
     }

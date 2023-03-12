@@ -19,29 +19,26 @@ const utils = {
     try {
       const token = utils.genToken();
 
-      const { insertId: tokenId } = await runQuery(queries.insertUserToken(), [token]);
+      const tokenId = await runQuery(queries.tokens.insert(), [token]);
+      if (!tokenId?.insertId) throw new Error(tokenId);
 
-      const { insertId: connection } = await runQuery(queries.insertUserTokenRelation(), [
+      const connection = await runQuery(queries.tokens.insertRelation(), [
         userId,
-        tokenId,
+        tokenId.insertId,
       ]);
 
-      if (!tokenId || !connection) {
-        res.status(500).send({ status: 3 });
-        return;
-      }
+      if (!connection?.insertId) throw new Error(connection);
 
-      return { value: token, id: tokenId, connection };
+      return { value: token, id: tokenId.insertId, connection: connection.insertId };
     } catch (err) {
-      console.log("error creating user token", err);
-      res.status(500).send({ status: 3 });
+      console.log(err);
       return;
     }
   },
 
   deleteUserToken: async ({ tokenId }, res) => {
     try {
-      const result = await runQuery(queries.patchUserToken(), [null, tokenId]);
+      const result = await runQuery(queries.tokens.patch(), [null, tokenId]);
 
       if (!result) {
         res.status(500).send({ status: 0 });

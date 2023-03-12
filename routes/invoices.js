@@ -34,11 +34,6 @@ router.put("/add", async function (req, res) {
 
     //Begin relationship entries
 
-    const { insertId: userRelationship } = await runQuery(
-      insert("user_invoices", ["user_id", "invoice_id"]),
-      [userId, companyId]
-    );
-
     const { insertId: specificsRelationship } = await runQuery(
       insert("invoice_specific", ["invoice_id", "specific_id"]),
       [companyId, specificsId]

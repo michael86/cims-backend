@@ -2,38 +2,42 @@ const queries = require("../../mysql/query");
 const { runQuery } = require("../sql");
 
 const utils = {
-  registerUserCompany: async (data, userId, res) => {
+  registerUserCompany: async (data, userId) => {
     try {
-      const insertId = utils.insertCompany(data);
-      if (!insertId) return;
+      const company = await utils.insertCompany(data);
+      if (!company?.insertId) throw new Error(insertId);
 
-      const relation = await runQuery(queries.insertUserCompanyRelation(), [userId, insertId]);
-      if (!relation) throw new Error(`Error creating userCompanyRelation: ${relation}`);
+      const relation = await runQuery(queries.company.insertUserCompanyRelation(), [
+        userId,
+        company.insertId,
+      ]);
 
-      return insertId;
+      if (!relation?.insertId) throw new Error(relation);
+
+      return company.insertId;
     } catch (err) {
-      res.status(500).send({ status: 3 });
       console.log("error registering user company", err);
       return;
     }
   },
 
-  getUserCompany: async (id, res) => {
+  getUserCompany: async (id) => {
     try {
-      const [company] = await runQuery(queries.selectUserCompany(), [id]);
+      console.log("id", id);
+      const [company] = await runQuery(queries.company.selectUserCompany(), [id]);
+      console.log(`company ${company}`);
       if (!company) throw new Error(`unable to get user company on log in, user id: ${id}`);
 
       return company;
     } catch (err) {
-      console.log(`error selecting userCompany: `, err);
-      res.status(500).send({ status: 0 });
-      return;
+      console.log(err);
+      return 0;
     }
   },
 
-  insertCompany: async (data, res, returnToken = false) => {
+  insertCompany: async (data) => {
     try {
-      const insertId = await runQuery(queries.insertCompany(), [
+      const insertId = await runQuery(queries.company.insert(), [
         data.company,
         data.companyStreet,
         data.companyCity,
@@ -42,15 +46,15 @@ const utils = {
         data.companyCountry,
       ]);
 
-      if (!insertId.affectedRows) throw new Error(`insert Id invalid: ${insertId}`);
+      if (!insertId.affectedRows) throw new Error(insertId);
+
+      // const relation = await runQuery(queries.insertInvoiceCompanyRelation(), [userId, companyId]);
+      // if (!relation) throw new Error(relation);
 
       return insertId;
     } catch (err) {
       console.log(`Error inserting company \n data: ${data} \n err: ${err}`);
 
-      returnToken
-        ? res.status(500).send({ status: 0, token: res.headers.newToken })
-        : res && res.status(500).send({ status: 0 });
       return;
     }
   },

@@ -12,62 +12,86 @@ router.put("/login", async function (req, res) {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    res.send({ status: 1, error: "credentials not sent" });
+    res.status(400).send({ status: 1, error: "credentials not sent" });
     return;
   }
 
-  const userId = await utils.validateUserLogin(email, password, res);
-  if (!userId) return;
+  try {
+    const userId = await utils.validateUserLogin(email, password, res);
 
-  const company = await compUtils.getUserCompany(userId);
-  if (!company) return;
+    //password Invalid
+    if (userId === 0) {
+      res.send({ status: 2 });
+      return;
+    }
 
-  const token = await utils.patchUserToken(email, userId, res);
-  if (!token) return;
+    if (!userId) throw new Error(`Error login user in\n${userId}`);
 
-  res.send({
-    status: 1,
-    token,
-    email,
-    company,
-  });
+    const company = await compUtils.getUserCompany(userId);
+    if (!company) throw new Error(`Account.js\nError selecting user company\n${company}`);
+
+    const token = await utils.patchUserToken(email, userId);
+    if (!token) return;
+
+    res.send({
+      status: 1,
+      token,
+      email,
+      company,
+    });
+  } catch (err) {
+    console.log(`Error login user in\n${err}`);
+    res.status(500).send({ status: 2 });
+  }
 });
 
 router.put("/register", async function (req, res) {
-  const account = await utils.validateRegistrationData(req.body.data, res);
-  if (!account) return;
+  try {
+    const account = await utils.validateRegistrationData(req.body.data);
+    if (!account) {
+      res.status(400).send({ status: 0 });
+      return;
+    }
 
-  const user = await utils.createUser(account, res);
-  if (!user) return;
+    const user = await utils.createUser(account);
 
-  const company = await compUtils.registerUserCompany(account, user.insertId, res);
-  if (!company) {
-    return;
-  }
+    if (user === "ER_DUP_ENTRY") {
+      res.send({ status: 2 });
+      return;
+    }
 
-  const token = await tokenUtils.createUserToken(user.insertId, res);
-  if (!token) return;
+    if (!user) throw new Error(user);
 
-  addToken(account.email, {
-    userId: user.insertId,
-    token: token.value,
-    tokenId: token.id,
-  });
+    const company = await compUtils.registerUserCompany(account, user.insertId);
+    if (!company) throw new Error(company);
 
-  res.send({
-    status: 1,
-    data: {
-      user: { email: account.email, token: token.value, authenticated: true },
-      company: {
-        name: account.company,
-        street: account.companyStreet,
-        city: account.companyCity,
-        county: account.companyCounty,
-        postcode: account.companyPostcode,
-        country: account.companyCountry,
+    const token = await tokenUtils.createUserToken(user.insertId, res);
+    if (!token) throw new Error(token);
+
+    addToken(account.email, {
+      userId: user.insertId,
+      token: token.value,
+      tokenId: token.id,
+    });
+
+    res.send({
+      status: 1,
+      data: {
+        user: { email: account.email, token: token.value, authenticated: true },
+        company: {
+          name: account.company,
+          street: account.companyStreet,
+          city: account.companyCity,
+          county: account.companyCounty,
+          postcode: account.companyPostcode,
+          country: account.companyCountry,
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.log(`Error registering user\n${error}`);
+    res.status(500).send();
+  }
 });
 
 router.delete("/logout", async function (req, res) {
@@ -79,10 +103,15 @@ router.delete("/logout", async function (req, res) {
     return;
   }
 
-  const result = await tokenUtils.deleteUserToken(getTokenCreds(email, token), res);
-  if (!result) return;
+  try {
+    const result = await tokenUtils.deleteUserToken(getTokenCreds(email, token), res);
+    if (!result) throw new Error(`Error login user out\n result ${result}`);
 
-  res.send({ status: 1 });
+    res.send({ status: 1 });
+  } catch (error) {
+    console.log(`error loggin user out\n ${error}`);
+    res.status(500).send();
+  }
 });
 
 router.put("/forgot-password", async function (req, res) {

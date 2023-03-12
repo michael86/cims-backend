@@ -62,6 +62,8 @@ module.exports.initTokenCache = async () => {
 
       const [connection] = await runQuery(select("user_token", ["token", "id"], "user"), [userId]);
 
+      if (!connection) continue; //Incase something happened when a user registered and they dont have a token. Caused by bug
+
       const { token: tokenId, id: connectionId } = connection;
 
       const [userToken] = await runQuery(select("tokens", ["token"], "id"), [tokenId]);

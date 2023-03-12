@@ -5,17 +5,19 @@ const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
 
 const utils = {
-  validateUserLogin: async (email, password, res) => {
+  validateUserLogin: async (email, password) => {
     try {
-      const [user] = await runQuery(queries.selectUserCreds(["password", "id"], "email"), [email]);
+      const [user] = await runQuery(queries.user.selectCreds(["password", "id"], "email"), [email]);
 
-      if (user && sha256(`${process.env.SALT}${password}`) === user.password) return user.id;
+      if (!user) throw new Error("Error selecint user");
+      if (sha256(`${process.env.SALT}${password}`) !== user.password) return 0;
 
-      res.send({ status: 2 });
-      return;
+      return user.id;
     } catch (err) {
-      console.log(`error logging user in (${email}) in: `, err);
-      res.status(500).send({ status: 2 });
+      console.log(`
+      error logging user in
+      ${email}
+      ${err}`);
       return;
     }
   },
@@ -40,16 +42,13 @@ const utils = {
     }
   },
 
-  patchUserToken: async (email, id, res) => {
+  patchUserToken: async (email, id) => {
     try {
       const token = genToken();
       const { tokenId } = getTokenCreds(email);
-      const result = await runQuery(queries.patchUserToken(), [token, tokenId]);
+      const result = await runQuery(queries.tokens.patch(), [token, tokenId]);
 
-      if (!result || !result.affectedRows) {
-        res.status(500).send({ status: 0 });
-        return;
-      }
+      if (!result?.affectedRows) throw new Error(`result: ${result}`);
 
       addToken(email, {
         userId: id,
@@ -59,13 +58,12 @@ const utils = {
 
       return token;
     } catch (err) {
-      console.log(`error patching user (${id}) token: `, err);
-      res.status(500).send({ status: 0 });
-      return err;
+      console.log(`error patching user token\nUser Id: ${id}\n ${err}`);
+      return;
     }
   },
 
-  validateRegistrationData: (data, res) => {
+  validateRegistrationData: (data) => {
     if (
       data.email &&
       data.password &&
@@ -77,33 +75,24 @@ const utils = {
       data.companyCountry &&
       typeof data.pricePlan === "number"
     )
-      return { ...data };
-
-    res.status(400).send({ status: 0 });
+      return data;
     return;
   },
 
-  createUser: async (data, res) => {
+  createUser: async (data) => {
     try {
-      const userRes = await runQuery(queries.insertUser(), [
+      const userRes = await runQuery(queries.user.insert(), [
         data.email,
         sha256(`${process.env.SALT}${data.password}`),
       ]);
 
-      if (userRes === "ER_DUP_ENTRY") {
-        res.send({ status: 2 });
-        return;
-      }
+      if (userRes === "ER_DUP_ENTRY") return userRes;
 
-      if (!userRes) {
-        res.status(500).send({ status: 3 });
-        return;
-      }
+      if (!userRes) throw new Error(userRes);
 
       return userRes;
     } catch (err) {
       console.log("error creating user: ", err);
-      res.status(500).send({ status: 3 });
       return;
     }
   },

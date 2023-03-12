@@ -6,7 +6,7 @@ const utils = {
     try {
       const ids = [];
       for (const item of items) {
-        const { insertId: itemId } = await runQuery(queries.insertInvoiceStock(), [
+        const res = await runQuery(queries.insertInvoiceItems(), [
           item.name,
           item.description,
           item.quantity,
@@ -14,14 +14,16 @@ const utils = {
           item.tax,
         ]);
 
-        if (!itemId) throw new Error(`Error inserting stock \n item: ${item}`);
+        if (!res.insertId) throw new Error(`Error getting res \n res: ${res}`);
 
-        itemIds.push(itemId);
+        ids.push(res.insertId);
       }
 
       return ids;
     } catch (err) {
-      console.log(err);
+      console.log(`Error in stock utils\n
+      ${err}\n
+      items: ${items}`);
       return;
     }
   },
