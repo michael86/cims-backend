@@ -9,10 +9,7 @@ router.get("/pdf/:id", async function (req, res) {
   const filePath = path.join(__dirname, "..", "public/invoices", id);
   try {
     if (fs.existsSync(filePath)) {
-      res.setHeader(
-        "Content-disposition",
-        "attachment; filename=jsonFile.json"
-      );
+      res.setHeader("Content-disposition", "attachment; filename=jsonFile.json");
       res.setHeader("Content-Type", "text/json");
       res.download(filePath, function (err) {
         if (err) {

@@ -1,4 +1,7 @@
 const express = require("express");
+const router = express.Router();
+const path = require("node:path");
+
 const niceInvoice = require("nice-invoice");
 const {
   select,
@@ -7,10 +10,11 @@ const {
   selectInvoiceItemIds,
   selectUserInvoiceIds,
 } = require("../mysql/query");
+
 const { updateToken, runQuery } = require("../utils/sql");
-const router = express.Router();
-const fs = require("fs");
-const path = require("node:path");
+const utils = require("../utils/invoices");
+const compUtils = require("../utils/company");
+const stockUtils = require("../utils/stock");
 
 router.put("/add", async function (req, res) {
   const { newToken: token, tokenId, userId } = req.headers;
@@ -21,100 +25,35 @@ router.put("/add", async function (req, res) {
     return;
   }
 
-  const { insertId: companyInsertId } = await runQuery(
-    insert("invoice_company", [
-      "contact",
-      "name",
-      "address",
-      "city",
-      "state",
-      "country",
-      "postcode",
-    ]),
-    Object.values(company)
-  );
+  try {
+    const companyId = await compUtils.insertCompany(company, res, true);
 
-  if (!companyInsertId) {
-    res.status(500).send({ status: 0, token });
-    return;
-  }
+    const specificsId = await utils.createInvoiceSpecifics(specifics, res);
 
-  specifics.dueDate = Math.floor(new Date(specifics.dueDate).getTime() / 1000);
-  specifics.billingDate = Math.floor(
-    new Date(specifics.billingDate).getTime() / 1000
-  );
+    const itemIds = await stockUtils.createStock(items);
 
-  console.log(specifics);
+    //Begin relationship entries
 
-  const { insertId: specificsInsertId } = await runQuery(
-    insert("invoice_specifics", [
-      "due_date",
-      "billing_date",
-      "order_number",
-      "footer",
-    ]),
-    Object.values(specifics)
-  );
-
-  if (!specificsInsertId) {
-    res.status(500).send({ status: 0, token });
-  }
-
-  const itemIds = [];
-  for (const item of items) {
-    const { insertId: itemId } = await runQuery(
-      insert("invoice_items", [
-        "sku",
-        "description",
-        "quantity",
-        "price",
-        "tax",
-      ]),
-      [item.item, item.description, item.quantity, item.price, item.tax]
+    const { insertId: specificsRelationship } = await runQuery(
+      insert("invoice_specific", ["invoice_id", "specific_id"]),
+      [companyId, specificsId]
     );
 
-    if (!itemId) {
-      res.status(500).send({ status: 0, token });
-      return;
+    for (const itemId of itemIds) {
+      const { insertId: itemInsertId } = await runQuery(
+        insert("invoice_item", ["invoice_id", "item_id"]),
+        [companyId, itemId]
+      );
     }
 
-    itemIds.push(itemId);
+    await updateToken("tokens", [["token", `'${token}'`]], ["id", tokenId]);
+
+    res.send({ status: 1, token });
+  } catch (err) {
+    console.log(`error in invoice route
+     ${err}`);
+    res.send({ status: 0, token });
   }
-
-  //Begin relationship entries
-
-  const { insertId: userRelationship } = await runQuery(
-    insert("user_invoices", ["user_id", "invoice_id"]),
-    [userId, companyInsertId]
-  );
-
-  if (!userRelationship) {
-    res.status(500).send({ status: 0, token });
-  }
-
-  const { insertId: specificsRelationship } = await runQuery(
-    insert("invoice_specific", ["invoice_id", "specific_id"]),
-    [companyInsertId, specificsInsertId]
-  );
-
-  if (!specificsRelationship) {
-    res.status(500).send({ status: 0, token });
-  }
-
-  for (const itemId of itemIds) {
-    const { insertId: itemInsertId } = await runQuery(
-      insert("invoice_item", ["invoice_id", "item_id"]),
-      [companyInsertId, itemId]
-    );
-
-    if (!itemInsertId) {
-      res.status(500).send({ status: 0, token });
-    }
-  }
-
-  await updateToken("tokens", [["token", `'${token}'`]], ["id", tokenId]);
-
-  res.send({ status: 1, token });
 });
 
 router.get("/get", async function (req, res) {
@@ -158,11 +97,7 @@ router.get("/get", async function (req, res) {
 
     for (const item of items) {
       const itemData = await runQuery(
-        select(
-          "invoice_items",
-          ["sku", "description", "quantity", "price", "tax"],
-          "id"
-        ),
+        select("invoice_items", ["sku", "description", "quantity", "price", "tax"], "id"),
 
         [item.item_id]
       );
@@ -193,11 +128,7 @@ router.post("/gen-pdf", async function (req, res) {
   console.log("start items");
   for (const i of itemsData) {
     const [itemData] = await runQuery(
-      select(
-        "invoice_items",
-        ["sku", "description", "quantity", "price", "tax"],
-        "id"
-      ),
+      select("invoice_items", ["sku", "description", "quantity", "price", "tax"], "id"),
       [i.item_id]
     );
 
@@ -240,9 +171,7 @@ router.post("/gen-pdf", async function (req, res) {
     },
   };
 
-  const fileName = `${invoiceData.contact.replace(" ", "")}-${
-    invoiceData.name
-  }.pdf`;
+  const fileName = `${invoiceData.contact.replace(" ", "")}-${invoiceData.name}.pdf`;
 
   const filePath = path.join(__dirname, "..", "public/invoices", fileName);
 
