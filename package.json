@@ -1,0 +1,29 @@
+{
+  "name": "cims-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michael86/cims-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michael86/cims-backend/issues"
+  },
+  "homepage": "https://github.com/michael86/cims-backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "mysql": "^2.18.1",
+    "nice-invoice": "^1.1.8",
+    "sha256": "^0.2.0",
+    "sib-api-v3-sdk": "^8.5.0"
+  }
+}
