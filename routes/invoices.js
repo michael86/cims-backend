@@ -125,14 +125,13 @@ router.post("/gen-pdf", async function (req, res) {
   const itemsData = await runQuery(selectInvoiceItemIds(), [id]);
 
   const items = [];
-  console.log("start items");
+
   for (const i of itemsData) {
     const [itemData] = await runQuery(
       select("invoice_items", ["sku", "description", "quantity", "price", "tax"], "id"),
       [i.item_id]
     );
 
-    console.log(itemData.sku);
     items.push({
       item: itemData.sku,
       description: itemData.description,
@@ -140,10 +139,8 @@ router.post("/gen-pdf", async function (req, res) {
       price: itemData.price,
       tax: itemData,
     });
-    console.log("item done");
   }
 
-  console.log(items);
   const invoiceDetail = {
     shipping: {
       name: `${invoiceData.contact} - ${invoiceData.name}`,

@@ -129,7 +129,6 @@ router.put("/forgot-password", async function (req, res) {
     const token = await tokenUtils.updateResetToken(user);
     if (!token) return;
 
-    console.log(emailUtils);
     const sent = await emailUtils.sendResetPassEmail(token, email);
     if (!sent) return;
 
