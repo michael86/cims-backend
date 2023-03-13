@@ -6,7 +6,6 @@ SibApiV3Sdk.ApiClient.instance.authentications["api-key"].apiKey = process.env.S
 
 const utils = {
   sendEmail: async (payload) => {
-    console.log("process.env.SEND_IN_BLUE", process.env.SEND_IN_BLUE);
     try {
       const { receivers, subject, htmlContent, params } = payload;
 
@@ -25,13 +24,10 @@ const utils = {
         params,
       });
 
-      console.log("result", result);
-
       if (!result.messageId) throw new Error("error sending mail");
 
       return true;
     } catch (err) {
-      console.log("erm");
       console.log(`sendMail
       payload: ${payload}
       ${err}`);

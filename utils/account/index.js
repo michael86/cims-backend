@@ -101,8 +101,6 @@ const utils = {
         identifiers[1],
       ]);
 
-      console.log("user", user);
-
       if (!user?.id || !user?.email) throw new Error(user);
 
       return { ...user };

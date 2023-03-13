@@ -408,11 +408,8 @@ router.patch("/update", async function (req, res) {
     const relationRes = await runQuery(createHistoryRelation(), [history.id, historyRes.insertId]);
 
     //create relations between history_locations
-    console.log(history.locations);
     for (const location of history.locations) {
       const locRes = await runQuery(createHistoryLocRelation(), [historyRes.insertId, location.id]);
-
-      console.log(locRes);
     }
   };
 
