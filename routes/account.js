@@ -6,7 +6,7 @@ const { addToken, getTokenCreds } = require("../middleware/tokens");
 const utils = require("../utils/account");
 const compUtils = require("../utils/company");
 const tokenUtils = require("../utils/tokens");
-const { sendResetPassEmail } = require("../utils/sendInBlue");
+const emailUtils = require("../utils/sendInBlue");
 
 router.put("/login", async function (req, res) {
   const { email, password } = req.body;
@@ -129,7 +129,8 @@ router.put("/forgot-password", async function (req, res) {
     const token = await tokenUtils.updateResetToken(user);
     if (!token) return;
 
-    const sent = await sendResetPassEmail(token, email);
+    console.log(emailUtils);
+    const sent = await emailUtils.sendResetPassEmail(token, email);
     if (!sent) return;
 
     res.send({ status: 1 });
