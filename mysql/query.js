@@ -106,29 +106,14 @@ const queries = {
         typeof selector === "string"
           ? `${selector} = ?`
           : selector
-<<<<<<< HEAD
-              .map(
-                (select, index) =>
-                  `${select} = ? ${index === selector.length - 1 ? "" : "AND"}`
-              )
-=======
               .map((select, index) => `${select} = ? ${index === selector.length - 1 ? "" : "AND"}`)
->>>>>>> fe9a9e79b25213de21794251abac79f595666887
               .join(" ")
       }`
     }`;
   },
 
-<<<<<<< HEAD
-  insert: (location, columns) => {
-    return `INSERT INTO ${location} (${columns.join(
-      ", "
-    )}) VALUES (${columns.map(() => "?")});`;
-  },
-=======
   insert: (location, columns) =>
     `INSERT INTO ${location} (${columns.join(", ")}) VALUES (${columns.map(() => "?")})`,
->>>>>>> fe9a9e79b25213de21794251abac79f595666887
 
   //This makes me cry
   update: (location, targets, selector) => {
@@ -143,13 +128,10 @@ const queries = {
               )} 
                 WHERE ${selector[0]} = ${selector[1] ? selector[1] : "?"}`;
   },
-<<<<<<< HEAD
-=======
 
   remove: (table, selector) => {
     return `DELETE FROM ${table} WHERE ${selector} = ?`;
   },
->>>>>>> fe9a9e79b25213de21794251abac79f595666887
 };
 
 module.exports = queries;
