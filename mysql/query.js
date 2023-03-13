@@ -48,16 +48,23 @@ const queries = {
       `INSERT INTO user_invoices (user_id, invoice_id) VALUES (?, ?)`,
   },
   invoices: {
-    selectInvoiceIds: (userId) =>
-      `SELECT invoice_id FROM user_invoices WHERE user_invoices.user_id LIKE ${userId}`,
+    insertCompany: () =>
+      `INSERT INTO invoice_company (contact, name, address, city, state, country, postcode) VALUES (?,?,?,?,?,?,?)`,
 
-    insertInvoiceSpecifics: () =>
+    insertUserRelation: () => `INSERT INTO user_invoices (user_id, invoice_id) VALUES (?, ?)`,
+
+    insertSpecifics: () =>
       `INSERT INTO invoice_specifics (due_date, billing_date, order_number, footer) VALUES (?, ?, ?, ?);`,
 
-    insertInvoiceItems: () =>
+    insertSpecificRelation: () =>
+      `INSERT INTO invoice_specific (invoice_id, specific_id) VALUES (?, ?)`,
+
+    insertItem: () =>
       `INSERT INTO invoice_items (sku, description, quantity, price, tax) VALUES (?, ?, ?, ?, ?)`,
 
-    selectInvoice: () =>
+    insertItemRelation: () => `INSERT INTO invoice_item (invoice_id, item_id) VALUES (?, ?)`,
+
+    select: () =>
       `SELECT 
         invoice_company.contact, invoice_company.name, invoice_company.address, invoice_company.city, invoice_company.state, invoice_company.country, invoice_company.postcode,
         invoice_specific.specific_id,
@@ -67,7 +74,10 @@ const queries = {
             JOIN invoice_specifics ON invoice_specifics.id = invoice_specific.specific_id 
               WHERE invoice_company.id = ?;`,
 
-    selectInvoiceItemIds: () => `SELECT item_id FROM invoice_item WHERE invoice_id = ?`,
+    selectIds: (userId) =>
+      `SELECT invoice_id FROM user_invoices WHERE user_invoices.user_id LIKE ${userId}`,
+
+    selectItemIds: () => `SELECT item_id FROM invoice_item WHERE invoice_id = ?`,
   },
 
   tokens: {

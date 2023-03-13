@@ -5,20 +5,18 @@ const path = require("node:path");
 const niceInvoice = require("nice-invoice");
 const {
   select,
-  insert,
   selectInvoiceCompSpecs,
   selectInvoiceItemIds,
   selectUserInvoiceIds,
 } = require("../mysql/query");
 
 const { updateToken, runQuery } = require("../utils/sql");
-const utils = require("../utils/invoices");
-const compUtils = require("../utils/company");
-const stockUtils = require("../utils/stock");
+const invoices = require("../utils/invoices");
+const company = require("../utils/company");
 
 router.put("/add", async function (req, res) {
   const { newToken: token, tokenId, userId } = req.headers;
-  const { items, company, specifics } = req.body;
+  const { items, company: comp, specifics } = req.body;
 
   if (!items || !company || !specifics) {
     res.status(400).send({ status: 0, token });
@@ -26,25 +24,18 @@ router.put("/add", async function (req, res) {
   }
 
   try {
-    const companyId = await compUtils.insertCompany(company);
+    const companyId = await invoices.insertCompany(comp);
+    await invoices.createUserRelation(userId, companyId);
 
-    const specificsId = await utils.createInvoiceSpecifics(specifics, res);
+    const specificsId = await invoices.createSpecifics(specifics, res);
+    await invoices.createSpecificRelation(companyId, specificsId);
 
-    const itemIds = await stockUtils.createStock(items);
+    const itemIds = await invoices.createItems(items);
+    console.log("itemIds", itemIds);
+    console.log("companyId", companyId);
+    const result = await invoices.createItemRelations(itemIds, companyId);
 
-    //Begin relationship entries
-
-    const { insertId: specificsRelationship } = await runQuery(
-      insert("invoice_specific", ["invoice_id", "specific_id"]),
-      [companyId, specificsId]
-    );
-
-    for (const itemId of itemIds) {
-      const { insertId: itemInsertId } = await runQuery(
-        insert("invoice_item", ["invoice_id", "item_id"]),
-        [companyId, itemId]
-      );
-    }
+    if (!result) throw new error("Error crerating invoice item relation");
 
     await updateToken("tokens", [["token", `'${token}'`]], ["id", tokenId]);
 

@@ -7,13 +7,13 @@ const utils = {
       const company = await utils.insertCompany(data);
       if (!company?.insertId) throw new Error(insertId);
 
-      const relation = await utils.insertUserRelation(userId, company.insertId);
+      const relation = await utils.createUserRelation(userId, company.insertId);
 
       if (!relation) throw new Error(relation);
 
       return company.insertId;
     } catch (err) {
-      console.log("error registering user company", err);
+      console.log(`\x1b[31m${err}\x1b[0m`);
       return;
     }
   },
@@ -26,7 +26,7 @@ const utils = {
 
       return company;
     } catch (err) {
-      console.log(err);
+      console.log(`\x1b[31m${err}\x1b[0m`);
       return 0;
     }
   },
@@ -46,12 +46,12 @@ const utils = {
 
       return insertId;
     } catch (err) {
-      console.log(`Error inserting company \n data: ${data} \n err: ${err}`);
+      console.log(`\x1b[31m${err}\x1b[0m \ndata: ${data} \n `);
 
       return;
     }
   },
-  insertUserRelation: async (userId, companyId) => {
+  createUserRelation: async (userId, companyId) => {
     try {
       const relation = await runQuery(queries.company.insertUserCompanyRelation(), [
         userId,
@@ -62,7 +62,7 @@ const utils = {
 
       return relation.insertId;
     } catch (err) {
-      console.log(err);
+      console.log(`\x1b[31m${err}"\x1b[0m"`);
       return;
     }
   },
