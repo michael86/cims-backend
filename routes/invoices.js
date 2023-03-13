@@ -26,7 +26,7 @@ router.put("/add", async function (req, res) {
   }
 
   try {
-    const companyId = await compUtils.insertCompany(company, res, true);
+    const companyId = await compUtils.insertCompany(company);
 
     const specificsId = await utils.createInvoiceSpecifics(specifics, res);
 

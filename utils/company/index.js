@@ -7,12 +7,9 @@ const utils = {
       const company = await utils.insertCompany(data);
       if (!company?.insertId) throw new Error(insertId);
 
-      const relation = await runQuery(queries.company.insertUserCompanyRelation(), [
-        userId,
-        company.insertId,
-      ]);
+      const relation = await utils.insertUserRelation(userId, company.insertId);
 
-      if (!relation?.insertId) throw new Error(relation);
+      if (!relation) throw new Error(relation);
 
       return company.insertId;
     } catch (err) {
@@ -47,13 +44,25 @@ const utils = {
 
       if (!insertId.affectedRows) throw new Error(insertId);
 
-      // const relation = await runQuery(queries.insertInvoiceCompanyRelation(), [userId, companyId]);
-      // if (!relation) throw new Error(relation);
-
       return insertId;
     } catch (err) {
       console.log(`Error inserting company \n data: ${data} \n err: ${err}`);
 
+      return;
+    }
+  },
+  insertUserRelation: async (userId, companyId) => {
+    try {
+      const relation = await runQuery(queries.company.insertUserCompanyRelation(), [
+        userId,
+        companyId,
+      ]);
+
+      if (!relation?.insertId) throw new Error(relation);
+
+      return relation.insertId;
+    } catch (err) {
+      console.log(err);
       return;
     }
   },
