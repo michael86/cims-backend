@@ -153,7 +153,6 @@ router.patch("/reset-password/:token/:email/:password", async function (req, res
 
     const user = await utils.validateUserResetToken(email, resetId);
 
-    //Failed validation.
     if (user === 0) {
       res.send({ status: 0 });
       return;

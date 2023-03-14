@@ -64,17 +64,6 @@ const queries = {
 
     insertItemRelation: () => `INSERT INTO invoice_item (invoice_id, item_id) VALUES (?, ?)`,
 
-    // contact: companySpecifics.contact,
-    // name: companySpecifics.name,
-    // address: companySpecifics.address,
-    // city: companySpecifics.city,
-    // state: companySpecifics.state,
-    // country: companySpecifics.country,
-    // postcode: companySpecifics.postcode,
-    // billingDate: companySpecifics.billing_date, // need to convert to unix in sql
-    // dueDate: companySpecifics.due_date, //need to convert to unix in sql
-    // order_number: companySpecifics.order_number,
-    // footer: companySpecifics.footer,
     select: () =>
       `SELECT 
         invoice_company.id, invoice_company.contact, invoice_company.name, invoice_company.address, invoice_company.city, invoice_company.state, invoice_company.country, invoice_company.postcode,

@@ -134,7 +134,7 @@ const utils = {
         let invoice = await runQuery(queries.invoices.select(), [id, id]);
 
         if (!Array.isArray(invoice)) throw new Error(invoice);
-        [{ ...invoice }] = invoice; //runQuery returns an object inside an array, so destructure it.
+        [{ ...invoice }] = invoice;
 
         const itemIds = await runQuery(queries.invoices.selectItemIds(), id);
         if (!Array.isArray(itemIds)) throw new Error(itemIds);
@@ -147,7 +147,6 @@ const utils = {
           return i;
         });
 
-        // console.log(invoice);
         invoices.push(invoice);
       }
       return invoices;

@@ -71,7 +71,6 @@ router.get("/get/:id?", async function (req, res) {
     const invoices = await _invoices.getInvoices(ids);
     if (!Array.isArray(invoices)) throw new Error(invoices);
 
-    // console.log(invoices);
     res.send({ status: 1, token, invoices });
   } catch (err) {
     console.log(`invoices/get

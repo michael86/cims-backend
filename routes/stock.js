@@ -108,7 +108,6 @@ const addCompanytoItem = async (data, itemId, companyId) => {
     companyCountry: data.companyCountry,
   });
 
-  //something is missing... If legal request was made, this will always be 6, so just stop here.
   if (!companyId) {
     const { insertId: id } = await runQuery(
       insert("companies", ["name", "address", "city", "county", "postcode", "country"]),
@@ -204,8 +203,6 @@ const addHistoryToItem = async ([data], itemId) => {
   return true;
 };
 
-//Any where there's a res.end is because the user may be up to no good.
-//Prob refactor that to be middleware when we add validation
 router.post("/add", async function (req, res) {
   const { newToken: token, email } = req.headers;
   const { data } = req.body;
@@ -316,7 +313,6 @@ router.get("/get", async function (req, res) {
 
   const stockIds = await runQuery(select("user_stock", ["stock_id AS stockId"], "user_id"), [user]);
 
-  //handle if user has no stock
   if (!stockIds) {
     res.send({ status: 1, stock: [] });
     return;
@@ -345,7 +341,6 @@ router.get("/get", async function (req, res) {
       const item = { ...itemDetails };
       item.id = id;
 
-      //gen additional data if in query params
       locations
         ? (item.locations = await getLocations(id))
         : history
@@ -370,7 +365,6 @@ router.patch("/update", async function (req, res) {
     const locationsToDelete = getLocationsToDelete(newLocs, oldLocs);
     const locationsToInsert = getLocationsToInsert(newLocs, oldLocs);
 
-    //Delete current locations
     for (const id of locationsToDelete) {
       const res = await runQuery(remove("stock_locations", "location_id"), [id]);
 
@@ -397,18 +391,14 @@ router.patch("/update", async function (req, res) {
   };
 
   const createHistory = async (history) => {
-    //insert sku, quantity, price into history
-
     const historyRes = await runQuery(insertHistory(), [
       history.sku,
       history.quantity,
       history.price,
     ]);
 
-    //create relation to stock_histories
     const relationRes = await runQuery(createHistoryRelation(), [history.id, historyRes.insertId]);
 
-    //create relations between history_locations
     for (const location of history.locations) {
       const locRes = await runQuery(createHistoryLocRelation(), [historyRes.insertId, location.id]);
     }
