@@ -11,7 +11,7 @@ const {
 } = require("../mysql/query");
 
 const { updateToken, runQuery } = require("../utils/sql");
-const invoices = require("../utils/invoices");
+const _invoices = require("../utils/invoices");
 const company = require("../utils/company");
 
 router.put("/add", async function (req, res) {
@@ -24,82 +24,59 @@ router.put("/add", async function (req, res) {
   }
 
   try {
-    const companyId = await invoices.insertCompany(comp);
-    await invoices.createUserRelation(userId, companyId);
+    const companyId = await _invoices.insertCompany(comp);
+    if (!companyId || typeof companyId !== "number") throw new Error(companyId);
 
-    const specificsId = await invoices.createSpecifics(specifics, res);
-    await invoices.createSpecificRelation(companyId, specificsId);
+    const relation = await _invoices.createUserRelation(userId, companyId);
+    if (!relation || typeof relation !== "number") throw new Error(companyId);
 
-    const itemIds = await invoices.createItems(items);
-    console.log("itemIds", itemIds);
-    console.log("companyId", companyId);
-    const result = await invoices.createItemRelations(itemIds, companyId);
+    const specificsId = await _invoices.createSpecifics(specifics, res);
+    if (!specificsId || typeof specificsId !== "number") throw new Error(companyId);
 
-    if (!result) throw new error("Error crerating invoice item relation");
+    const specificsRelation = await _invoices.createSpecificRelation(companyId, specificsId);
+    if (typeof specificsRelation !== "number") throw new Error(specificsRelation);
+
+    const itemIds = await _invoices.createItems(items);
+
+    if (!Array.isArray(itemIds))
+      throw new Error(`invoices/add
+    Error creating itemIds
+    itemIds: ${itemIds}`);
+
+    const itemRelations = await _invoices.createItemRelations(itemIds, companyId);
+    if (!Array.isArray(itemRelations))
+      throw new Error(`invoices/add
+    Error creating item relations
+    result: ${itemRelations}`);
 
     await updateToken("tokens", [["token", `'${token}'`]], ["id", tokenId]);
 
     res.send({ status: 1, token });
   } catch (err) {
-    console.log(`error in invoice route
-     ${err}`);
+    console.log(`invoices/add
+      \x1b[31m${err}\x1b[0m`);
     res.send({ status: 0, token });
   }
 });
 
-router.get("/get", async function (req, res) {
+router.get("/get/:id?", async function (req, res) {
   const { newToken: token, userId } = req.headers;
+  const { id } = req.query;
 
-  const invoices = await runQuery(selectUserInvoiceIds(userId));
+  try {
+    const ids = id ? [id] : await _invoices.getInvoiceIds(userId);
 
-  //Run checks to see what happens when user has no invoices. Is it undefined or empty array?
-  if (!invoices) {
-    res.send({ status: 1, token });
-    return;
+    if (!Array.isArray(ids)) throw new Error(invoices);
+
+    const invoices = await _invoices.getInvoices(ids);
+    if (!Array.isArray(invoices)) throw new Error(invoices);
+
+    res.send({ status: 1, token, data: invoices });
+  } catch (err) {
+    console.log(`invoices/get
+      \x1b[31m${err}\x1b[0m`);
+    res.status(500).send({ status: 0, token });
   }
-
-  const data = [];
-
-  for (const id of invoices) {
-    const [companySpecifics] = await runQuery(selectInvoiceCompSpecs(), [
-      id.invoice_id,
-      id.invoice_id,
-    ]);
-
-    if (!companySpecifics) continue; //Something broke cause my code is broke and everything just feels broken!!
-
-    const invoice = {
-      id: id.invoice_id,
-      contact: companySpecifics.contact,
-      name: companySpecifics.name,
-      address: companySpecifics.address,
-      city: companySpecifics.city,
-      state: companySpecifics.state,
-      country: companySpecifics.country,
-      postcode: companySpecifics.postcode,
-      billingDate: companySpecifics.billing_date, // need to convert to unix in sql
-      dueDate: companySpecifics.due_date, //need to convert to unix in sql
-      order_number: companySpecifics.order_number,
-      footer: companySpecifics.footer,
-      items: [],
-    };
-
-    const items = await runQuery(selectInvoiceItemIds(), [id.invoice_id]);
-
-    for (const item of items) {
-      const itemData = await runQuery(
-        select("invoice_items", ["sku", "description", "quantity", "price", "tax"], "id"),
-
-        [item.item_id]
-      );
-
-      invoice.items.push({ ...itemData[0] });
-    }
-
-    data.push(invoice);
-  }
-
-  res.send({ status: 1, token, data });
 });
 
 router.post("/gen-pdf", async function (req, res) {
@@ -161,7 +138,7 @@ router.post("/gen-pdf", async function (req, res) {
 
   const fileName = `${invoiceData.contact.replace(" ", "")}-${invoiceData.name}.pdf`;
 
-  const filePath = path.join(__dirname, "..", "public/invoices", fileName);
+  const filePath = path.join(__dirname, "..", "public/_invoices", fileName);
 
   niceInvoice(invoiceDetail, filePath);
 

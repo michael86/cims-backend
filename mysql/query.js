@@ -64,20 +64,33 @@ const queries = {
 
     insertItemRelation: () => `INSERT INTO invoice_item (invoice_id, item_id) VALUES (?, ?)`,
 
+    // contact: companySpecifics.contact,
+    // name: companySpecifics.name,
+    // address: companySpecifics.address,
+    // city: companySpecifics.city,
+    // state: companySpecifics.state,
+    // country: companySpecifics.country,
+    // postcode: companySpecifics.postcode,
+    // billingDate: companySpecifics.billing_date, // need to convert to unix in sql
+    // dueDate: companySpecifics.due_date, //need to convert to unix in sql
+    // order_number: companySpecifics.order_number,
+    // footer: companySpecifics.footer,
     select: () =>
       `SELECT 
-        invoice_company.contact, invoice_company.name, invoice_company.address, invoice_company.city, invoice_company.state, invoice_company.country, invoice_company.postcode,
-        invoice_specific.specific_id,
-        invoice_specifics.billing_date, invoice_specifics.due_date, invoice_specifics.order_number, invoice_specifics.footer
+        invoice_company.id, invoice_company.contact, invoice_company.name, invoice_company.address, invoice_company.city, invoice_company.state, invoice_company.country, invoice_company.postcode,
+        invoice_specific.specific_id AS specificId,
+        invoice_specifics.billing_date AS billingDate, invoice_specifics.due_date AS dueDate, invoice_specifics.order_number AS orderNumber, invoice_specifics.footer
           FROM invoice_company
             JOIN invoice_specific ON  invoice_specific.invoice_id = ?
             JOIN invoice_specifics ON invoice_specifics.id = invoice_specific.specific_id 
               WHERE invoice_company.id = ?;`,
 
-    selectIds: (userId) =>
-      `SELECT invoice_id FROM user_invoices WHERE user_invoices.user_id LIKE ${userId}`,
+    selectIds: () => `SELECT invoice_id AS id FROM user_invoices WHERE user_id = ?`,
 
-    selectItemIds: () => `SELECT item_id FROM invoice_item WHERE invoice_id = ?`,
+    selectItemIds: () => `SELECT item_id AS id FROM invoice_item WHERE invoice_id = ?`,
+
+    selectItem: () =>
+      `SELECT sku, description, quantity, price, tax FROM invoice_items WHERE id = ?`,
   },
 
   tokens: {

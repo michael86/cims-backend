@@ -82,6 +82,7 @@ const validateData = (payload) => {
 };
 
 const poundsToPennies = (amount) => Math.floor(parseFloat(amount) * 100);
+const penniesToPounds = (amount) => Math.floor(parseFloat(amount) / 100);
 
 const getCompanyId = async (data) => {
   const company = {

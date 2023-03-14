@@ -21,10 +21,7 @@ const utils = {
       if (!res.insertId) throw new Error(res);
       return res.insertId;
     } catch (err) {
-      console.log(`
-        invoices.createCompany
-        \x1b[31m${err}\x1b[0m\n`);
-      return;
+      return err;
     }
   },
   createUserRelation: async (user, invoice) => {
@@ -35,10 +32,7 @@ const utils = {
 
       return res.insertId;
     } catch (err) {
-      console.log(`
-        invoices.createUserRelation
-        \x1b[31m${err}\x1b[0m\n`);
-      return;
+      return err;
     }
   },
   createSpecifics: async (specifics) => {
@@ -57,13 +51,7 @@ const utils = {
 
       return result.insertId;
     } catch (err) {
-      console.log(`
-        createInvoiceSpecifics
-        \x1b[31m${err}\x1b[0m\n
-        specifics: ${specifics}
-      `);
-
-      return;
+      return err;
     }
   },
   createSpecificRelation: async (invoice, specific) => {
@@ -73,15 +61,13 @@ const utils = {
 
       return res.insertId;
     } catch (err) {
-      console.log(`\x1b[31m${err}\x1b[0m`);
-      return;
+      return err;
     }
   },
   createItems: async (items) => {
     try {
       const ids = [];
       for (item of items) {
-        console.log(item);
         const res = await runQuery(queries.invoices.insertItem(), [
           item.name,
           item.description,
@@ -96,9 +82,7 @@ const utils = {
 
       return ids;
     } catch (err) {
-      console.log(`invoices.createItems
-      \x1b[31m${err}\x1b[0m`);
-      return;
+      return err;
     }
   },
   createItemRelations: async (ids, invoice) => {
@@ -113,9 +97,60 @@ const utils = {
 
       return relationIds;
     } catch (err) {
-      console.log(`invoices.createItemRelations
-      \x1b[31m${err}\x1b[0m`);
-      return;
+      return err;
+    }
+  },
+
+  getInvoiceIds: async (user) => {
+    try {
+      let userInvoices = await runQuery(queries.invoices.selectIds(), [user]);
+
+      if (!userInvoices[0]) throw new Error(user_invoices);
+
+      return userInvoices.map(({ id }) => id);
+    } catch (err) {
+      return err;
+    }
+  },
+
+  getItems: async (ids) => {
+    try {
+      const items = [];
+      for (const { id } of ids) {
+        const item = await runQuery(queries.invoices.selectItem(), [id]);
+        if (!item[0]) throw new Error(item);
+        items.push(item);
+      }
+      return items;
+    } catch (err) {
+      return err;
+    }
+  },
+  getInvoices: async (ids) => {
+    try {
+      const invoices = [];
+      for (const id of ids) {
+        const invoice = await runQuery(queries.invoices.select(), [id, id]);
+
+        if (!Array.isArray(invoice)) throw new Error(invoice);
+
+        const itemIds = await runQuery(queries.invoices.selectItemIds(), id);
+        if (!Array.isArray(itemIds)) throw new Error(itemIds);
+
+        const items = await utils.getItems(itemIds);
+        invoice.items = items.map((item) => {
+          const i = { ...item[0] };
+          i.price = (i.price / 100).toFixed(2);
+          return i;
+        });
+
+        console.log(invoice.items);
+
+        invoices.push(invoice);
+      }
+      return invoices;
+    } catch (err) {
+      return err;
     }
   },
 };
