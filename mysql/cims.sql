@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 07, 2023 at 09:19 PM
+-- Generation Time: Mar 14, 2023 at 10:56 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -46,7 +46,82 @@ INSERT INTO `companies` (`id`, `name`, `address`, `city`, `county`, `postcode`, 
 (32, 'dominoes', 'unit 45 Triangle Parade', 'Laindon', 'essex', 'ss11 2aa', 'United Kingdom', '2023-02-18 11:01:34'),
 (54, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-18 11:04:50'),
 (55, 'photomechanical', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-18 11:07:18'),
-(56, 'Copping Gamer', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-06 21:16:11');
+(56, 'Copping Gamer', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-06 21:16:11'),
+(57, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:44:08'),
+(58, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:46:06'),
+(59, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:47:51'),
+(60, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:48:38'),
+(61, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:49:56'),
+(62, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:50:50'),
+(63, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:52:59'),
+(64, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:53:48'),
+(65, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:56:03'),
+(66, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:57:18'),
+(67, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:58:29'),
+(68, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 21:59:25'),
+(69, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:00:44'),
+(70, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:01:27'),
+(71, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:02:23'),
+(72, 'fhnsdajf', 'KLFJSDL', 'FGKLDLG', 'kljklfdfsk', 'fdsfg', 'lfgkfsdl', '2023-03-08 22:03:35'),
+(73, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:05:20'),
+(74, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:07:16'),
+(75, 'photomechanical', '123 disney land', 'sleep', 'is', 'now', 'needded', '2023-03-08 22:08:50'),
+(76, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:11:54'),
+(77, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:14:09'),
+(78, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:15:05'),
+(79, 'ndjdsh', 'njkndkj', 'njkkj', 'njk', 'kj', 'nkj', '2023-03-08 22:18:35'),
+(80, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-08 22:23:54'),
+(81, 'mdsaj', 'kfms', 'jiojvci', 'jioof', 'kof', 'joifd', '2023-03-09 18:13:45'),
+(82, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-09 18:30:57'),
+(83, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-10 23:15:56'),
+(84, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-10 23:28:11'),
+(85, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 11:33:29'),
+(86, 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:02:49'),
+(87, 'my new company', '74 great oxcroft', 'Basildon', 'Essex', 'ss15 6pn', 'United Kingdom', '2023-03-11 12:04:25'),
+(88, 'creekview', '75 little lullaway', 'Basildon', 'essex', 'rm17 6pp', 'United Kingdom', '2023-03-11 12:05:21'),
+(89, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:50:05'),
+(90, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:51:31'),
+(91, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:52:05'),
+(92, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:52:19'),
+(93, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:52:41'),
+(94, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:53:15'),
+(95, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:54:25'),
+(96, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-11 12:56:34'),
+(97, 'creekview', '27 Wickhay', 'Basildon', 'florida', 'ss15 5ae', 'United Kingdom', '2023-03-11 13:00:56'),
+(98, 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-11 13:02:43'),
+(99, 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-11 13:03:24'),
+(100, 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-11 13:04:04'),
+(101, 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-11 13:04:23'),
+(102, 'creekview', '27 Wickhay', 'Basildon', 'florida', 'ss15 5ae', 'United Kingdom', '2023-03-12 19:37:56'),
+(103, 'creekview', '27 Wickhay', 'Basildon', 'florida', 'ss15 5ae', 'United Kingdom', '2023-03-12 19:39:22'),
+(104, 'creekview', '27 Wickhay', 'Basildon', 'florida', 'ss15 5ae', 'United Kingdom', '2023-03-12 19:41:27'),
+(105, 'creekview', '27 Wickhay', 'Basildon', 'florida', 'ss15 5ae', 'United Kingdom', '2023-03-12 19:42:23'),
+(106, 'shitcunt', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-12 19:43:22'),
+(107, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 20:40:47'),
+(108, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 20:41:46'),
+(109, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 20:42:23'),
+(110, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 20:50:40'),
+(111, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 20:53:26'),
+(112, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 20:54:15'),
+(113, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 20:54:57'),
+(114, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 20:57:00'),
+(115, 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-03-12 21:03:40'),
+(116, 'dsjkna', 'njk', 'nkj', 'nkjk', 'nkj', 'nkj', '2023-03-12 21:07:44'),
+(117, 'fklsdj', 'nkji', 'nji', 'nji', 'nmjo', 'njoi', '2023-03-12 21:09:01'),
+(118, 'nyu', 'nbh', 'ni', 'nji', 'ni', 'ni', '2023-03-12 21:09:33'),
+(119, 'fdsa', 'mnoi', 'jui', 'jmio', 'jio', 'jmio', '2023-03-12 21:10:06'),
+(120, 'niu', 'no', 'no', 'mnoo', 'mni', 'noi', '2023-03-12 21:11:28'),
+(121, 'BHJUHGB', 'bhjbjuh', 'nbkhj', 'jk', 'h', 'hjk', '2023-03-12 21:34:51'),
+(122, 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-13 18:45:40'),
+(123, 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:05:31'),
+(124, 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:06:01'),
+(125, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:06:43'),
+(126, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:09:31'),
+(127, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:36:02'),
+(128, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:36:54'),
+(129, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:37:45'),
+(130, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:37:58'),
+(131, 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-13 19:39:58');
 
 -- --------------------------------------------------------
 
@@ -116,31 +191,8 @@ CREATE TABLE `invoice_company` (
 --
 
 INSERT INTO `invoice_company` (`id`, `contact`, `name`, `address`, `city`, `state`, `country`, `postcode`, `date_added`) VALUES
-(1, 'Lynda', 'evapo', 'unit 34 state square', 'basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-01-24 21:41:53'),
-(2, 'Richard Smith', 'creekview', 'unit 2 Buckwins square', 'Basildon', 'Essex', 'SS13 2BJ', 'United Kingdom', '2023-01-24 21:43:03'),
-(3, 'Russel', 'The Jump', '123 fake street', 'london', 'dreamland', 'swfhu', 'zimbabwa', '2023-01-25 18:27:02'),
-(4, 'Sophia', 'Crumbles Pedicures', '75 Great Oxcroft', 'Leeds', 'Yorkshire', 'LS10 2HP', 'UK', '2023-01-25 20:28:57'),
-(5, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:08:55'),
-(6, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:14:27'),
-(7, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:14:50'),
-(8, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:15:32'),
-(9, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:16:40'),
-(10, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'es', 'ss15 5ae', 'United Kingdom', '2023-02-12 13:18:48'),
-(11, 'Kiri', 'Kiri munrooooo', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 14:02:45'),
-(12, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 14:52:05'),
-(13, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:22:12'),
-(14, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:23:20'),
-(15, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'dsad', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:24:11'),
-(16, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:26:33'),
-(17, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:29:11'),
-(18, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-02-12 15:31:18'),
-(19, 'Kiri Munro', 'Kiris Reptiles', '74 great oxcroft', 'Baildon', 'Essex', 'ss15 6pn', 'United Kingdom', '2023-02-17 20:46:32'),
-(20, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-02-24 21:25:44'),
-(21, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-02-24 21:43:02'),
-(22, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-02-24 21:44:32'),
-(23, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-02-24 21:45:44'),
-(24, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'America', 'ss15 5ae', 'United Kingdom', '2023-02-24 21:46:11'),
-(25, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'Essex', 'ss15 5ae', 'United Kingdom', '2023-03-06 21:13:17');
+(46, 'Michael James Hodgson', 'creekview', '27 Wickhay', 'Basildon', 'America', 'United Kingdom', 'ss15 5ae', '2023-03-14 21:35:26'),
+(47, 'kiri', 'PhotoMechanical', '123 disney land', 'Basildon', 'America', 'United Kingdom', 'ss15 5ae', '2023-03-14 21:36:48');
 
 -- --------------------------------------------------------
 
@@ -160,34 +212,9 @@ CREATE TABLE `invoice_item` (
 --
 
 INSERT INTO `invoice_item` (`id`, `invoice_id`, `item_id`, `date`) VALUES
-(1, 1, 1, '2023-01-24 21:41:53'),
-(2, 1, 2, '2023-01-24 21:41:53'),
-(3, 1, 3, '2023-01-24 21:41:53'),
-(4, 2, 4, '2023-01-24 21:43:03'),
-(5, 3, 5, '2023-01-25 18:27:02'),
-(6, 4, 6, '2023-01-25 20:28:57'),
-(7, 4, 7, '2023-01-25 20:28:57'),
-(8, 5, 8, '2023-02-12 13:08:55'),
-(9, 6, 9, '2023-02-12 13:14:27'),
-(10, 8, 10, '2023-02-12 13:15:32'),
-(11, 9, 11, '2023-02-12 13:16:40'),
-(12, 10, 12, '2023-02-12 13:18:48'),
-(13, 10, 13, '2023-02-12 13:18:48'),
-(14, 11, 14, '2023-02-12 14:02:45'),
-(15, 12, 15, '2023-02-12 14:52:05'),
-(16, 12, 16, '2023-02-12 14:52:05'),
-(17, 13, 17, '2023-02-12 15:22:12'),
-(18, 14, 18, '2023-02-12 15:23:20'),
-(19, 15, 19, '2023-02-12 15:24:11'),
-(20, 15, 20, '2023-02-12 15:24:11'),
-(21, 16, 21, '2023-02-12 15:26:33'),
-(22, 17, 22, '2023-02-12 15:29:11'),
-(23, 18, 23, '2023-02-12 15:31:18'),
-(24, 19, 24, '2023-02-17 20:46:32'),
-(25, 23, 25, '2023-02-24 21:45:44'),
-(26, 24, 26, '2023-02-24 21:46:11'),
-(27, 25, 27, '2023-03-06 21:13:17'),
-(28, 25, 28, '2023-03-06 21:13:17');
+(46, 46, 58, '2023-03-14 21:35:26'),
+(47, 46, 59, '2023-03-14 21:35:26'),
+(48, 47, 60, '2023-03-14 21:36:48');
 
 -- --------------------------------------------------------
 
@@ -210,34 +237,9 @@ CREATE TABLE `invoice_items` (
 --
 
 INSERT INTO `invoice_items` (`id`, `sku`, `description`, `quantity`, `price`, `tax`, `date_added`) VALUES
-(1, 'orange and mango', 'orange and mango by fruitsome', 2, 12, 3, '2023-01-24 21:41:53'),
-(2, 'lychee and mango', 'lychee and mango by fruitsome', 3, 12, 3, '2023-01-24 21:41:53'),
-(3, 'passion fruit', 'passionfruit by fruitsome', 1, 20, 0, '2023-01-24 21:41:53'),
-(4, 'web design', 'UX design for creekview', 1, 500, 5, '2023-01-24 21:43:03'),
-(5, 'pencile', 'lead pencil', 10, 1, 0, '2023-01-25 18:27:02'),
-(6, 'Pedicure', 'Naill cut, file, paint', 1, 12, 0, '2023-01-25 20:28:57'),
-(7, 'hair cut', 'Fresh trim', 1, 30, 0, '2023-01-25 20:28:57'),
-(8, '123', '123', 123, 123, 132, '2023-02-12 13:08:55'),
-(9, '123', '123', 1233, 123, 13, '2023-02-12 13:14:27'),
-(10, '15', '15', 15, 15, 15, '2023-02-12 13:15:32'),
-(11, '15', '15', 15, 15, 15, '2023-02-12 13:16:40'),
-(12, '15', '15', 15, 15, 15, '2023-02-12 13:18:48'),
-(13, '15', '15', 15, 15, 15, '2023-02-12 13:18:48'),
-(14, 'love', 'Not easy loving you', 0, 1000, 0, '2023-02-12 14:02:45'),
-(15, '123', '123', 123, 124, 12, '2023-02-12 14:52:05'),
-(16, '123', '123', 123, 124, 12, '2023-02-12 14:52:05'),
-(17, '123', '123', 1233, 123, 123, '2023-02-12 15:22:12'),
-(18, '12', '12', 12, 12, 1, '2023-02-12 15:23:20'),
-(19, '111', '1', 11, 11, 11, '2023-02-12 15:24:11'),
-(20, '111', '1', 11, 11, 11, '2023-02-12 15:24:11'),
-(21, '12', '12', 12, 12, 12, '2023-02-12 15:26:33'),
-(22, '4', '4', 4, 4, 4, '2023-02-12 15:29:11'),
-(23, '1', '1', 1, 1, 1, '2023-02-12 15:31:18'),
-(24, 'Manual Labour', 'Carried 2 x vivs to propety', 1, 50, 0, '2023-02-17 20:46:32'),
-(25, 'Michael James Hodgson', '123', 1, 0, 1, '2023-02-24 21:45:44'),
-(26, 'Michael James Hodgson', '123', 1, 0, 1, '2023-02-24 21:46:11'),
-(27, 'caffeine', 'For some go go juice', 1, 99, 0, '2023-03-06 21:13:17'),
-(28, 'cup', 'cup for said go go juice', 1, 1, 5, '2023-03-06 21:13:17');
+(58, 'peas', 'green', 100, 50, 0, '2023-03-14 21:35:26'),
+(59, 'brussels', 'also green', 10, 198, 0, '2023-03-14 21:35:26'),
+(60, 'hugs', 'cute', 1, 1, 0, '2023-03-14 21:36:48');
 
 -- --------------------------------------------------------
 
@@ -257,27 +259,8 @@ CREATE TABLE `invoice_specific` (
 --
 
 INSERT INTO `invoice_specific` (`id`, `invoice_id`, `specific_id`, `date`) VALUES
-(1, 1, 1, '2023-01-24 21:41:53'),
-(2, 2, 2, '2023-01-24 21:43:03'),
-(3, 3, 3, '2023-01-25 18:27:02'),
-(4, 4, 4, '2023-01-25 20:28:57'),
-(5, 5, 5, '2023-02-12 13:08:55'),
-(6, 6, 6, '2023-02-12 13:14:27'),
-(7, 8, 7, '2023-02-12 13:15:32'),
-(8, 9, 8, '2023-02-12 13:16:40'),
-(9, 10, 9, '2023-02-12 13:18:48'),
-(10, 11, 10, '2023-02-12 14:02:45'),
-(11, 12, 11, '2023-02-12 14:52:05'),
-(12, 13, 12, '2023-02-12 15:22:12'),
-(13, 14, 13, '2023-02-12 15:23:20'),
-(14, 15, 14, '2023-02-12 15:24:11'),
-(15, 16, 15, '2023-02-12 15:26:33'),
-(16, 17, 16, '2023-02-12 15:29:11'),
-(17, 18, 17, '2023-02-12 15:31:18'),
-(18, 19, 18, '2023-02-17 20:46:32'),
-(19, 23, 22, '2023-02-24 21:45:44'),
-(20, 24, 23, '2023-02-24 21:46:11'),
-(21, 25, 24, '2023-03-06 21:13:17');
+(40, 46, 61, '2023-03-14 21:35:26'),
+(41, 47, 62, '2023-03-14 21:36:48');
 
 -- --------------------------------------------------------
 
@@ -299,30 +282,8 @@ CREATE TABLE `invoice_specifics` (
 --
 
 INSERT INTO `invoice_specifics` (`id`, `billing_date`, `due_date`, `order_number`, `footer`, `date_added`) VALUES
-(1, 20230131, 20230124, 'For some vape juice', 'invoice 1', '2023-01-24 21:41:53'),
-(2, 20230210, 20230124, 'For Richard Website', 'Order 2', '2023-01-24 21:43:03'),
-(3, 20230126, 20230125, 'To Russel from Micael', 'FJDIs434344', '2023-01-25 18:27:02'),
-(4, 20570430, 20570430, 'For Sophia', '987654', '2023-01-25 20:28:57'),
-(5, 0, 0, '123', '123', '2023-02-12 13:08:55'),
-(6, 0, 0, '123', '123', '2023-02-12 13:14:27'),
-(7, 0, 0, '15', '15', '2023-02-12 13:15:32'),
-(8, 2147483647, -1579046400, '15', '15', '2023-02-12 13:16:40'),
-(9, 519523200, 522115200, '15', '15', '2023-02-12 13:18:48'),
-(10, 1676160000, 1676246400, 'For loving me', 's3x1', '2023-02-12 14:02:45'),
-(11, 519523200, 524793600, '123', '123', '2023-02-12 14:52:05'),
-(12, 1675296000, 1643760000, '123', '123', '2023-02-12 15:22:12'),
-(13, -2147483648, -2147483648, '12', '12', '2023-02-12 15:23:20'),
-(14, -2147483648, -2147483648, '111', '11', '2023-02-12 15:24:11'),
-(15, -2147483648, 2147483647, '12', '12', '2023-02-12 15:26:33'),
-(16, 519523200, 519523200, '44', '444', '2023-02-12 15:29:11'),
-(17, -2147483648, -2147483648, '1', '1', '2023-02-12 15:31:18'),
-(18, 1676592000, 1676592000, 'Will take kisses as payment', '001', '2023-02-17 20:46:32'),
-(19, 1706832000, 1704153600, '123', '111', '2023-02-24 21:25:44'),
-(20, 1672531200, 1672531200, '123', '123', '2023-02-24 21:43:02'),
-(21, 1672531200, 1672531200, '123', '123', '2023-02-24 21:44:32'),
-(22, 1672531200, 1672531200, '123', '123', '2023-02-24 21:45:44'),
-(23, 1672531200, 1672531200, '123', '123', '2023-02-24 21:46:11'),
-(24, 1678060800, 1678147200, '123', 'For Paul', '2023-03-06 21:13:17');
+(61, 1678752000, 1678752000, 'my first invocie', 'my first invocie footer', '2023-03-14 21:35:26'),
+(62, 1709337600, 1680393600, 'second', 'sec  ond foro', '2023-03-14 21:36:48');
 
 -- --------------------------------------------------------
 
@@ -422,7 +383,8 @@ CREATE TABLE `reset_tokens` (
 --
 
 INSERT INTO `reset_tokens` (`id`, `token`) VALUES
-(51, 'qt2Oiv57aIL3gCO0eTsbmJzHtsglbceJUKfs03sM4WzHAyr6rG51676206192771');
+(78, 'bEczBJsBILxzDuIRslcaOet2pagmj2raV2dmyspJRoHUAVm17qM1678657078271'),
+(79, 'XnDeNMf7obX0Cu5roLLnz2b2fzDWElw5ehdsfTQ7zRlzrbdY1dH1678823896964');
 
 -- --------------------------------------------------------
 
@@ -553,7 +515,24 @@ CREATE TABLE `tokens` (
 --
 
 INSERT INTO `tokens` (`id`, `token`) VALUES
-(71, 'ehu!qbfb9*cySeV48kru4DyQAS*v8nu%sKW3)EnWjHCd+sST^v91678220164435');
+(71, '&N(Ke296l!H8\"SS4igQLU)2Q4F66ld6DD\"7e$ckOxqi&cr)1H-\"1678830794560'),
+(88, ''),
+(89, ''),
+(90, ''),
+(91, 'TRNbwJot&2G2OeH9i*K\"KD!JS$jXR&pB£drezUmMw5xMwA*aOS\"1678490967302'),
+(92, 'MKgzTCYlqG(!XHZ-IffsotWn4Rn8H(q+-1BKOJU50Y3PNvgW7ik1678535362681'),
+(93, '0o*T\"-EtEE)DX_lAGU4A$8DE$9ZTUexG2!FJ3cTEkj^)Ehqx_)s1678539394209'),
+(94, 'a^H3Y\"L4hkmL7BV^YP-H+(ggxV6SbY£yXGBHz8gF5L_H1h)2okb1678654406715'),
+(95, 'JJx_O^)+44-Ir*%07eQu+8sfCc!g5_A2XOWSyDhOPTWobhOZx£k1678654455641'),
+(96, 'RH5\"SDAFl*^dmyJC£nJF!hUPqUL-0GAgAqT+%B^\"IrRZJRrUPx^1678654497051'),
+(97, ''),
+(98, ''),
+(99, ''),
+(100, ''),
+(101, ''),
+(102, ''),
+(103, ''),
+(104, '');
 
 -- --------------------------------------------------------
 
@@ -573,7 +552,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `date`) VALUES
-(84, 'michael8t6@gmail.com', '7fee8b1ff1733876febc0d525ae88c5f28f605c08d11c61c109af63b05b4bf03', '2023-02-12 12:50:19');
+(84, 'michael8t6@gmail.com', '51475b76dda6383493d7ca1286fcffb9efaaee6b05e63de02cef5a1939a3a68f', '2023-03-13 18:44:09'),
+(169, 'm@m.m', '7fee8b1ff1733876febc0d525ae88c5f28f605c08d11c61c109af63b05b4bf03', '2023-03-12 21:34:51');
 
 -- --------------------------------------------------------
 
@@ -592,7 +572,13 @@ CREATE TABLE `user_company` (
 --
 
 INSERT INTO `user_company` (`id`, `user_id`, `company_id`) VALUES
-(30, 84, 32);
+(30, 84, 32),
+(50, 131, 81),
+(51, 133, 82),
+(52, 134, 83),
+(53, 135, 84),
+(54, 168, 120),
+(55, 169, 121);
 
 -- --------------------------------------------------------
 
@@ -612,27 +598,8 @@ CREATE TABLE `user_invoices` (
 --
 
 INSERT INTO `user_invoices` (`id`, `user_id`, `invoice_id`, `date`) VALUES
-(1, 84, 1, '2023-01-24 21:41:53'),
-(2, 84, 2, '2023-01-24 21:43:03'),
-(3, 84, 3, '2023-01-25 18:27:02'),
-(4, 84, 4, '2023-01-25 20:28:57'),
-(5, 84, 5, '2023-02-12 13:08:55'),
-(6, 84, 6, '2023-02-12 13:14:27'),
-(7, 84, 8, '2023-02-12 13:15:32'),
-(8, 84, 9, '2023-02-12 13:16:40'),
-(9, 84, 10, '2023-02-12 13:18:48'),
-(10, 84, 11, '2023-02-12 14:02:45'),
-(11, 84, 12, '2023-02-12 14:52:05'),
-(12, 84, 13, '2023-02-12 15:22:12'),
-(13, 84, 14, '2023-02-12 15:23:20'),
-(14, 84, 15, '2023-02-12 15:24:11'),
-(15, 84, 16, '2023-02-12 15:26:33'),
-(16, 84, 17, '2023-02-12 15:29:11'),
-(17, 84, 18, '2023-02-12 15:31:18'),
-(18, 84, 19, '2023-02-17 20:46:32'),
-(19, 84, 23, '2023-02-24 21:45:44'),
-(20, 84, 24, '2023-02-24 21:46:11'),
-(21, 84, 25, '2023-03-06 21:13:17');
+(41, 84, 46, '2023-03-14 21:35:26'),
+(42, 84, 47, '2023-03-14 21:36:48');
 
 -- --------------------------------------------------------
 
@@ -651,7 +618,8 @@ CREATE TABLE `user_reset` (
 --
 
 INSERT INTO `user_reset` (`id`, `user_id`, `token_id`) VALUES
-(42, 84, 51);
+(52, 169, 78),
+(53, 84, 79);
 
 -- --------------------------------------------------------
 
@@ -698,7 +666,22 @@ CREATE TABLE `user_token` (
 --
 
 INSERT INTO `user_token` (`id`, `user`, `token`) VALUES
-(53, 84, 71);
+(54, 84, 71),
+(66, 131, 88),
+(67, 133, 89),
+(68, 134, 90),
+(69, 135, 91),
+(70, 136, 92),
+(71, 137, 93),
+(72, 159, 96),
+(73, 161, 97),
+(74, 163, 98),
+(75, 164, 99),
+(76, 165, 100),
+(77, 166, 101),
+(78, 167, 102),
+(79, 168, 103),
+(80, 169, 104);
 
 --
 -- Indexes for dumped tables
@@ -841,7 +824,7 @@ ALTER TABLE `user_token`
 -- AUTO_INCREMENT for table `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 
 --
 -- AUTO_INCREMENT for table `history`
@@ -859,31 +842,31 @@ ALTER TABLE `history_locations`
 -- AUTO_INCREMENT for table `invoice_company`
 --
 ALTER TABLE `invoice_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `invoice_items`
 --
 ALTER TABLE `invoice_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
 
 --
 -- AUTO_INCREMENT for table `invoice_specific`
 --
 ALTER TABLE `invoice_specific`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `invoice_specifics`
 --
 ALTER TABLE `invoice_specifics`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `locations`
@@ -895,7 +878,7 @@ ALTER TABLE `locations`
 -- AUTO_INCREMENT for table `reset_tokens`
 --
 ALTER TABLE `reset_tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `stock`
@@ -925,31 +908,31 @@ ALTER TABLE `stock_locations`
 -- AUTO_INCREMENT for table `tokens`
 --
 ALTER TABLE `tokens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
 
 --
 -- AUTO_INCREMENT for table `user_company`
 --
 ALTER TABLE `user_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `user_invoices`
 --
 ALTER TABLE `user_invoices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `user_reset`
 --
 ALTER TABLE `user_reset`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `user_stock`
@@ -961,7 +944,7 @@ ALTER TABLE `user_stock`
 -- AUTO_INCREMENT for table `user_token`
 --
 ALTER TABLE `user_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
