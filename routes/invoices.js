@@ -66,12 +66,13 @@ router.get("/get/:id?", async function (req, res) {
   try {
     const ids = id ? [id] : await _invoices.getInvoiceIds(userId);
 
-    if (!Array.isArray(ids)) throw new Error(invoices);
+    if (!Array.isArray(ids)) throw new Error(ids);
 
     const invoices = await _invoices.getInvoices(ids);
     if (!Array.isArray(invoices)) throw new Error(invoices);
 
-    res.send({ status: 1, token, data: invoices });
+    // console.log(invoices);
+    res.send({ status: 1, token, invoices });
   } catch (err) {
     console.log(`invoices/get
       \x1b[31m${err}\x1b[0m`);

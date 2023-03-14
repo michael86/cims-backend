@@ -105,7 +105,7 @@ const utils = {
     try {
       let userInvoices = await runQuery(queries.invoices.selectIds(), [user]);
 
-      if (!userInvoices[0]) throw new Error(user_invoices);
+      if (!Array.isArray(userInvoices)) throw new Error(userInvoices);
 
       return userInvoices.map(({ id }) => id);
     } catch (err) {
@@ -118,7 +118,7 @@ const utils = {
       const items = [];
       for (const { id } of ids) {
         const item = await runQuery(queries.invoices.selectItem(), [id]);
-        if (!item[0]) throw new Error(item);
+        if (!Array.isArray(item)) throw new Error(item);
         items.push(item);
       }
       return items;
@@ -126,30 +126,33 @@ const utils = {
       return err;
     }
   },
+
   getInvoices: async (ids) => {
     try {
       const invoices = [];
       for (const id of ids) {
-        const invoice = await runQuery(queries.invoices.select(), [id, id]);
+        let invoice = await runQuery(queries.invoices.select(), [id, id]);
 
         if (!Array.isArray(invoice)) throw new Error(invoice);
+        [{ ...invoice }] = invoice; //runQuery returns an object inside an array, so destructure it.
 
         const itemIds = await runQuery(queries.invoices.selectItemIds(), id);
         if (!Array.isArray(itemIds)) throw new Error(itemIds);
 
         const items = await utils.getItems(itemIds);
+
         invoice.items = items.map((item) => {
           const i = { ...item[0] };
           i.price = (i.price / 100).toFixed(2);
           return i;
         });
 
-        console.log(invoice.items);
-
+        // console.log(invoice);
         invoices.push(invoice);
       }
       return invoices;
     } catch (err) {
+      console.log(2);
       return err;
     }
   },
