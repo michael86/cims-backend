@@ -1,6 +1,8 @@
 const queries = require("../../mysql/query");
 const { runQuery } = require("../sql");
 const { poundsToPennies } = require("../generic");
+const path = require("node:path");
+const niceInvoice = require("nice-invoice");
 
 const utils = {
   insertCompany: async (data) => {
@@ -152,6 +154,59 @@ const utils = {
       return invoices;
     } catch (err) {
       console.log(2);
+      return err;
+    }
+  },
+  createFile: async ([data], userId) => {
+    try {
+      let company = await runQuery(queries.company.selectUserCompany(), [userId]);
+      if (company instanceof Error) throw new Error(company);
+      [{ ...company }] = company;
+
+      const items = [];
+
+      for (const item of data.items) {
+        item.price = parseFloat(item.price); //cast this to number at root of selection in future
+        items.push({ ...item });
+      }
+
+      const invoiceDetail = {
+        shipping: {
+          name: `${data.contact} - ${data.name}`,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          country: data.country,
+          postal_code: data.postcode,
+        },
+        items,
+        total: 2,
+        order_number: data.orderNumber,
+        header: {
+          company_name: company.name,
+          company_logo: "logo.png",
+          company_address: `${company.address}, ${company.city}, ${company.county}, ${company.postcode}, ${company.country}`,
+        },
+        footer: {
+          text: data.footer,
+        },
+        currency_symbol: "£",
+        date: {
+          billing_date: data.billing_date,
+          due_date: data.due_date,
+        },
+      };
+
+      const fileName = `${data.contact.replaceAll(" ", "-")}-${data.name}.pdf`;
+
+      const filePath = path.join(__dirname, "..", "..", "public/invoices", fileName);
+
+      const fileCreated = await niceInvoice(invoiceDetail, filePath);
+      console.log(fileCreated);
+      if (fileCreated instanceof Error) throw new Error(fileCreated);
+      console.log("yeeeet");
+      return fileName;
+    } catch (err) {
       return err;
     }
   },
