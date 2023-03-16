@@ -21,7 +21,7 @@ module.exports.authenticate = (req, res, next) => {
 };
 
 module.exports.validateToken = async (req, res, next) => {
-  const { token } = req.headers;
+  let { token } = req.headers;
 
   for (const user in authenticatedUsers) {
     if (authenticatedUsers[user].token === token) {

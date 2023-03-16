@@ -2,7 +2,8 @@ const queries = require("../../mysql/query");
 const { runQuery } = require("../sql");
 const { poundsToPennies } = require("../generic");
 const path = require("node:path");
-const niceInvoice = require("nice-invoice");
+const easyinvoice = require("easyinvoice");
+const fs = require("fs");
 
 const utils = {
   insertCompany: async (data) => {
@@ -166,45 +167,67 @@ const utils = {
       const items = [];
 
       for (const item of data.items) {
-        item.price = parseFloat(item.price); //cast this to number at root of selection in future
-        items.push({ ...item });
+        items.push({
+          quantity: item.quantity,
+          description: `${item.sku}: ${item.description}`,
+          "tax-rate": item.tax,
+          price: parseFloat(item.price),
+        });
       }
 
+      const template = path.join(__dirname, "..", "..", "utils/invoices", "template.html");
+
       const invoiceDetail = {
-        shipping: {
-          name: `${data.contact} - ${data.name}`,
+        customize: {
+          template: fs.readFileSync(template, "base64"), // Must be base64 encoded html
+        },
+        images: {
+          logo: "https://avatars.githubusercontent.com/u/24959057?s=400&u=c327230943159112b4851d5f0b0a0602950abcde&v=4",
+        },
+        sender: {
+          company: company.name,
+          address: company.address,
+          zip: company.postcode,
+          city: company.city,
+          country: company.country,
+          custom1: company.county,
+        },
+        client: {
+          company: data.name,
+          custom1: data.contact,
           address: data.address,
+          custom2: data.state,
+          zip: data.postcode,
           city: data.city,
-          state: data.state,
           country: data.country,
-          postal_code: data.postcode,
         },
-        items,
-        total: 2,
-        order_number: data.orderNumber,
-        header: {
-          company_name: company.name,
-          company_logo: "logo.png",
-          company_address: `${company.address}, ${company.city}, ${company.county}, ${company.postcode}, ${company.country}`,
+        information: {
+          number: data.orderNumber,
+          date: new Date(data.billingDate * 1000).toLocaleDateString(),
+          "due-date": new Date(data.dueDate * 1000).toLocaleDateString(),
         },
-        footer: {
-          text: data.footer,
-        },
-        currency_symbol: "£",
-        date: {
-          billing_date: data.billing_date,
-          due_date: data.due_date,
+        products: items,
+        "bottom-notice": data.footer,
+        settings: {
+          currency: "GBP", // See documentation 'Locales and Currency' for more info. Leave empty for no currency.
+          // "locale": "nl-NL", // Defaults to en-US, used for number formatting (see docs)
+          // "taxNotation": "gst", // Defaults to vat
+          // "margin-top": 25, // Default to 25
+          // "margin-right": 25, // Default to 25
+          // "margin-left": 25, // Default to 25
+          // "margin-bottom": 25, // Default to 25
+          // "format": "Letter", // Defaults to A4
+          // "height": "1000px", // allowed units: mm, cm, in, px
+          // "width": "500px", // allowed units: mm, cm, in, px
+          // "orientation": "landscape", // portrait or landscape, defaults to portrait
         },
       };
 
       const fileName = `${data.contact.replaceAll(" ", "-")}-${data.name}.pdf`;
-
       const filePath = path.join(__dirname, "..", "..", "public/invoices", fileName);
+      const result = await easyinvoice.createInvoice(invoiceDetail);
+      await fs.writeFileSync(filePath, result.pdf, "base64"); //This triggers the catch if fails, so no need to check for errors.
 
-      const fileCreated = await niceInvoice(invoiceDetail, filePath);
-      console.log(fileCreated);
-      if (fileCreated instanceof Error) throw new Error(fileCreated);
-      console.log("yeeeet");
       return fileName;
     } catch (err) {
       return err;

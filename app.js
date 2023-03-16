@@ -1,12 +1,12 @@
 const express = require("express");
-const { authenticate, validateToken, initTokenCache } = require("./middleware/tokens");
+const { validateToken, initTokenCache } = require("./middleware/tokens");
 const app = express();
 const cors = require("cors");
 
 require("dotenv").config();
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static("./public"));
 app.use(cors());
 
 app.use("/account", require("./routes/account"));
