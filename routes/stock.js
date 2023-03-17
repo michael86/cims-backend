@@ -208,42 +208,51 @@ router.post("/add", async function (req, res) {
   const { data } = req.body;
   const { locations, history } = data;
 
-  if (!validateData(data) || !email) return;
-
-  const [{ id: userId }] = await runQuery(select("users", ["id"], "email"), [email]);
-
-  if (!userId) return;
-
-  const itemId = await addItemToUser(data, userId);
-
-  if (!itemId) {
-    res.end();
-    return;
-  }
-  if (itemId === "ER_DUP_ENTRY") {
-    res.send({ status: 2, token });
+  if (!validateData(data) || !email) {
+    res.status(400).send({ status: 0 });
     return;
   }
 
-  const compRel = await addCompanytoItem(data, itemId, await getCompanyId(data));
-  if (!compRel) {
-    res.end();
-    return;
-  }
+  try {
+    const [{ id: userId }] = await runQuery(select("users", ["id"], "email"), [email]);
 
-  const locationRel = await addLocationstoItem(locations, itemId);
-  if (!locationRel) {
-    res.end();
-    return;
-  }
+    if (!userId) return;
 
-  const historyRel = await addHistoryToItem(history, itemId);
-  if (!historyRel) {
-    res.end();
-    return;
-  }
+    const itemId = await addItemToUser(data, userId);
 
-  res.send({ status: 1, token });
+    if (!itemId) {
+      res.end();
+      return;
+    }
+    if (itemId === "ER_DUP_ENTRY") {
+      res.send({ status: 2, token });
+      return;
+    }
+
+    const compRel = await addCompanytoItem(data, itemId, await getCompanyId(data));
+    if (!compRel) {
+      res.end();
+      return;
+    }
+
+    const locationRel = await addLocationstoItem(locations, itemId);
+    if (!locationRel) {
+      res.end();
+      return;
+    }
+
+    const historyRel = await addHistoryToItem(history, itemId);
+    if (!historyRel) {
+      res.end();
+      return;
+    }
+
+    res.send({ status: 1, token });
+  } catch (err) {
+    console.log(`stock/add
+      \x1b[31m${err}\x1b[0m`);
+    res.send({ status: 0, token });
+  }
 });
 
 const getLocations = async (id) => {
