@@ -27,11 +27,13 @@ const utils = {
       return;
     }
   },
+
   validateData: (payload) => {
+    //Don't check for price as can be ommitted if free issue
+
     const {
       sku,
       qty,
-      price,
       company,
       companyStreet,
       companyCity,
@@ -45,7 +47,6 @@ const utils = {
     if (
       !sku ||
       !qty ||
-      !price ||
       !company ||
       !companyStreet ||
       !companyCity ||
@@ -58,12 +59,11 @@ const utils = {
       return false;
 
     if (!utils.validateLocations(locations)) return false;
-
     let valid = true;
 
     for (const his of history) {
-      const { qty, price, locations } = his;
-      if (!qty || !price || !locations) {
+      const { qty, locations } = his;
+      if (!qty || !locations) {
         valid = false;
         break;
       }
@@ -95,6 +95,30 @@ const utils = {
     }
 
     return valid;
+  },
+
+  createStock: async (item) => {
+    try {
+      const res = await runQuery(
+        insert("stock", ["sku", "quantity", "price", "image_name", "free_issue"]),
+        [sku, qty, poundsToPennies(price), "null", false]
+      );
+      console.log(res);
+      if (res instanceof Error) return;
+    } catch (err) {
+      return err;
+    }
+  },
+
+  addItemToUser: async (data, id) => {
+    try {
+      console.log(data);
+      const { sku, qty, price } = data;
+
+      return itemId;
+    } catch (err) {
+      return err;
+    }
   },
 };
 

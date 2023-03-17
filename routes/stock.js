@@ -12,8 +12,8 @@ const { runQuery } = require("../utils/sql");
 const { getLocationsToDelete, getLocationsToInsert } = require("../utils");
 const router = express.Router();
 
-const poundsToPennies = (amount) => Math.floor(parseFloat(amount) * 100);
-const penniesToPounds = (amount) => Math.floor(parseFloat(amount) / 100);
+const stock = require("../utils/stock");
+const account = require("../utils/account");
 
 const getCompanyId = async (data) => {
   const company = {
@@ -79,28 +79,6 @@ const addLocationstoItem = async (locations, itemId) => {
   return true;
 };
 
-const addItemToUser = async (data, userId) => {
-  const { sku, qty, price } = data;
-
-  const itemRes = await runQuery(
-    insert("stock", ["sku", "quantity", "price", "image_name", "free_issue"]),
-    [sku, qty, poundsToPennies(price), "null", false]
-  );
-
-  if (!itemRes) return;
-  if (itemRes === "ER_DUP_ENTRY") return itemRes;
-
-  const { insertId: itemId } = itemRes;
-
-  const { insertId: relation } = await runQuery(insert("user_stock", ["user_id", "stock_id"]), [
-    userId,
-    itemId,
-  ]);
-
-  if (!relation) return;
-  return itemId;
-};
-
 const addHistoryToItem = async ([data], itemId) => {
   const { insertId: historyId } = await runQuery(insert("history", ["quantity", "price"]), [
     data.qty,
@@ -139,22 +117,18 @@ router.post("/add", async function (req, res) {
   const { data } = req.body;
   const { locations, history } = data;
 
-  if (!validateData(data) || !email) {
-    res.status(400).send({ status: 0 });
+  if (!stock.validateData(data) || !email) {
+    res.status(400).send({ status: 0, token });
     return;
   }
 
   try {
-    const [{ id: userId }] = await runQuery(select("users", ["id"], "email"), [email]);
+    const { id } = await account.getUserDetails(["id"], ["email", email]);
+    if (id instanceof Error) throw new Error(id);
 
-    if (!userId) return;
+    const itemId = await stock.addItemToUser(data, id);
+    if (itemId instanceof Error) throw new Error(itemId);
 
-    const itemId = await addItemToUser(data, userId);
-
-    if (!itemId) {
-      res.end();
-      return;
-    }
     if (itemId === "ER_DUP_ENTRY") {
       res.send({ status: 2, token });
       return;
@@ -182,7 +156,7 @@ router.post("/add", async function (req, res) {
   } catch (err) {
     console.log(`stock/add
       \x1b[31m${err}\x1b[0m`);
-    res.send({ status: 0, token });
+    res.status(500).send({ status: 0, token });
   }
 });
 

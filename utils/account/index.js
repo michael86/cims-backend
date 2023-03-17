@@ -101,14 +101,11 @@ const utils = {
         identifiers[1],
       ]);
 
-      if (!user?.id || !user?.email) throw new Error(user);
+      if (user instanceof Error) throw new Error(user);
 
-      return { ...user };
+      return user;
     } catch (err) {
-      console.log(
-        `error getting user details \n targets: ${targets} \n identifiers: ${identifiers} \n error: ${err}`
-      );
-      return;
+      return err;
     }
   },
 
