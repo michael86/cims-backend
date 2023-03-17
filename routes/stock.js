@@ -129,12 +129,14 @@ router.post("/add", async function (req, res) {
     const itemId = await stock.addItemToUser(data, id);
     if (itemId instanceof Error) throw new Error(itemId);
 
-    if (itemId === "ER_DUP_ENTRY") {
+    if (itemId === "used") {
       res.send({ status: 2, token });
       return;
     }
 
+    console.log(itemId, "itemId");
     const compRel = await addCompanytoItem(data, itemId, await getCompanyId(data));
+
     if (!compRel) {
       res.end();
       return;

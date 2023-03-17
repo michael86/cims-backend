@@ -1,5 +1,6 @@
 const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
+const generic = require("../../utils/generic");
 
 const utils = {
   createStock: async (items) => {
@@ -58,66 +59,70 @@ const utils = {
     )
       return false;
 
-    if (!utils.validateLocations(locations)) return false;
     let valid = true;
-
     for (const his of history) {
       const { qty, locations } = his;
       if (!qty || !locations) {
         valid = false;
         break;
       }
-
-      if (!utils.validateLocations(locations)) {
-        valid = false;
-        break;
-      }
     }
 
     return valid;
   },
 
-  validateLocations: (locations) => {
-    const specialCharReg = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-    let valid = true;
-    for (const location of locations) {
-      const { name, value } = location;
-
-      if (!name || !value) {
-        valid = false;
-        break;
-      }
-
-      if (name.match(specialCharReg) || value.match(specialCharReg)) {
-        valid = false;
-        break;
-      }
-    }
-
-    return valid;
-  },
-
-  createStock: async (item) => {
+  createStock: async ({ sku, qty, price }) => {
     try {
-      const res = await runQuery(
-        insert("stock", ["sku", "quantity", "price", "image_name", "free_issue"]),
-        [sku, qty, poundsToPennies(price), "null", false]
-      );
-      console.log(res);
-      if (res instanceof Error) return;
+      const res = await runQuery(queries.stock.insertStock(), [
+        sku,
+        qty,
+        price ? generic.poundsToPennies(price) : 0,
+        null,
+        !price ? 1 : 0,
+      ]);
+
+      if (res instanceof Error) return res;
+
+      return res.insertId;
     } catch (err) {
-      return err;
+      return `createStock: ${err}`;
     }
   },
 
   addItemToUser: async (data, id) => {
     try {
-      console.log(data);
       const { sku, qty, price } = data;
+
+      const valid = await utils.validateUserSku(sku, id);
+      if (valid instanceof Error) throw new Error(valid);
+
+      if (!valid) return "used";
+
+      const itemId = await utils.createStock({ sku, qty, price });
+      if (itemId instanceof Error) throw new Error(itemId);
+
+      const relation = await runQuery(queries.user.insertRelation("stock", "stock_id"), [
+        id,
+        itemId,
+      ]);
+
+      if (relation instanceof Error) throw new Error(relation);
 
       return itemId;
     } catch (err) {
-      return err;
+      return `addItemToUser: ${err}`;
+    }
+  },
+
+  validateUserSku: async (sku, id) => {
+    try {
+      const skus = await runQuery(queries.stock.selectUserSkus(), [id]);
+
+      if (skus instanceof Error) throw new Error(skus);
+
+      return skus.every((i) => i.sku !== sku);
+    } catch (err) {
+      return `validateUserSku: ${err}`;
     }
   },
 };

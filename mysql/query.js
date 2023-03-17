@@ -1,6 +1,18 @@
 const queries = {
   user: {
+    relations: {
+      stock: "user_stock",
+      company: "user_compamy",
+      invoices: "user_invoices",
+      reset: "user_reset",
+      token: "user_token",
+    },
     insert: () => `INSERT INTO users (email, password) VALUES (?, ?)`,
+
+    insertRelation: (table, column) => {
+      //I really should have used normal functions so I can use 'this'
+      return `INSERT INTO ${queries.user.relations[table]} (user_id, ${column}) VALUES (?, ?)`;
+    },
 
     selectCreds: (creds, like) => `SELECT ${creds.join(", ")} FROM users WHERE ${like} LIKE ?;`,
 
@@ -11,7 +23,7 @@ const queries = {
 
   stock: {
     insertStock: () => {
-      return `INSERT INTO stock (sku, description, quantity, price, tax) VALUES (?, ?, ?, ?, ?)`;
+      return `INSERT INTO stock (sku, quantity, price, image_name, free_issue) VALUES (?, ?, ?, ?, ?)`;
     },
 
     patchStock: (items, selectors) => {
@@ -24,11 +36,19 @@ const queries = {
       return `INSERT INTO history (sku, quantity, price) VALUES (?, ?, ?)`;
     },
 
-    createHistoryRelation: () => {
+    insertHistoryRelation: () => {
       return `INSERT INTO stock_histories (stock_id, history_id) VALUES (?, ?)`;
     },
-    createHistoryLocRelation: () => {
+    insertHistoryLocRelation: () => {
       return `INSERT INTO history_locations (history_id, location_id) VALUES (?, ?)`;
+    },
+
+    selectUserSkus: () => {
+      return `SELECT user_stock.stock_id,  
+		          stock.sku 
+                FROM user_stock 
+                  JOIN stock ON stock.id = user_stock.stock_id 
+                    WHERE user_stock.user_id = 84 `;
     },
   },
   company: {
