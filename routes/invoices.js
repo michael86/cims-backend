@@ -16,7 +16,7 @@ router.put("/add", async function (req, res) {
   }
 
   try {
-    const companyId = await _invoices.insertCompany(comp);
+    const companyId = await _invoices.createCompany(comp);
     if (!companyId || typeof companyId !== "number") throw new Error(companyId);
 
     const relation = await _invoices.createUserRelation(userId, companyId);

@@ -31,7 +31,7 @@ const utils = {
     }
   },
 
-  insertCompany: async (data) => {
+  createCompany: async (data) => {
     try {
       const insertId = await runQuery(queries.company.insert(), [
         data.company,
@@ -42,13 +42,11 @@ const utils = {
         data.companyCountry,
       ]);
 
-      if (!insertId.affectedRows) throw new Error(insertId);
+      if (insertId instanceof Error) throw new Error(`createCompany: ${insertId}`);
 
       return insertId;
     } catch (err) {
-      console.log(`\x1b[31m${err}\x1b[0m \ndata: ${data} \n `);
-
-      return;
+      return err;
     }
   },
   createUserRelation: async (userId, companyId) => {

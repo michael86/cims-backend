@@ -125,6 +125,8 @@ const utils = {
       return `validateUserSku: ${err}`;
     }
   },
+
+  createCompanyRelation: async (id) => {},
 };
 
 module.exports = utils;

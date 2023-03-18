@@ -14,6 +14,7 @@ const router = express.Router();
 
 const stock = require("../utils/stock");
 const account = require("../utils/account");
+const company = require("../utils/company");
 
 const getCompanyId = async (data) => {
   const company = {
@@ -134,13 +135,9 @@ router.post("/add", async function (req, res) {
       return;
     }
 
-    console.log(itemId, "itemId");
-    const compRel = await addCompanytoItem(data, itemId, await getCompanyId(data));
-
-    if (!compRel) {
-      res.end();
-      return;
-    }
+    const compId = await company.createCompany(data);
+    console.log("compId", compId);
+    const compRes = await stock.createCompanyRelation(itemId);
 
     const locationRel = await addLocationstoItem(locations, itemId);
     if (!locationRel) {
