@@ -31,9 +31,9 @@ const utils = {
     }
   },
 
-  createCompany: async (data) => {
+  createCompany: async (data, getCompany = false) => {
     try {
-      const insertId = await runQuery(queries.company.insert(), [
+      let res = await runQuery(queries.company.insert(), [
         data.company,
         data.companyStreet,
         data.companyCity,
@@ -42,9 +42,15 @@ const utils = {
         data.companyCountry,
       ]);
 
-      if (insertId instanceof Error) throw new Error(`createCompany: ${insertId}`);
+      if (res instanceof Error) throw new Error(`createCompany: ${res}`);
+      if (res === "ER_DUP_ENTRY" && !getCompany) return res;
 
-      return insertId;
+      if (res === "ER_DUP_ENTRY" && getCompany) {
+        res = await utils.getCompany(data.company, data.companyPostcode);
+        if (res instanceof Error) throw new Error(`createCompany: ${res}`);
+      }
+
+      return res.insertId || res.id;
     } catch (err) {
       return err;
     }
@@ -62,6 +68,17 @@ const utils = {
     } catch (err) {
       console.log(`\x1b[31m${err}"\x1b[0m"`);
       return;
+    }
+  },
+  getCompany: async (name, postcode) => {
+    try {
+      let company = await runQuery(queries.company.select(), [name, postcode]);
+      if (company instanceof Error) throw new Error(`getCompany: ${company}`);
+      [{ ...company }] = company;
+
+      return company;
+    } catch (err) {
+      return err;
     }
   },
 };

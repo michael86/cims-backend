@@ -126,7 +126,15 @@ const utils = {
     }
   },
 
-  createCompanyRelation: async (id) => {},
+  createCompanyRelation: async (stock, company) => {
+    try {
+      const res = await runQuery(queries.stock.insertCompanyRelation(), [stock, company]);
+      if (res instanceof Error) throw new Error(`stock creatCompanyRelation: ${res}`);
+      return res.insertId;
+    } catch (err) {
+      return err;
+    }
+  },
 };
 
 module.exports = utils;

@@ -135,9 +135,12 @@ router.post("/add", async function (req, res) {
       return;
     }
 
-    const compId = await company.createCompany(data);
-    console.log("compId", compId);
-    const compRes = await stock.createCompanyRelation(itemId);
+    const compId = await company.createCompany(data, true);
+    if (compId instanceof Error) throw new Error(compId);
+
+    const compRelation = await stock.createCompanyRelation(itemId, compId);
+    if (compRelation instanceof Error) throw new Error(compRelation);
+    console.log("compRelation", compRelation);
 
     const locationRel = await addLocationstoItem(locations, itemId);
     if (!locationRel) {

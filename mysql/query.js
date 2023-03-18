@@ -22,9 +22,8 @@ const queries = {
   },
 
   stock: {
-    insertStock: () => {
-      return `INSERT INTO stock (sku, quantity, price, image_name, free_issue) VALUES (?, ?, ?, ?, ?)`;
-    },
+    insertStock: () =>
+      `INSERT INTO stock (sku, quantity, price, image_name, free_issue) VALUES (?, ?, ?, ?, ?)`,
 
     patchStock: (items, selectors) => {
       return `UPDATE stock SET ${items
@@ -32,16 +31,14 @@ const queries = {
         .join("")} 
             WHERE  ${selectors.map((selector) => `${selector} = ?`)}`;
     },
-    insertHistory: () => {
-      return `INSERT INTO history (sku, quantity, price) VALUES (?, ?, ?)`;
-    },
+    insertHistory: () => `INSERT INTO history (sku, quantity, price) VALUES (?, ?, ?)`,
 
-    insertHistoryRelation: () => {
-      return `INSERT INTO stock_histories (stock_id, history_id) VALUES (?, ?)`;
-    },
-    insertHistoryLocRelation: () => {
-      return `INSERT INTO history_locations (history_id, location_id) VALUES (?, ?)`;
-    },
+    insertHistoryRelation: () => `INSERT INTO stock_histories (stock_id, history_id) VALUES (?, ?)`,
+
+    insertHistoryLocRelation: () =>
+      `INSERT INTO history_locations (history_id, location_id) VALUES (?, ?)`,
+
+    insertCompanyRelation: () => `INSERT INTO stock_company (stock_id, company_id) VALUES (?, ?)`,
 
     selectUserSkus: () => {
       return `SELECT user_stock.stock_id,  
@@ -52,6 +49,8 @@ const queries = {
     },
   },
   company: {
+    select: () => `SELECT * FROM companies WHERE name = ? AND postcode = ?`,
+
     insert: () =>
       `INSERT INTO companies (name, address, city, county, postcode, country) VALUES (?, ?, ?, ?, ?, ?);`,
 
