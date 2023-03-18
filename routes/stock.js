@@ -16,51 +16,6 @@ const stock = require("../utils/stock");
 const account = require("../utils/account");
 const company = require("../utils/company");
 
-const getCompanyId = async (data) => {
-  const company = {
-    name: data.company,
-    postcode: data.companyPostcode,
-  };
-
-  const [compRes] = await runQuery(select("companies", ["id"], ["name", "postcode"]), [
-    company.name,
-    company.postcode,
-  ]);
-
-  return compRes?.id || undefined;
-};
-
-const addCompanytoItem = async (data, itemId, companyId) => {
-  const company = Object.values({
-    company: data.company,
-    companyStreet: data.companyStreet,
-    companyCity: data.companyCity,
-    companyCounty: data.companyCounty,
-    companyPostcode: data.companyPostcode,
-    companyCountry: data.companyCountry,
-  });
-
-  if (!companyId) {
-    const { insertId: id } = await runQuery(
-      insert("companies", ["name", "address", "city", "county", "postcode", "country"]),
-      [...company]
-    );
-
-    if (!id) return;
-
-    companyId = id;
-  }
-
-  const { insertId: relationship } = await runQuery(
-    insert("stock_company", ["stock_id", "company_id"]),
-    [itemId, companyId]
-  );
-
-  if (!relationship) return;
-
-  return true;
-};
-
 const addLocationstoItem = async (locations, itemId) => {
   for (const location of locations) {
     const { insertId: locId } = await runQuery(insert("locations", ["name", "value"]), [
@@ -140,7 +95,6 @@ router.post("/add", async function (req, res) {
 
     const compRelation = await stock.createCompanyRelation(itemId, compId);
     if (compRelation instanceof Error) throw new Error(compRelation);
-    console.log("compRelation", compRelation);
 
     const locationRel = await addLocationstoItem(locations, itemId);
     if (!locationRel) {

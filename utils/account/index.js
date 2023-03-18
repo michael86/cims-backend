@@ -9,16 +9,12 @@ const utils = {
     try {
       const [user] = await runQuery(queries.user.selectCreds(["password", "id"], "email"), [email]);
 
-      if (!user) throw new Error("Error selecint user");
+      if (user instanceof Error) throw new Error(`validateUserLogin: ${user}`);
       if (sha256(`${process.env.SALT}${password}`) !== user.password) return 0;
 
       return user.id;
     } catch (err) {
-      console.log(`
-      error logging user in
-      ${email}
-      ${err}`);
-      return;
+      return err;
     }
   },
 
@@ -27,7 +23,7 @@ const utils = {
       const pass = sha256(`${process.env.SALT}${password}`);
       const updateRes = await runQuery(queries.user.patch("password"), [pass, id]);
 
-      if (!updateRes?.affectedRows) throw new Error(`affectedRows is null`);
+      if (updateRes instanceof Error) throw new Error(`updateUserPassword: ${updateRes}`);
 
       return true;
     } catch (err) {

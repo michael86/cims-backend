@@ -3,6 +3,8 @@ const { update } = require("../../mysql/query");
 
 module.exports.runQuery = async (query, data) => {
   try {
+    for (const i in data) if (typeof data[i] === "string") data[i] = data[i].toLowerCase();
+
     const res = await asyncMySQL(query, data);
 
     if (res.affectedRows === 0) {
