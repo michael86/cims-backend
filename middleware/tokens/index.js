@@ -1,6 +1,7 @@
 const { select } = require("../../mysql/query");
 const { genToken } = require("../../utils/tokens");
 const { runQuery, updateToken } = require("../../utils/sql");
+const queries = require("../../mysql/query");
 
 const authenticatedUsers = {};
 
@@ -56,32 +57,30 @@ module.exports.validateToken = async (req, res, next) => {
 module.exports.addToken = (email, payload) => (authenticatedUsers[email] = { ...payload });
 
 module.exports.initTokenCache = async () => {
-  await runQuery(select("users", ["email", "id"])).then(async (res) => {
-    for (const user of res) {
-      const { id: userId, email } = user;
+  try {
+    const users = await runQuery(select("users", ["email", "id"]));
 
-      const [connection] = await runQuery(select("user_token", ["token", "id"], "user"), [userId]);
+    for (const { id: userId, email } of users) {
+      const token = await runQuery(queries.tokens.select(), [userId]);
 
-      if (!connection) continue;
-
-      const { token: tokenId, id: connectionId } = connection;
-
-      const [userToken] = await runQuery(select("tokens", ["token"], "id"), [tokenId]);
-
-      const { token } = userToken;
+      if (token instanceof Error) throw new Error(`initTokenCache: ${token}`);
 
       this.addToken(email, {
         userId,
-        token,
-        tokenId,
+        token: token[0].value,
+        tokenId: token[0].id,
       });
     }
-  });
+  } catch (err) {
+    console.log(`Error initiating token cache\n${err}`);
+  }
 };
 
-module.exports.getTokenCreds = (email, token) =>
-  token
+module.exports.getTokenCreds = (email, token) => {
+  console.log("getTokenCreds: ", authenticatedUsers);
+  return token
     ? authenticatedUsers[email].token === token
       ? authenticatedUsers[email]
       : null
     : authenticatedUsers[email];
+};

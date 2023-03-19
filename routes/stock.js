@@ -16,39 +16,6 @@ const stock = require("../utils/stock");
 const account = require("../utils/account");
 const company = require("../utils/company");
 
-const addHistoryToItem = async ([data], itemId) => {
-  const { insertId: historyId } = await runQuery(insert("history", ["quantity", "price"]), [
-    data.qty,
-    poundsToPennies(data.price),
-  ]);
-
-  if (!historyId) return;
-
-  const { insertId: histRelation } = await runQuery(
-    insert("stock_histories", ["stock_id", "history_id"]),
-    [itemId, historyId]
-  );
-
-  if (!histRelation) return;
-
-  for (const location of data.locations) {
-    const { insertId: locId } = await runQuery(insert("locations", ["name", "value"]), [
-      location.name,
-      location.value,
-    ]);
-
-    if (!locId) return;
-
-    const { insertId: relationship } = await runQuery(
-      insert("history_locations", ["history_id", "location_id"]),
-      [historyId, locId]
-    );
-
-    if (!relationship) return;
-  }
-  return true;
-};
-
 router.post("/add", async function (req, res) {
   const { newToken: token, email } = req.headers;
   const { data } = req.body;
@@ -80,11 +47,8 @@ router.post("/add", async function (req, res) {
     const locs = await stock.createLocations(locations, itemId);
     if (locs instanceof Error) throw new Error(locations);
 
-    const historyRel = await addHistoryToItem(history, itemId);
-    if (!historyRel) {
-      res.end();
-      return;
-    }
+    const his = await stock.createHistory(history, itemId);
+    if (his instanceof Error) throw new Error(his);
 
     res.send({ status: 1, token });
   } catch (err) {

@@ -159,6 +159,44 @@ const utils = {
       return err;
     }
   },
+
+  createHistory: async ([data], itemId) => {
+    try {
+      const id = await runQuery(queries.stock.insertHistory(), [
+        data.sku,
+        data.qty,
+        generic.poundsToPennies(data.price),
+      ]);
+
+      if (id instanceof Error) throw new Error(`createHistory: ${id}`);
+
+      const { insertId: histRelation } = await runQuery(queries.stock.insertHistoryRelation(), [
+        itemId,
+        id.insertId,
+      ]);
+
+      if (histRelation instanceof Error) throw new Error(`createHistory: ${histRelation}`);
+
+      for (const location of data.locations) {
+        const locId = await runQuery(queries.stock.insertLocation(), [
+          location.name,
+          location.value,
+        ]);
+
+        if (locId instanceof Error) throw new Error(`createHistory: ${locId}`);
+
+        const relationship = await runQuery(queries.stock.insertHistoryLocRelation(), [
+          id.insertId,
+          locId.insertId,
+        ]);
+
+        if (relationship instanceof Error) throw new Error(`createHistory: ${relationship}`);
+      }
+      return true;
+    } catch (err) {
+      return err;
+    }
+  },
 };
 
 module.exports = utils;

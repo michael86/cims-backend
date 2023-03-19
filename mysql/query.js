@@ -107,6 +107,11 @@ const queries = {
   },
 
   tokens: {
+    select: () => `SELECT user_token.token_id AS id, tokens.token AS value
+                    FROM user_token 
+                      JOIN tokens ON tokens.id = user_token.token_id 
+                        WHERE user_token.user_id = ?`,
+
     insert: () => `INSERT INTO tokens (token) VALUES(?);`,
 
     insertRelation: () => `INSERT INTO user_token (user, token) VALUES (?, ?);`,

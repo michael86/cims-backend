@@ -31,7 +31,7 @@ router.put("/login", async function (req, res) {
     if (!company) throw new Error(`Account.js\nError selecting user company\n${company}`);
 
     const token = await utils.patchUserToken(email, userId);
-    if (!token) return;
+    if (token instanceof Error) throw new Error(token);
 
     res.send({
       status: 1,

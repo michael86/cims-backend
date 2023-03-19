@@ -52,7 +52,7 @@ const utils = {
       return token;
     } catch (err) {
       console.log(`error patching user token\nUser Id: ${id}\n ${err}`);
-      return;
+      return err;
     }
   },
 
