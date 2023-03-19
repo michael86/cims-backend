@@ -120,7 +120,7 @@ const utils = {
 
       if (skus instanceof Error) throw new Error(skus);
 
-      return skus.every((i) => i.sku !== sku);
+      return skus.every((i) => i.sku.toLowerCase() !== sku.toLowerCase());
     } catch (err) {
       return `validateUserSku: ${err}`;
     }
