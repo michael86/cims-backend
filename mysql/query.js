@@ -40,6 +40,11 @@ const queries = {
 
     insertCompanyRelation: () => `INSERT INTO stock_company (stock_id, company_id) VALUES (?, ?)`,
 
+    insertLocation: () => `INSERT INTO locations (name, value) VALUES (?, ?)`,
+
+    insertLocationRelation: () =>
+      `INSERT INTO stock_locations (stock_id, location_id) VALUES (?, ?)`,
+
     selectUserSkus: () => {
       return `SELECT user_stock.stock_id,  
 		          stock.sku 

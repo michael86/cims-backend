@@ -135,6 +135,30 @@ const utils = {
       return err;
     }
   },
+
+  createLocations: async (locations, id) => {
+    try {
+      for (const location of locations) {
+        const locId = await runQuery(queries.stock.insertLocation(), [
+          location.name,
+          location.value,
+        ]);
+
+        if (locId instanceof Error) throw new Error(`createLocations: ${locId}`);
+
+        const relationship = await runQuery(queries.stock.insertLocationRelation(), [
+          id,
+          locId.insertId,
+        ]);
+
+        if (relationship instanceof Error) throw new Error(`createLocations: ${relationship}`);
+      }
+
+      return true;
+    } catch (err) {
+      return err;
+    }
+  },
 };
 
 module.exports = utils;

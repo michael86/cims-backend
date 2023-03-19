@@ -16,25 +16,6 @@ const stock = require("../utils/stock");
 const account = require("../utils/account");
 const company = require("../utils/company");
 
-const addLocationstoItem = async (locations, itemId) => {
-  for (const location of locations) {
-    const { insertId: locId } = await runQuery(insert("locations", ["name", "value"]), [
-      location.name,
-      location.value,
-    ]);
-
-    if (!locId) return;
-
-    const { insertId: relationship } = await runQuery(
-      insert("stock_locations", ["stock_id", "location_id"]),
-      [itemId, locId]
-    );
-
-    if (!relationship) return;
-  }
-  return true;
-};
-
 const addHistoryToItem = async ([data], itemId) => {
   const { insertId: historyId } = await runQuery(insert("history", ["quantity", "price"]), [
     data.qty,
@@ -96,11 +77,8 @@ router.post("/add", async function (req, res) {
     const compRelation = await stock.createCompanyRelation(itemId, compId);
     if (compRelation instanceof Error) throw new Error(compRelation);
 
-    const locationRel = await addLocationstoItem(locations, itemId);
-    if (!locationRel) {
-      res.end();
-      return;
-    }
+    const locs = await stock.createLocations(locations, itemId);
+    if (locs instanceof Error) throw new Error(locations);
 
     const historyRel = await addHistoryToItem(history, itemId);
     if (!historyRel) {
