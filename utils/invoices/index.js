@@ -6,7 +6,7 @@ const easyinvoice = require("easyinvoice");
 const fs = require("fs");
 
 const utils = {
-  insertCompany: async (data) => {
+  createCompany: async (data) => {
     /*This is not in the company utils as we have a sep table for companies that an invoice is to.
       At some point, we could add a new column on the companies table called contact and allow it to be Null
       Then insert into there, but for the sake of it though. I'm lazy ;) */
@@ -133,14 +133,17 @@ const utils = {
   getInvoices: async (ids) => {
     try {
       const invoices = [];
+
       for (const id of ids) {
         let invoice = await runQuery(queries.invoices.select(), [id, id]);
 
-        if (!Array.isArray(invoice)) throw new Error(invoice);
+        if (invoice instanceof Error) throw new Error(invoice);
+
+        console.log("itemIds", invoice);
         [{ ...invoice }] = invoice;
 
         const itemIds = await runQuery(queries.invoices.selectItemIds(), id);
-        if (!Array.isArray(itemIds)) throw new Error(itemIds);
+        if (itemIds instanceof Error) throw new Error(itemIds);
 
         const items = await utils.getItems(itemIds);
 

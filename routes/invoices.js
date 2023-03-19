@@ -4,7 +4,6 @@ const router = express.Router();
 const { updateToken } = require("../utils/sql");
 const _invoices = require("../utils/invoices");
 const company = require("../utils/company");
-const path = require("path");
 
 router.put("/add", async function (req, res) {
   const { newToken: token, tokenId, userId } = req.headers;
@@ -70,7 +69,7 @@ router.get("/get/:id?:download?", async function (req, res) {
       res.send({ status: 1, token, filename });
       return;
     }
-
+    console.log("3");
     res.send({ status: 1, token, invoices });
   } catch (err) {
     console.log(`invoices/get

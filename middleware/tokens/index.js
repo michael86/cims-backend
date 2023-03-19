@@ -76,11 +76,9 @@ module.exports.initTokenCache = async () => {
   }
 };
 
-module.exports.getTokenCreds = (email, token) => {
-  console.log("getTokenCreds: ", authenticatedUsers);
-  return token
+module.exports.getTokenCreds = (email, token) =>
+  token
     ? authenticatedUsers[email].token === token
       ? authenticatedUsers[email]
       : null
     : authenticatedUsers[email];
-};
