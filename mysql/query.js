@@ -75,6 +75,8 @@ const queries = {
     insertCompany: () =>
       `INSERT INTO invoice_company (contact, name, address, city, state, country, postcode) VALUES (?,?,?,?,?,?,?)`,
 
+    selectCompany: () => `SELECT id FROM invoice_company WHERE name = ? AND postcode = ?`,
+
     insertUserRelation: () => `INSERT INTO user_invoices (user_id, invoice_id) VALUES (?, ?)`,
 
     insertSpecifics: () =>

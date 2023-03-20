@@ -15,30 +15,25 @@ router.put("/add", async function (req, res) {
   }
 
   try {
-    const companyId = await _invoices.createCompany(comp);
-    if (!companyId || typeof companyId !== "number") throw new Error(companyId);
+    const companyId = await _invoices.createCompany(comp, true);
+
+    if (companyId instanceof Error) throw new Error(companyId);
 
     const relation = await _invoices.createUserRelation(userId, companyId);
-    if (!relation || typeof relation !== "number") throw new Error(companyId);
+    if (relation instanceof Error) throw new Error(companyId);
 
     const specificsId = await _invoices.createSpecifics(specifics, res);
-    if (!specificsId || typeof specificsId !== "number") throw new Error(companyId);
+    if (specificsId instanceof Error) throw new Error(companyId);
 
     const specificsRelation = await _invoices.createSpecificRelation(companyId, specificsId);
-    if (typeof specificsRelation !== "number") throw new Error(specificsRelation);
+    if (specificsRelation instanceof Error) throw new Error(specificsRelation);
 
     const itemIds = await _invoices.createItems(items);
 
-    if (!Array.isArray(itemIds))
-      throw new Error(`invoices/add
-    Error creating itemIds
-    itemIds: ${itemIds}`);
+    if (itemIds instanceof Error) throw new Error(itemIds);
 
     const itemRelations = await _invoices.createItemRelations(itemIds, companyId);
-    if (!Array.isArray(itemRelations))
-      throw new Error(`invoices/add
-    Error creating item relations
-    result: ${itemRelations}`);
+    if (itemRelations instanceof Error) throw new Error(itemRelations);
 
     await updateToken("tokens", [["token", `'${token}'`]], ["id", tokenId]);
 
@@ -69,7 +64,7 @@ router.get("/get/:id?:download?", async function (req, res) {
       res.send({ status: 1, token, filename });
       return;
     }
-    console.log("3");
+
     res.send({ status: 1, token, invoices });
   } catch (err) {
     console.log(`invoices/get

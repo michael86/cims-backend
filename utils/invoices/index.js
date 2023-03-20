@@ -6,12 +6,12 @@ const easyinvoice = require("easyinvoice");
 const fs = require("fs");
 
 const utils = {
-  createCompany: async (data) => {
+  createCompany: async (data, getIfExists = false) => {
     /*This is not in the company utils as we have a sep table for companies that an invoice is to.
       At some point, we could add a new column on the companies table called contact and allow it to be Null
       Then insert into there, but for the sake of it though. I'm lazy ;) */
     try {
-      const res = await runQuery(queries.invoices.insertCompany(), [
+      let res = await runQuery(queries.invoices.insertCompany(), [
         data.contact,
         data.company,
         data.companyStreet,
@@ -21,8 +21,19 @@ const utils = {
         data.companyPostcode,
       ]);
 
-      if (!res.insertId) throw new Error(res);
-      return res.insertId;
+      if (res instanceof Error) throw new Error(res);
+      if (res === "ER_DUP_ENTRY" && !getIfExists) return res;
+
+      if (res === "ER_DUP_ENTRY") {
+        res = await runQuery(queries.invoices.selectCompany(), [
+          data.company,
+          data.companyPostcode,
+        ]);
+
+        if (res instanceof Error) throw new Error(`createCompany: ${res}`);
+      }
+
+      return res.insertId || res[0].id;
     } catch (err) {
       return err;
     }
@@ -139,7 +150,6 @@ const utils = {
 
         if (invoice instanceof Error) throw new Error(invoice);
 
-        console.log("itemIds", invoice);
         [{ ...invoice }] = invoice;
 
         const itemIds = await runQuery(queries.invoices.selectItemIds(), id);
@@ -157,7 +167,6 @@ const utils = {
       }
       return invoices;
     } catch (err) {
-      console.log(2);
       return err;
     }
   },
