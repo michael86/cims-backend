@@ -117,13 +117,13 @@ router.get("/get", async function (req, res) {
   }
 
   try {
-    let user = await account.getUserDetails(["id"], ["email", email]);
-    if (user instanceof Error) throw new Error(user);
-    user = user.id;
+    let userId = await account.getUserDetails(["id"], ["email", email]);
+    if (userId instanceof Error) throw new Error(userId);
+    userId = userId.id;
 
-    const res = await stock.getStock(locations, history, id);
+    const data = await stock.getStock(userId, locations, history, id);
 
-    res.send({ status: 1, token, stock: res });
+    res.send({ status: 1, token, stock: data });
   } catch (err) {
     console.log(`stock/get
       \x1b[31m${err}\x1b[0m`);

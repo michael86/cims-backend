@@ -1,6 +1,7 @@
 const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
 const generic = require("../../utils/generic");
+const { convertDateToUnix } = require("../../utils/generic");
 
 const utils = {
   validateData: (payload) => {
@@ -105,7 +106,7 @@ const utils = {
       const skus = [];
 
       for (const { id } of ids) {
-        const res = await runQuery(queries.stock.selectUserSku(), [id]);
+        const res = await runQuery(queries.stock.select("sku"), [id]);
         if (res instanceof Error) throw new Error(res);
         skus.push(res[0].sku);
       }
@@ -188,14 +189,23 @@ const utils = {
     }
   },
 
-  getStock: async (locations, history, id) => {
+  getStock: async (user, locations, history, id) => {
     try {
-      console.log(locations, history, id);
+      let ids = !id ? await utils.selectUserIds(user) : [id];
+      ids = !id ? ids.map((i) => i.id) : ids;
 
-      const ids = !id && (await utils.selectUserIds());
-      console.log(ids);
+      const data = [];
 
-      return true;
+      for (const id of ids) {
+        const stock = await runQuery(queries.stock.select("*"), [id]);
+        if (stock instanceof Error) throw new Error(stock);
+
+        stock[0].date = convertDateToUnix(stock[0].date);
+        data.push({ ...stock[0] });
+        // console.log(data);
+      }
+
+      return data;
     } catch (err) {
       return err;
     }

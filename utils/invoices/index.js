@@ -1,6 +1,6 @@
 const queries = require("../../mysql/query");
 const { runQuery } = require("../sql");
-const { poundsToPennies } = require("../generic");
+const { poundsToPennies, convertDateToUnix, convertUnixToLocale } = require("../generic");
 const path = require("node:path");
 const easyinvoice = require("easyinvoice");
 const fs = require("fs");
@@ -51,8 +51,8 @@ const utils = {
   },
   createSpecifics: async (specifics) => {
     try {
-      specifics.dueDate = Math.floor(new Date(specifics.dueDate).getTime() / 1000);
-      specifics.billingDate = Math.floor(new Date(specifics.billingDate).getTime() / 1000);
+      specifics.dueDate = convertDateToUnix(specifics.dueDate);
+      specifics.billingDate = convertDateToUnix(specifics.billingDate);
 
       const result = await runQuery(queries.invoices.insertSpecifics(), [
         specifics.dueDate,
@@ -215,8 +215,8 @@ const utils = {
         },
         information: {
           number: data.orderNumber,
-          date: new Date(data.billingDate * 1000).toLocaleDateString(),
-          "due-date": new Date(data.dueDate * 1000).toLocaleDateString(),
+          date: convertUnixToLocale(data.billingDate),
+          "due-date": convertUnixToLocale(data.dueDate),
         },
         products: items,
         "bottom-notice": data.footer,
