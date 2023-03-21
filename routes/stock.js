@@ -1,6 +1,5 @@
 const express = require("express");
 const {
-  select,
   insert,
   patchItem,
   remove,
@@ -57,55 +56,6 @@ router.post("/add", async function (req, res) {
     res.status(500).send({ status: 0, token });
   }
 });
-
-const getLocations = async (id) => {
-  const locations = [];
-  const locIds = await runQuery(select("stock_locations", ["location_id AS id"], "stock_id"), [id]);
-
-  for (const location of locIds) {
-    const currentLoc = await runQuery(select("locations", ["name", "value"], "id"), [location.id]);
-
-    for (const index of currentLoc) {
-      locations.push({ ...index, id: location.id });
-    }
-  }
-
-  return locations;
-};
-
-const getHistory = async (id) => {
-  const history = [];
-  const historyIds = await runQuery(select("stock_histories", ["history_id AS id"], "stock_id"), [
-    id,
-  ]);
-
-  for (const hisId of historyIds) {
-    const { id } = hisId;
-    const [history] = await runQuery(
-      select("history", ["quantity", "price", "UNIX_TIMESTAMP(date_added) AS dateAdded"], "id"),
-      [id]
-    );
-
-    const entry = { ...history };
-    entry.location = [];
-
-    const hisLocId = await runQuery(
-      select("history_locations", ["location_id AS id"], "history_id"),
-      [id]
-    );
-
-    for (const index of hisLocId) {
-      const { id } = index;
-
-      const [currentLoc] = await runQuery(select("locations", ["name", "value"], "id"), [id]);
-      entry.location.push({ ...currentLoc });
-    }
-
-    history.push(entry);
-  }
-
-  return history;
-};
 
 router.get("/get", async function (req, res) {
   const { newToken: token, email } = req.headers;

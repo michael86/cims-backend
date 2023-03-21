@@ -1,7 +1,7 @@
 const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
 const generic = require("../../utils/generic");
-const { convertDateToUnix } = require("../../utils/generic");
+const { convertDateToUnix, penniesToPounds } = require("../../utils/generic");
 
 const utils = {
   validateData: (payload) => {
@@ -189,6 +189,73 @@ const utils = {
     }
   },
 
+  getLocationIds: async (id) => {
+    try {
+      const ids = await runQuery(queries.stock.selectLocationRelation(), [id]);
+      if (ids instanceof Error) throw new Error(ids);
+      return ids;
+    } catch (err) {
+      return err;
+    }
+  },
+
+  getLocations: async (id) => {
+    try {
+      const locations = [];
+
+      const ids = await utils.getLocationIds(id);
+
+      for (const { id } of ids) {
+        const location = await runQuery(queries.stock.selectLocation(), [id]);
+        if (location instanceof Error) throw new Error(location);
+
+        locations.push({
+          id,
+          name: location[0].name,
+          value: location[0].value,
+        });
+      }
+
+      return locations;
+    } catch (err) {
+      return err;
+    }
+  },
+
+  getHistory: async (id) => {
+    const history = [];
+    const historyIds = await runQuery(select("stock_histories", ["history_id AS id"], "stock_id"), [
+      id,
+    ]);
+
+    for (const hisId of historyIds) {
+      const { id } = hisId;
+      const [history] = await runQuery(
+        select("history", ["quantity", "price", "UNIX_TIMESTAMP(date_added) AS dateAdded"], "id"),
+        [id]
+      );
+
+      const entry = { ...history };
+      entry.location = [];
+
+      const hisLocId = await runQuery(
+        select("history_locations", ["location_id AS id"], "history_id"),
+        [id]
+      );
+
+      for (const index of hisLocId) {
+        const { id } = index;
+
+        const [currentLoc] = await runQuery(select("locations", ["name", "value"], "id"), [id]);
+        entry.location.push({ ...currentLoc });
+      }
+
+      history.push(entry);
+    }
+
+    return history;
+  },
+
   getStock: async (user, locations, history, id) => {
     try {
       let ids = !id ? await utils.selectUserIds(user) : [id];
@@ -201,8 +268,16 @@ const utils = {
         if (stock instanceof Error) throw new Error(stock);
 
         stock[0].date = convertDateToUnix(stock[0].date);
+
+        stock[0].price = penniesToPounds(stock[0].price);
+
+        stock[0].locations = locations ? await utils.getLocations(id) : null;
+        if (stock[0].locations instanceof Error) throw new Error(stock[0].locations);
+
+        stock[0].history = history ? await utils.getHistory(id) : null;
+        if (stock[0].history instanceof Error) throw new Error(stock[0].history);
+
         data.push({ ...stock[0] });
-        // console.log(data);
       }
 
       return data;

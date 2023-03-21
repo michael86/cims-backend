@@ -1,7 +1,7 @@
 const utils = {
   poundsToPennies: (amount) => Math.floor(parseFloat(amount) * 100),
 
-  penniesToPounds: (amount) => Math.floor(parseFloat(amount) / 100),
+  penniesToPounds: (amount) => parseFloat(amount) / 100,
 
   convertDateToUnix: (date) => Math.floor(new Date(date).getTime() / 1000),
 

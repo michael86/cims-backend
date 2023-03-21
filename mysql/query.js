@@ -48,6 +48,11 @@ const queries = {
     selectrelationIds: () => `SELECT stock_id AS id FROM user_stock WHERE user_id = ? `,
 
     select: (selector) => `SELECT ${selector} FROM stock WHERE id = ? `,
+
+    selectLocation: () => `SELECT name, value FROM locations WHERE id =?`,
+
+    selectLocationRelation: () =>
+      `SELECT location_id as id FROM stock_locations where stock_id = ?`,
   },
   company: {
     select: () => `SELECT * FROM companies WHERE name = ? AND postcode = ?`,
