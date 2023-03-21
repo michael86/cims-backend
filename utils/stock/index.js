@@ -3,32 +3,6 @@ const queries = require("../../mysql/query");
 const generic = require("../../utils/generic");
 
 const utils = {
-  createStock: async (items) => {
-    try {
-      const ids = [];
-      for (const item of items) {
-        const res = await runQuery(queries.insertInvoiceItems(), [
-          item.name,
-          item.description,
-          item.quantity,
-          item.price,
-          item.tax,
-        ]);
-
-        if (!res.insertId) throw new Error(`Error getting res \n res: ${res}`);
-
-        ids.push(res.insertId);
-      }
-
-      return ids;
-    } catch (err) {
-      console.log(`Error in stock utils\n
-      ${err}\n
-      items: ${items}`);
-      return;
-    }
-  },
-
   validateData: (payload) => {
     //Don't check for price as can be ommitted if free issue
 
@@ -114,13 +88,29 @@ const utils = {
     }
   },
 
+  selectUserIds: async (id) => {
+    try {
+      const ids = await runQuery(queries.stock.selectrelationIds(), [id]);
+      if (ids instanceof Error) throw new Error(ids);
+      return ids;
+    } catch (err) {
+      return err;
+    }
+  },
+
   validateUserSku: async (sku, id) => {
     try {
-      const skus = await runQuery(queries.stock.selectUserSkus(), [id]);
+      const ids = await utils.selectUserIds(id);
 
-      if (skus instanceof Error) throw new Error(skus);
+      const skus = [];
 
-      return skus.every((i) => i.sku.toLowerCase() !== sku.toLowerCase());
+      for (const { id } of ids) {
+        const res = await runQuery(queries.stock.selectUserSku(), [id]);
+        if (res instanceof Error) throw new Error(res);
+        skus.push(res[0].sku);
+      }
+
+      return skus.every((i) => i.toLowerCase() !== sku.toLowerCase());
     } catch (err) {
       return `validateUserSku: ${err}`;
     }
@@ -192,6 +182,19 @@ const utils = {
 
         if (relationship instanceof Error) throw new Error(`createHistory: ${relationship}`);
       }
+      return true;
+    } catch (err) {
+      return err;
+    }
+  },
+
+  getStock: async (locations, history, id) => {
+    try {
+      console.log(locations, history, id);
+
+      const ids = !id && (await utils.selectUserIds());
+      console.log(ids);
+
       return true;
     } catch (err) {
       return err;

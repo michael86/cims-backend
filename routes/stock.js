@@ -109,63 +109,26 @@ const getHistory = async (id) => {
 
 router.get("/get", async function (req, res) {
   const { newToken: token, email } = req.headers;
-  const { history, locations } = req.query;
+  const { history, locations, id } = req.query;
 
   if (!email) {
-    res.end();
+    res.status(400).send({ status: 0 });
     return;
   }
 
-  const [{ id: user }] = await runQuery(select("users", ["id"], "email"), [email]);
-
-  if (!user) {
-    res.end();
-    return;
-  }
-
-  const stockIds = await runQuery(select("user_stock", ["stock_id AS stockId"], "user_id"), [user]);
-
-  if (!stockIds) {
-    res.send({ status: 1, stock: [] });
-    return;
-  }
-
-  const stock = [];
   try {
-    for (const index of stockIds) {
-      const { stockId: id } = index;
+    let user = await account.getUserDetails(["id"], ["email", email]);
+    if (user instanceof Error) throw new Error(user);
+    user = user.id;
 
-      const [itemDetails] = await runQuery(
-        select(
-          "stock",
-          [
-            "sku",
-            "quantity",
-            "price",
-            "free_issue AS freeIssue",
-            "UNIX_TIMESTAMP(date) AS dateCreated",
-          ],
-          "id"
-        ),
-        [id]
-      );
+    const res = await stock.getStock(locations, history, id);
 
-      const item = { ...itemDetails };
-      item.id = id;
-
-      locations
-        ? (item.locations = await getLocations(id))
-        : history
-        ? (item.history = await getHistory(id))
-        : null;
-
-      stock.push(item);
-    }
-  } catch (e) {
-    console.log(e);
+    res.send({ status: 1, token, stock: res });
+  } catch (err) {
+    console.log(`stock/get
+      \x1b[31m${err}\x1b[0m`);
+    res.status(500).send({ status: 0, token });
   }
-
-  res.send({ status: 1, token, stock });
 });
 
 router.patch("/update", async function (req, res) {

@@ -45,13 +45,11 @@ const queries = {
     insertLocationRelation: () =>
       `INSERT INTO stock_locations (stock_id, location_id) VALUES (?, ?)`,
 
-    selectUserSkus: () => {
-      return `SELECT user_stock.stock_id,  
-		          stock.sku 
-                FROM user_stock 
-                  JOIN stock ON stock.id = user_stock.stock_id 
-                    WHERE user_stock.user_id = 84 `;
-    },
+    selectrelationIds: () => `SELECT stock_id AS id FROM user_stock WHERE user_id = ? `,
+
+    selectUserSku: () => `SELECT sku FROM stock WHERE id = ? `,
+
+    selectUserStock: () => {},
   },
   company: {
     select: () => `SELECT * FROM companies WHERE name = ? AND postcode = ?`,
