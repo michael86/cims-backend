@@ -1,13 +1,4 @@
 const express = require("express");
-const {
-  insert,
-  remove,
-  insertHistory,
-  createHistoryRelation,
-  createHistoryLocRelation,
-} = require("../mysql/query");
-const { runQuery } = require("../utils/sql");
-const { getLocationsToDelete, getLocationsToInsert } = require("../utils");
 const router = express.Router();
 
 const stock = require("../utils/stock");
@@ -91,51 +82,12 @@ router.patch("/update", async function (req, res) {
   }
 
   try {
-    const updateLocations = async (newLocs, oldLocs) => {
-      const locationsToDelete = getLocationsToDelete(newLocs, oldLocs);
-      const locationsToInsert = getLocationsToInsert(newLocs, oldLocs);
-
-      for (const id of locationsToDelete) {
-        const res = await runQuery(remove("stock_locations", "location_id"), [id]);
-
-        if (!res.affectedRows) return false;
-      }
-
-      for (const location of locationsToInsert) {
-        const { insertId } = await runQuery(insert("locations", ["name", "value"]), [
-          location.name,
-          location.value,
-        ]);
-
-        if (!insertId) return false;
-
-        const { insertId: relationId } = await runQuery(
-          insert("stock_locations", ["stock_id", "location_id"]),
-          [data.id, insertId]
-        );
-
-        if (!relationId) return false;
-      }
-
-      return true;
-    };
-
     const patched = await stock.patchItem(userId, data, history, locations);
     if (patched instanceof Error) throw new Error(patched);
     if (!patched) {
       res.send({ status: 3, token });
       return;
     }
-
-    // if (+updateLocs) {
-    //   const locRes = await updateLocations(data.locations, history.locations);
-
-    //   if (!locRes) {
-    //     res.status(500).send({ status: 0, error: "failed to updated locations." });
-
-    //     return;
-    //   }
-    // }
 
     res.send({ status: 1, token });
   } catch (err) {

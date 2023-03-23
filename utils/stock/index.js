@@ -315,6 +315,69 @@ const utils = {
     }
   },
 
+  getLocationsToDelete: (newLocs, oldLocs) => {
+    const idsToDelete = [];
+
+    for (const { id: oldId } of oldLocs) {
+      let fount = false;
+
+      for (const { id: newId } of newLocs) {
+        if (oldId === newId) {
+          fount = true;
+          break;
+        }
+      }
+
+      if (!fount) idsToDelete.push(oldId);
+    }
+
+    return idsToDelete;
+  },
+
+  getLocationsToInsert: (newLocs, oldLocs) => {
+    const locationsToInsert = [];
+
+    for (const newLoc of newLocs) {
+      let fount = false;
+
+      for (const { id: oldId } of oldLocs) {
+        if (oldId === newLoc.id) {
+          fount = true;
+          break;
+        }
+      }
+
+      if (!fount) locationsToInsert.push({ name: newLoc.name, value: newLoc.value });
+    }
+
+    return locationsToInsert;
+  },
+
+  updateLocations: async ({ id, locations: newLocs }, oldLocs) => {
+    try {
+      const locationsToDelete = utils.getLocationsToDelete(newLocs, oldLocs);
+      const locationsToInsert = utils.getLocationsToInsert(newLocs, oldLocs);
+
+      for (const id of locationsToDelete) {
+        const res = await runQuery(queries.remove("stock_locations", "location_id"), [id]);
+        if (res instanceof Error) throw new Error(`updateLocations: ${res}`);
+      }
+
+      for (const location of locationsToInsert) {
+        const res = await runQuery(queries.stock.insertLocation(), [location.name, location.value]);
+        if (res instanceof Error) throw new Error(`updateLocations ${res}`);
+
+        const stockRes = await runQuery(queries.stock.insertLocationRelation(), [id, res.insertId]);
+
+        if (stockRes instanceof Error) throw new Error(`updateLocations: ${stockRes}`);
+      }
+
+      return true;
+    } catch (err) {
+      return err;
+    }
+  },
+
   patchItem: async (user, data, history, locations) => {
     try {
       const currentSku = await runQuery(queries.stock.select("sku"), [data.id]);
@@ -334,6 +397,9 @@ const utils = {
 
       const hist = await utils.createHistory(history);
       if (hist instanceof Error) throw new Error(`patchItem: ${hist}`);
+
+      const locRes = locations && (await utils.updateLocations(data, history.locations));
+      if (locRes instanceof Error) throw new Error(`patchItem: ${locRes}`);
 
       return true;
     } catch (err) {
