@@ -120,26 +120,6 @@ router.patch("/update", async function (req, res) {
       return true;
     };
 
-    const createHistory = async (history) => {
-      const historyRes = await runQuery(insertHistory(), [
-        history.sku,
-        history.quantity,
-        history.price,
-      ]);
-
-      const relationRes = await runQuery(createHistoryRelation(), [
-        history.id,
-        historyRes.insertId,
-      ]);
-
-      for (const location of history.locations) {
-        const locRes = await runQuery(createHistoryLocRelation(), [
-          historyRes.insertId,
-          location.id,
-        ]);
-      }
-    };
-
     const patched = await stock.patchItem(userId, data, history, locations);
     if (patched instanceof Error) throw new Error(patched);
     if (!patched) {
@@ -147,17 +127,16 @@ router.patch("/update", async function (req, res) {
       return;
     }
 
-    if (+updateLocs) {
-      const locRes = await updateLocations(data.locations, history.locations);
+    // if (+updateLocs) {
+    //   const locRes = await updateLocations(data.locations, history.locations);
 
-      if (!locRes) {
-        res.status(500).send({ status: 0, error: "failed to updated locations." });
+    //   if (!locRes) {
+    //     res.status(500).send({ status: 0, error: "failed to updated locations." });
 
-        return;
-      }
-    }
+    //     return;
+    //   }
+    // }
 
-    createHistory(history);
     res.send({ status: 1, token });
   } catch (err) {
     console.log(`stock/update

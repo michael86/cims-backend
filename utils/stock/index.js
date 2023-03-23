@@ -286,6 +286,35 @@ const utils = {
     }
   },
 
+  createHistory: async (history) => {
+    try {
+      const hist = await runQuery(queries.stock.insertHistory(), [
+        history.sku,
+        history.quantity,
+        history.price,
+      ]);
+      if (hist instanceof Error) throw new Error(`createHistory: ${hist}`);
+
+      const relation = await runQuery(queries.stock.insertHistoryRelation(), [
+        history.id,
+        hist.insertId,
+      ]);
+      if (relation instanceof Error) throw new Error(`createHistory: ${relation}`);
+
+      for (const location of history.locations) {
+        const res = await runQuery(queries.stock.insertHistoryLocRelation(), [
+          hist.insertId,
+          location.id,
+        ]);
+        if (!res instanceof Error) throw new Error(res);
+      }
+
+      return true;
+    } catch (err) {
+      return err;
+    }
+  },
+
   patchItem: async (user, data, history, locations) => {
     try {
       const currentSku = await runQuery(queries.stock.select("sku"), [data.id]);
@@ -297,10 +326,14 @@ const utils = {
         if (!isValid) return false;
       }
 
-      const updateItem = await runQuery(
+      const update = await runQuery(
         queries.stock.patchStock(["sku", "quantity", "price", "image_name", "free_issue"]),
         [data.sku, data.qty, generic.poundsToPennies(data.price), "null", 0, data.id]
       );
+      if (update instanceof Error) throw new Error(`patchItem: ${update}`);
+
+      const hist = await utils.createHistory(history);
+      if (hist instanceof Error) throw new Error(`patchItem: ${hist}`);
 
       return true;
     } catch (err) {
