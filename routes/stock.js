@@ -1,7 +1,6 @@
 const express = require("express");
 const {
   insert,
-  patchItem,
   remove,
   insertHistory,
   createHistoryRelation,
@@ -67,11 +66,10 @@ router.get("/get", async function (req, res) {
   }
 
   try {
-    let userId = await account.getUserDetails(["id"], ["email", email]);
-    if (userId instanceof Error) throw new Error(userId);
-    userId = userId.id;
+    let user = await account.getUserDetails(["id"], ["email", email]);
+    if (user instanceof Error) throw new Error(user);
 
-    const data = await stock.getStock(userId, locations, history, id);
+    const data = await stock.getStock(user.id, locations, history, id);
 
     res.send({ status: 1, token, stock: data });
   } catch (err) {
@@ -82,81 +80,90 @@ router.get("/get", async function (req, res) {
 });
 
 router.patch("/update", async function (req, res) {
-  const { newToken: token } = req.headers;
+  const { newToken: token, userId } = req.headers;
+
   const { data, history } = req.body;
-  const { locations: updateLocs } = req.query;
+  const { locations } = req.query;
 
-  const updateLocations = async (newLocs, oldLocs) => {
-    const locationsToDelete = getLocationsToDelete(newLocs, oldLocs);
-    const locationsToInsert = getLocationsToInsert(newLocs, oldLocs);
+  if (!data || !history) {
+    res.status(400).send({ status: 0, token });
+    return;
+  }
 
-    for (const id of locationsToDelete) {
-      const res = await runQuery(remove("stock_locations", "location_id"), [id]);
+  try {
+    const updateLocations = async (newLocs, oldLocs) => {
+      const locationsToDelete = getLocationsToDelete(newLocs, oldLocs);
+      const locationsToInsert = getLocationsToInsert(newLocs, oldLocs);
 
-      if (!res.affectedRows) return false;
-    }
+      for (const id of locationsToDelete) {
+        const res = await runQuery(remove("stock_locations", "location_id"), [id]);
 
-    for (const location of locationsToInsert) {
-      const { insertId } = await runQuery(insert("locations", ["name", "value"]), [
-        location.name,
-        location.value,
+        if (!res.affectedRows) return false;
+      }
+
+      for (const location of locationsToInsert) {
+        const { insertId } = await runQuery(insert("locations", ["name", "value"]), [
+          location.name,
+          location.value,
+        ]);
+
+        if (!insertId) return false;
+
+        const { insertId: relationId } = await runQuery(
+          insert("stock_locations", ["stock_id", "location_id"]),
+          [data.id, insertId]
+        );
+
+        if (!relationId) return false;
+      }
+
+      return true;
+    };
+
+    const createHistory = async (history) => {
+      const historyRes = await runQuery(insertHistory(), [
+        history.sku,
+        history.quantity,
+        history.price,
       ]);
 
-      if (!insertId) return false;
+      const relationRes = await runQuery(createHistoryRelation(), [
+        history.id,
+        historyRes.insertId,
+      ]);
 
-      const { insertId: relationId } = await runQuery(
-        insert("stock_locations", ["stock_id", "location_id"]),
-        [data.id, insertId]
-      );
+      for (const location of history.locations) {
+        const locRes = await runQuery(createHistoryLocRelation(), [
+          historyRes.insertId,
+          location.id,
+        ]);
+      }
+    };
 
-      if (!relationId) return false;
-    }
-
-    return true;
-  };
-
-  const createHistory = async (history) => {
-    const historyRes = await runQuery(insertHistory(), [
-      history.sku,
-      history.quantity,
-      history.price,
-    ]);
-
-    const relationRes = await runQuery(createHistoryRelation(), [history.id, historyRes.insertId]);
-
-    for (const location of history.locations) {
-      const locRes = await runQuery(createHistoryLocRelation(), [historyRes.insertId, location.id]);
-    }
-  };
-
-  const updateItem = await runQuery(
-    patchItem(["sku", "quantity", "price", "image_name", "free_issue"], ["id"]),
-    [data.sku, data.qty, poundsToPennies(data.price), "null", 0, data.id]
-  );
-
-  if (updateItem === "ER_DUP_ENTRY") {
-    res.send({ status: 3, token });
-    return;
-  }
-
-  if (!updateItem.affectedRows) {
-    res.status(500).send({ status: 0, token });
-    return;
-  }
-
-  if (+updateLocs) {
-    const locRes = await updateLocations(data.locations, history.locations);
-
-    if (!locRes) {
-      res.status(500).send({ status: 0, error: "failed to updated locations." });
-
+    const patched = await stock.patchItem(userId, data, history, locations);
+    if (patched instanceof Error) throw new Error(patched);
+    if (!patched) {
+      res.send({ status: 3, token });
       return;
     }
+
+    if (+updateLocs) {
+      const locRes = await updateLocations(data.locations, history.locations);
+
+      if (!locRes) {
+        res.status(500).send({ status: 0, error: "failed to updated locations." });
+
+        return;
+      }
+    }
+
+    createHistory(history);
+    res.send({ status: 1, token });
+  } catch (err) {
+    console.log(`stock/update
+      \x1b[31m${err}\x1b[0m`);
+    res.status(500).send({ status: 0, token });
   }
-
-  createHistory(history);
-
-  res.send({ status: 1, token });
 });
 
 router.delete("/delete", async function (req, res) {

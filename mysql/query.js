@@ -25,12 +25,9 @@ const queries = {
     insertStock: () =>
       `INSERT INTO stock (sku, quantity, price, image_name, free_issue) VALUES (?, ?, ?, ?, ?)`,
 
-    patchStock: (items, selectors) => {
-      return `UPDATE stock SET ${items
-        .map((item, index) => `${item} = ?${index !== items.length - 1 ? "," : ""} `)
-        .join("")} 
-            WHERE  ${selectors.map((selector) => `${selector} = ?`)}`;
-    },
+    patchStock: (columns) =>
+      `UPDATE stock SET ${columns.map((column) => `${column} = ?`).join(", ")} WHERE id = ? `,
+
     insertHistory: () => `INSERT INTO history (sku, quantity, price) VALUES (?, ?, ?)`,
 
     insertHistoryRelation: () => `INSERT INTO stock_histories (stock_id, history_id) VALUES (?, ?)`,

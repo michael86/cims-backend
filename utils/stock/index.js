@@ -1,7 +1,7 @@
 const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
 const generic = require("../../utils/generic");
-const { convertDateToUnix, penniesToPounds } = require("../../utils/generic");
+const { convertDateToUnix, penniesToPounds, poundsToPennies } = require("../../utils/generic");
 
 const utils = {
   validateData: (payload) => {
@@ -107,13 +107,13 @@ const utils = {
 
       for (const { id } of ids) {
         const res = await runQuery(queries.stock.select("sku"), [id]);
-        if (res instanceof Error) throw new Error(res);
+        if (res instanceof Error) throw new Error(`validateUserSku: ${res}`);
         skus.push(res[0].sku);
       }
 
       return skus.every((i) => i.toLowerCase() !== sku.toLowerCase());
     } catch (err) {
-      return `validateUserSku: ${err}`;
+      return err;
     }
   },
 
@@ -281,6 +281,28 @@ const utils = {
       }
 
       return data;
+    } catch (err) {
+      return err;
+    }
+  },
+
+  patchItem: async (user, data, history, locations) => {
+    try {
+      const currentSku = await runQuery(queries.stock.select("sku"), [data.id]);
+      if (currentSku instanceof Error) throw new Error(`patchItem: ${currentSku}`);
+
+      if (currentSku[0].sku !== data.sku) {
+        //Sku has changed, so check if it's unique
+        const isValid = await utils.validateUserSku(data.sku, user);
+        if (!isValid) return false;
+      }
+
+      const updateItem = await runQuery(
+        queries.stock.patchStock(["sku", "quantity", "price", "image_name", "free_issue"]),
+        [data.sku, data.qty, generic.poundsToPennies(data.price), "null", 0, data.id]
+      );
+
+      return true;
     } catch (err) {
       return err;
     }
