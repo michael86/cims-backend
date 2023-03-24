@@ -286,35 +286,6 @@ const utils = {
     }
   },
 
-  createHistory: async (history) => {
-    try {
-      const hist = await runQuery(queries.stock.insertHistory(), [
-        history.sku,
-        history.quantity,
-        history.price,
-      ]);
-      if (hist instanceof Error) throw new Error(`createHistory: ${hist}`);
-
-      const relation = await runQuery(queries.stock.insertHistoryRelation(), [
-        history.id,
-        hist.insertId,
-      ]);
-      if (relation instanceof Error) throw new Error(`createHistory: ${relation}`);
-
-      for (const location of history.locations) {
-        const res = await runQuery(queries.stock.insertHistoryLocRelation(), [
-          hist.insertId,
-          location.id,
-        ]);
-        if (!res instanceof Error) throw new Error(res);
-      }
-
-      return true;
-    } catch (err) {
-      return err;
-    }
-  },
-
   getLocationsToDelete: (newLocs, oldLocs) => {
     const idsToDelete = [];
 
@@ -394,7 +365,8 @@ const utils = {
         [data.sku, data.qty, generic.poundsToPennies(data.price), "null", 0, data.id]
       );
       if (update instanceof Error) throw new Error(`patchItem: ${update}`);
-
+      console.log("erm");
+      console.log("history", history);
       const hist = await utils.createHistory(history);
       if (hist instanceof Error) throw new Error(`patchItem: ${hist}`);
 
