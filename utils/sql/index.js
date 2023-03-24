@@ -15,6 +15,7 @@ module.exports.runQuery = async (query, data) => {
     return res;
   } catch (err) {
     if (err.code !== "ER_DUP_ENTRY") return new Error(`${err.code}\n${err.sqlMessage}`);
+    err.sqlMessage && console.log(err.sqlMessage);
     return err.code;
   }
 };

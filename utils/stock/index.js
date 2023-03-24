@@ -9,7 +9,7 @@ const utils = {
 
     const {
       sku,
-      qty,
+      quantity,
       company,
       companyStreet,
       companyCity,
@@ -22,7 +22,7 @@ const utils = {
 
     if (
       !sku ||
-      !qty ||
+      !quantity ||
       !company ||
       !companyStreet ||
       !companyCity ||
@@ -35,22 +35,21 @@ const utils = {
       return false;
 
     let valid = true;
-    for (const his of history) {
-      const { qty, locations } = his;
-      if (!qty || !locations) {
-        valid = false;
-        break;
-      }
-    }
 
+    const { quantity: q, locations: l } = history[0];
+
+    if (!q || !l) valid = false;
+
+    console.log(valid);
     return valid;
   },
 
-  createStock: async ({ sku, qty, price }) => {
+  createStock: async ({ sku, quantity, price }) => {
+    console.log(sku, quantity, price);
     try {
       const res = await runQuery(queries.stock.insertStock(), [
         sku,
-        qty,
+        quantity,
         price ? generic.poundsToPennies(price) : 0,
         null,
         !price ? 1 : 0,
@@ -66,14 +65,14 @@ const utils = {
 
   addItemToUser: async (data, id) => {
     try {
-      const { sku, qty, price } = data;
-
+      const { sku, quantity, price } = data;
+      console.log(sku, quantity, price);
       const valid = await utils.validateUserSku(sku, id);
       if (valid instanceof Error) throw new Error(valid);
 
       if (!valid) return "used";
 
-      const itemId = await utils.createStock({ sku, qty, price });
+      const itemId = await utils.createStock({ sku, quantity, price });
       if (itemId instanceof Error) throw new Error(itemId);
 
       const relation = await runQuery(queries.user.insertRelation("stock", "stock_id"), [
@@ -370,7 +369,7 @@ const utils = {
 
       const update = await runQuery(
         queries.stock.patchStock(["sku", "quantity", "price", "image_name", "free_issue"]),
-        [data.sku, data.qty, generic.poundsToPennies(data.price), "null", 0, data.id]
+        [data.sku, data.quantity, generic.poundsToPennies(data.price), "null", 0, data.id]
       );
       if (update instanceof Error) throw new Error(`patchItem: ${update}`);
 
