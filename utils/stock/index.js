@@ -1,7 +1,7 @@
 const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
 const generic = require("../../utils/generic");
-const { convertDateToUnix, penniesToPounds, poundsToPennies } = require("../../utils/generic");
+const { convertDateToUnix, penniesToPounds } = require("../../utils/generic");
 
 const utils = {
   validateData: (payload) => {
@@ -127,8 +127,9 @@ const utils = {
     }
   },
 
-  createLocations: async (locations, id) => {
+  createLocations: async (locations) => {
     try {
+      const ids = [];
       for (const location of locations) {
         let res = await runQuery(queries.stock.insertLocation(), [location.name, location.value]);
 
@@ -138,15 +139,31 @@ const utils = {
           res = await runQuery(queries.stock.selectLocationId(), [location.name, location.value]);
         }
 
-        const relationship = await runQuery(queries.stock.insertLocationRelation(), [
-          id,
-          res.insertId || res[0].id,
-        ]);
-
-        if (relationship instanceof Error) throw new Error(`createLocations: ${relationship}`);
+        ids.push(res.insertId || res[0].id);
       }
 
-      return true;
+      return ids;
+    } catch (err) {
+      return err;
+    }
+  },
+
+  createLocationRelations: async (locations, stock, history = false) => {
+    try {
+      const ids = [];
+      for (const location of locations) {
+        const res = await runQuery(
+          !history
+            ? queries.stock.insertLocationRelation()
+            : queries.stock.insertHistoryLocRelation(),
+          [stock, location]
+        );
+
+        if (res instanceof Error) throw new Error(`createLocationrelation: ${relationship}`);
+        ids.push(res.insertId);
+      }
+
+      return ids;
     } catch (err) {
       return err;
     }
@@ -169,21 +186,12 @@ const utils = {
 
       if (histRelation instanceof Error) throw new Error(`createHistory: ${histRelation}`);
 
-      for (const location of data.locations) {
-        const locId = await runQuery(queries.stock.insertLocation(), [
-          location.name,
-          location.value,
-        ]);
+      const locationIds = await utils.createLocations(data.locations);
+      if (locationIds instanceof Error) throw new Error(`createHistory: ${locationIds}`);
 
-        if (locId instanceof Error) throw new Error(`createHistory: ${locId}`);
+      const locRelations = await utils.createLocationRelations(locationIds, id.insertId, true);
+      if (locRelations instanceof Error) throw new Error(`createHistory: ${locRelations}`);
 
-        const relationship = await runQuery(queries.stock.insertHistoryLocRelation(), [
-          id.insertId,
-          locId.insertId,
-        ]);
-
-        if (relationship instanceof Error) throw new Error(`createHistory: ${relationship}`);
-      }
       return true;
     } catch (err) {
       return err;

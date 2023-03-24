@@ -33,8 +33,11 @@ router.post("/add", async function (req, res) {
     const compRelation = await stock.createCompanyRelation(itemId, compId);
     if (compRelation instanceof Error) throw new Error(compRelation);
 
-    const locs = await stock.createLocations(locations, itemId);
-    if (locs instanceof Error) throw new Error(locations);
+    const locs = await stock.createLocations(locations);
+    if (locs instanceof Error) throw new Error(locs);
+
+    const locRelation = await stock.createLocationRelations(locs, itemId);
+    if (locRelation instanceof Error) throw new Error(locRelation);
 
     const his = await stock.createHistory(history, itemId);
     if (his instanceof Error) throw new Error(his);
