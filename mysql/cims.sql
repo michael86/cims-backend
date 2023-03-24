@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 19, 2023 at 11:00 PM
+-- Generation Time: Mar 24, 2023 at 05:32 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -45,7 +45,10 @@ CREATE TABLE `companies` (
 INSERT INTO `companies` (`id`, `name`, `address`, `city`, `county`, `postcode`, `country`, `date`) VALUES
 (1, 'creekview', '27 wickhay', 'basildon', 'essex', 'ss15 5ae', 'united kingdom', '2023-03-19 19:25:21'),
 (28, 'photomechanical', '27 wickhay', 'basildon', 'essex', 'ss15 5ae', 'united kingdom', '2023-03-19 21:51:56'),
-(31, 'some company', '27 wickhay', 'basildon', 'essex', 'ss15 5ae', 'united kingdom', '2023-03-19 21:59:46');
+(31, 'some company', '27 wickhay', 'basildon', 'essex', 'ss15 5ae', 'united kingdom', '2023-03-19 21:59:46'),
+(34, 'random company', '27 wickhay', 'basildon', 'essex', 'ss15 5ae', 'united kingdom', '2023-03-20 19:58:44'),
+(35, 'crash magic', '27 downing street', 'basildon', 'essex', 'dsad 12341', 'united kingdom', '2023-03-20 20:00:15'),
+(40, 'sddsdsd', 'sdds', 'dsdsd', 'sdsdds', 'dsdsd', 'dsdsdsdsdds', '2023-03-20 20:42:01');
 
 -- --------------------------------------------------------
 
@@ -66,8 +69,10 @@ CREATE TABLE `history` (
 --
 
 INSERT INTO `history` (`id`, `sku`, `quantity`, `price`, `date_added`) VALUES
-(1, 'nappies', 4, 2, '2023-03-19 21:59:29'),
-(2, 'nappies again', 4964, 2, '2023-03-19 21:59:46');
+(1, 'nappies', 1, 1, '2023-03-24 16:29:45'),
+(2, 'cup of go go juice', 1, 1, '2023-03-24 16:30:20'),
+(3, 'nappies again', 1, 1, '2023-03-24 16:30:46'),
+(4, 'nappies update', 1, 1, '2023-03-24 16:31:18');
 
 -- --------------------------------------------------------
 
@@ -80,14 +85,6 @@ CREATE TABLE `history_locations` (
   `history_id` int(11) NOT NULL,
   `location_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `history_locations`
---
-
-INSERT INTO `history_locations` (`id`, `history_id`, `location_id`) VALUES
-(1, 1, 2),
-(2, 2, 4);
 
 -- --------------------------------------------------------
 
@@ -107,13 +104,6 @@ CREATE TABLE `invoice_company` (
   `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `invoice_company`
---
-
-INSERT INTO `invoice_company` (`id`, `contact`, `name`, `address`, `city`, `state`, `country`, `postcode`, `date_added`) VALUES
-(1, 'michael james hodgson', 'creekview', '27 wickhay', 'basildon', 'america', 'united kingdom', 'ss15 5ae', '2023-03-19 21:58:46');
-
 -- --------------------------------------------------------
 
 --
@@ -126,13 +116,6 @@ CREATE TABLE `invoice_item` (
   `item_id` int(11) NOT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `invoice_item`
---
-
-INSERT INTO `invoice_item` (`id`, `invoice_id`, `item_id`, `date`) VALUES
-(1, 1, 1, '2023-03-19 21:58:46');
 
 -- --------------------------------------------------------
 
@@ -150,13 +133,6 @@ CREATE TABLE `invoice_items` (
   `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `invoice_items`
---
-
-INSERT INTO `invoice_items` (`id`, `sku`, `description`, `quantity`, `price`, `tax`, `date_added`) VALUES
-(1, 'michael james hodgson', '123', 2, 1, 1, '2023-03-19 21:58:46');
-
 -- --------------------------------------------------------
 
 --
@@ -169,13 +145,6 @@ CREATE TABLE `invoice_specific` (
   `specific_id` int(11) NOT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `invoice_specific`
---
-
-INSERT INTO `invoice_specific` (`id`, `invoice_id`, `specific_id`, `date`) VALUES
-(1, 1, 1, '2023-03-19 21:58:46');
 
 -- --------------------------------------------------------
 
@@ -191,13 +160,6 @@ CREATE TABLE `invoice_specifics` (
   `footer` varchar(256) NOT NULL,
   `date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `invoice_specifics`
---
-
-INSERT INTO `invoice_specifics` (`id`, `billing_date`, `due_date`, `order_number`, `footer`, `date_added`) VALUES
-(1, 1704153600, 1672531200, '2222', '123', '2023-03-19 21:58:46');
 
 -- --------------------------------------------------------
 
@@ -216,10 +178,8 @@ CREATE TABLE `locations` (
 --
 
 INSERT INTO `locations` (`id`, `name`, `value`) VALUES
-(1, 'dsad', 'dasd'),
-(2, 'dsad', 'dasd'),
-(3, 'dsad', 'dasd'),
-(4, 'dsad', 'dasd');
+(1, '1', '1'),
+(5, '1', '2');
 
 -- --------------------------------------------------------
 
@@ -253,8 +213,10 @@ CREATE TABLE `stock` (
 --
 
 INSERT INTO `stock` (`id`, `sku`, `quantity`, `price`, `image_name`, `free_issue`, `date`) VALUES
-(1, 'nappies', 4, 2, NULL, 0, '2023-03-19 21:59:29'),
-(2, 'nappies again', 4964, 2, NULL, 0, '2023-03-19 21:59:46');
+(1, 'nappies', 1, 1, NULL, 0, '2023-03-24 16:29:45'),
+(2, 'cup of go go juice', 1, 1, NULL, 0, '2023-03-24 16:30:20'),
+(3, 'nappies again', 1, 1, NULL, 0, '2023-03-24 16:30:46'),
+(4, 'nappies update', 1, 1, NULL, 0, '2023-03-24 16:31:18');
 
 -- --------------------------------------------------------
 
@@ -273,8 +235,10 @@ CREATE TABLE `stock_company` (
 --
 
 INSERT INTO `stock_company` (`id`, `stock_id`, `company_id`) VALUES
-(1, 1, 28),
-(2, 2, 31);
+(1, 1, 1),
+(2, 2, 1),
+(3, 3, 1),
+(4, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -294,7 +258,9 @@ CREATE TABLE `stock_histories` (
 
 INSERT INTO `stock_histories` (`id`, `stock_id`, `history_id`) VALUES
 (1, 1, 1),
-(2, 2, 2);
+(2, 2, 2),
+(3, 3, 3),
+(4, 4, 4);
 
 -- --------------------------------------------------------
 
@@ -314,7 +280,9 @@ CREATE TABLE `stock_locations` (
 
 INSERT INTO `stock_locations` (`id`, `stock_id`, `location_id`) VALUES
 (1, 1, 1),
-(2, 2, 3);
+(2, 2, 1),
+(3, 3, 5),
+(4, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -332,7 +300,7 @@ CREATE TABLE `tokens` (
 --
 
 INSERT INTO `tokens` (`id`, `token`) VALUES
-(1, 'aJUcHoMiRmqmmd35tuO£$!ZWvJJU$twb8rE8SG*tHuExe+uIA)I1679263189500');
+(1, ')W!XM&6a6)j2CM^&ZGHxfP1&N5pe4KsdSMzRkyi1Kk)P2LRwxNl1679675478536');
 
 -- --------------------------------------------------------
 
@@ -386,13 +354,6 @@ CREATE TABLE `user_invoices` (
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `user_invoices`
---
-
-INSERT INTO `user_invoices` (`id`, `user_id`, `invoice_id`, `date`) VALUES
-(1, 84, 1, '2023-03-19 21:58:46');
-
 -- --------------------------------------------------------
 
 --
@@ -423,7 +384,9 @@ CREATE TABLE `user_stock` (
 
 INSERT INTO `user_stock` (`id`, `user_id`, `stock_id`) VALUES
 (1, 84, 1),
-(2, 84, 2);
+(2, 84, 2),
+(3, 84, 3),
+(4, 84, 4);
 
 -- --------------------------------------------------------
 
@@ -502,7 +465,8 @@ ALTER TABLE `invoice_specifics`
 -- Indexes for table `locations`
 --
 ALTER TABLE `locations`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `location` (`name`,`value`);
 
 --
 -- Indexes for table `reset_tokens`
@@ -586,55 +550,55 @@ ALTER TABLE `user_token`
 -- AUTO_INCREMENT for table `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `history_locations`
 --
 ALTER TABLE `history_locations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `invoice_company`
 --
 ALTER TABLE `invoice_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `invoice_items`
 --
 ALTER TABLE `invoice_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `invoice_specific`
 --
 ALTER TABLE `invoice_specific`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `invoice_specifics`
 --
 ALTER TABLE `invoice_specifics`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `locations`
 --
 ALTER TABLE `locations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `reset_tokens`
@@ -646,25 +610,25 @@ ALTER TABLE `reset_tokens`
 -- AUTO_INCREMENT for table `stock`
 --
 ALTER TABLE `stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `stock_company`
 --
 ALTER TABLE `stock_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `stock_histories`
 --
 ALTER TABLE `stock_histories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `stock_locations`
 --
 ALTER TABLE `stock_locations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tokens`
@@ -688,7 +652,7 @@ ALTER TABLE `user_company`
 -- AUTO_INCREMENT for table `user_invoices`
 --
 ALTER TABLE `user_invoices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user_reset`
@@ -700,7 +664,7 @@ ALTER TABLE `user_reset`
 -- AUTO_INCREMENT for table `user_stock`
 --
 ALTER TABLE `user_stock`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `user_token`
