@@ -25,6 +25,14 @@ const queries = {
     insertStock: () =>
       `INSERT INTO stock (sku, quantity, price, image_name, free_issue) VALUES (?, ?, ?, ?, ?)`,
 
+    deleteStock: () =>
+      `DELETE user_stock, stock, stock_locations, stock_company
+        FROM user_stock
+          INNER JOIN stock ON user_stock.stock_id = stock.id 
+            INNER JOIN stock_locations ON user_stock.stock_id  = stock_locations.stock_id
+              INNER JOIN stock_company ON user_stock.stock_id  = stock_company.stock_id
+                WHERE user_stock.stock_id = ?`,
+
     patchStock: (columns) =>
       `UPDATE stock SET ${columns.map((column) => `${column} = ?`).join(", ")} WHERE id = ? `,
 
@@ -50,11 +58,20 @@ const queries = {
 
     selectLocationId: () => `SELECT id FROM locations WHERE name = ? AND value = ?`,
 
+    selectHistoryIds: () => `SELECT history_id AS id from stock_histories where stock_id = ?`,
+
     selectLocationRelation: () =>
       `SELECT location_id as id FROM stock_locations where stock_id = ?`,
 
     deleteLocationRelation: () =>
       `DELETE FROM stock_locations WHERE location_id = ? AND stock_id = ?`,
+
+    deleteHistory: () =>
+      `DELETE stock_histories, history, history_locations
+        FROM stock_histories
+          INNER JOIN history ON history.id = stock_histories.history_id
+            INNER JOIN history_locations ON history_locations.history_id = stock_histories.history_id 
+              WHERE stock_histories.history_id = ?`,
   },
   company: {
     select: () => `SELECT * FROM companies WHERE name = ? AND postcode = ?`,

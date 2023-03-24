@@ -102,9 +102,25 @@ router.patch("/update", async function (req, res) {
 
 router.delete("/delete", async function (req, res) {
   const { newToken: token } = req.headers;
+  const { id } = req.query;
 
-  console.log("delete");
+  if (!id) {
+    res.status(500).send({ status: 0 });
+    return;
+  }
 
-  res.send({ status: 1, token });
+  try {
+    const stockDeleted = await stock.deleteStock(id);
+    if (stockDeleted instanceof Error) throw new Error(stockDeleted);
+
+    const historyDeleted = await stock.deleteHistory(id);
+    if (historyDeleted instanceof Error) throw new Error(historyDeleted);
+
+    res.send({ status: 1, token });
+  } catch (err) {
+    res.status(500).send({ status: 0, token });
+    console.log(`stock/delete
+      \x1b[31m${err}\x1b[0m`);
+  }
 });
 module.exports = router;

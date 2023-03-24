@@ -40,12 +40,10 @@ const utils = {
 
     if (!q || !l) valid = false;
 
-    console.log(valid);
     return valid;
   },
 
   createStock: async ({ sku, quantity, price }) => {
-    console.log(sku, quantity, price);
     try {
       const res = await runQuery(queries.stock.insertStock(), [
         sku,
@@ -63,10 +61,37 @@ const utils = {
     }
   },
 
+  deleteStock: async (id) => {
+    try {
+      const res = await runQuery(queries.stock.deleteStock(), [id]);
+      if (res instanceof Error) throw new Error(`deleteStock: ${res}`);
+
+      return res.affectedRows;
+    } catch (err) {
+      return err;
+    }
+  },
+
+  deleteHistory: async (id) => {
+    try {
+      const historyIds = await runQuery(queries.stock.selectHistoryIds(), [id]);
+      if (historyIds instanceof Error) throw new Error(`deleteHistory: ${historyIds}`);
+
+      for (const { id } of historyIds) {
+        const res = await runQuery(queries.stock.deleteHistory(), [id]);
+        if (res instanceof Error) throw new Error(`deleteHistory: ${res}`);
+      }
+
+      return true;
+    } catch (err) {
+      return err;
+    }
+  },
+
   addItemToUser: async (data, id) => {
     try {
       const { sku, quantity, price } = data;
-      console.log(sku, quantity, price);
+
       const valid = await utils.validateUserSku(sku, id);
       if (valid instanceof Error) throw new Error(valid);
 
@@ -168,7 +193,7 @@ const utils = {
     }
   },
 
-  createHistory: async (data) => {
+  createHistory: async (data, stockId) => {
     try {
       const id = await runQuery(queries.stock.insertHistory(), [
         data.sku,
@@ -178,12 +203,12 @@ const utils = {
 
       if (id instanceof Error) throw new Error(`createHistory: ${id}`);
 
-      const { insertId: histRelation } = await runQuery(queries.stock.insertHistoryRelation(), [
-        data.id,
+      const relation = await runQuery(queries.stock.insertHistoryRelation(), [
+        data.id || stockId,
         id.insertId,
       ]);
 
-      if (histRelation instanceof Error) throw new Error(`createHistory: ${histRelation}`);
+      if (relation instanceof Error) throw new Error(`createHistory: ${relation}`);
 
       const locationIds = await utils.createLocations(data.locations);
       if (locationIds instanceof Error) throw new Error(`createHistory: ${locationIds}`);
