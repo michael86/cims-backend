@@ -130,16 +130,17 @@ const utils = {
   createLocations: async (locations, id) => {
     try {
       for (const location of locations) {
-        const locId = await runQuery(queries.stock.insertLocation(), [
-          location.name,
-          location.value,
-        ]);
+        let res = await runQuery(queries.stock.insertLocation(), [location.name, location.value]);
 
-        if (locId instanceof Error) throw new Error(`createLocations: ${locId}`);
+        if (res instanceof Error) throw new Error(`createLocations: ${res}`);
+
+        if (res === "ER_DUP_ENTRY") {
+          res = await runQuery(queries.stock.selectLocationId(), [location.name, location.value]);
+        }
 
         const relationship = await runQuery(queries.stock.insertLocationRelation(), [
           id,
-          locId.insertId,
+          res.insertId || res[0].id,
         ]);
 
         if (relationship instanceof Error) throw new Error(`createLocations: ${relationship}`);
@@ -365,8 +366,7 @@ const utils = {
         [data.sku, data.qty, generic.poundsToPennies(data.price), "null", 0, data.id]
       );
       if (update instanceof Error) throw new Error(`patchItem: ${update}`);
-      console.log("erm");
-      console.log("history", history);
+
       const hist = await utils.createHistory(history);
       if (hist instanceof Error) throw new Error(`patchItem: ${hist}`);
 

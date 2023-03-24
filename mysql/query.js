@@ -48,6 +48,8 @@ const queries = {
 
     selectLocation: () => `SELECT name, value FROM locations WHERE id =?`,
 
+    selectLocationId: () => `SELECT id FROM locations WHERE name = ? AND value = ?`,
+
     selectLocationRelation: () =>
       `SELECT location_id as id FROM stock_locations where stock_id = ?`,
   },
