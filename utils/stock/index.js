@@ -169,18 +169,18 @@ const utils = {
     }
   },
 
-  createHistory: async ([data], itemId) => {
+  createHistory: async (data) => {
     try {
       const id = await runQuery(queries.stock.insertHistory(), [
         data.sku,
-        data.qty,
+        data.quantity,
         generic.poundsToPennies(data.price),
       ]);
 
       if (id instanceof Error) throw new Error(`createHistory: ${id}`);
 
       const { insertId: histRelation } = await runQuery(queries.stock.insertHistoryRelation(), [
-        itemId,
+        data.id,
         id.insertId,
       ]);
 
@@ -201,6 +201,7 @@ const utils = {
   getLocationIds: async (id) => {
     try {
       const ids = await runQuery(queries.stock.selectLocationRelation(), [id]);
+
       if (ids instanceof Error) throw new Error(ids);
       return ids;
     } catch (err) {
@@ -213,7 +214,6 @@ const utils = {
       const locations = [];
 
       const ids = await utils.getLocationIds(id);
-
       for (const { id } of ids) {
         const location = await runQuery(queries.stock.selectLocation(), [id]);
         if (location instanceof Error) throw new Error(location);
@@ -280,10 +280,10 @@ const utils = {
 
         stock[0].price = penniesToPounds(stock[0].price);
 
-        stock[0].locations = locations ? await utils.getLocations(id) : null;
+        stock[0].locations = locations && (await utils.getLocations(id));
         if (stock[0].locations instanceof Error) throw new Error(stock[0].locations);
 
-        stock[0].history = history ? await utils.getHistory(id) : null;
+        stock[0].history = history && (await utils.getHistory(id));
         if (stock[0].history instanceof Error) throw new Error(stock[0].history);
 
         data.push({ ...stock[0] });
@@ -338,18 +338,17 @@ const utils = {
       const locationsToDelete = utils.getLocationsToDelete(newLocs, oldLocs);
       const locationsToInsert = utils.getLocationsToInsert(newLocs, oldLocs);
 
-      for (const id of locationsToDelete) {
-        const res = await runQuery(queries.remove("stock_locations", "location_id"), [id]);
+      for (const location of locationsToDelete) {
+        const res = await runQuery(queries.stock.deleteLocationRelation(), [location, id]);
         if (res instanceof Error) throw new Error(`updateLocations: ${res}`);
       }
 
       for (const location of locationsToInsert) {
-        const res = await runQuery(queries.stock.insertLocation(), [location.name, location.value]);
+        const res = await utils.createLocations([location]);
         if (res instanceof Error) throw new Error(`updateLocations ${res}`);
+        const relation = await utils.createLocationRelations(res, id);
 
-        const stockRes = await runQuery(queries.stock.insertLocationRelation(), [id, res.insertId]);
-
-        if (stockRes instanceof Error) throw new Error(`updateLocations: ${stockRes}`);
+        if (relation instanceof Error) throw new Error(`updateLocations: ${relation}`);
       }
 
       return true;
@@ -358,7 +357,7 @@ const utils = {
     }
   },
 
-  patchItem: async (user, data, history, locations) => {
+  patchItem: async (user, data, history, locations = false) => {
     try {
       const currentSku = await runQuery(queries.stock.select("sku"), [data.id]);
       if (currentSku instanceof Error) throw new Error(`patchItem: ${currentSku}`);
@@ -376,6 +375,7 @@ const utils = {
       if (update instanceof Error) throw new Error(`patchItem: ${update}`);
 
       const hist = await utils.createHistory(history);
+
       if (hist instanceof Error) throw new Error(`patchItem: ${hist}`);
 
       const locRes = locations && (await utils.updateLocations(data, history.locations));

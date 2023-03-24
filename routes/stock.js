@@ -39,7 +39,7 @@ router.post("/add", async function (req, res) {
     const locRelation = await stock.createLocationRelations(locs, itemId);
     if (locRelation instanceof Error) throw new Error(locRelation);
 
-    const his = await stock.createHistory(history, itemId);
+    const his = await stock.createHistory(history[0], itemId);
     if (his instanceof Error) throw new Error(his);
 
     res.send({ status: 1, token });

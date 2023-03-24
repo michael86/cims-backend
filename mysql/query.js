@@ -52,6 +52,9 @@ const queries = {
 
     selectLocationRelation: () =>
       `SELECT location_id as id FROM stock_locations where stock_id = ?`,
+
+    deleteLocationRelation: () =>
+      `DELETE FROM stock_locations WHERE location_id = ? AND stock_id = ?`,
   },
   company: {
     select: () => `SELECT * FROM companies WHERE name = ? AND postcode = ?`,
