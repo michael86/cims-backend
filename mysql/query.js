@@ -66,12 +66,10 @@ const queries = {
     deleteLocationRelation: () =>
       `DELETE FROM stock_locations WHERE location_id = ? AND stock_id = ?`,
 
-    deleteHistory: () =>
-      `DELETE stock_histories, history, history_locations
-        FROM stock_histories
-          INNER JOIN history ON history.id = stock_histories.history_id
-            INNER JOIN history_locations ON history_locations.history_id = stock_histories.history_id 
-              WHERE stock_histories.history_id = ?`,
+    deleteHistoryRelation: () => `DELETE FROM stock_histories WHERE history_id = ?`,
+
+    deleteHistory: () => `DELETE FROM history WHERE id = ?`,
+    deleteHistoryLocationRelation: () => `DELETE FROM history_locations WHERE history_id = ?`,
   },
   company: {
     select: () => `SELECT * FROM companies WHERE name = ? AND postcode = ?`,

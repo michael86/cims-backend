@@ -75,11 +75,18 @@ const utils = {
   deleteHistory: async (id) => {
     try {
       const historyIds = await runQuery(queries.stock.selectHistoryIds(), [id]);
+
       if (historyIds instanceof Error) throw new Error(`deleteHistory: ${historyIds}`);
 
       for (const { id } of historyIds) {
-        const res = await runQuery(queries.stock.deleteHistory(), [id]);
-        if (res instanceof Error) throw new Error(`deleteHistory: ${res}`);
+        const relation = await runQuery(queries.stock.deleteHistoryRelation(), [id]);
+        if (relation instanceof Error) throw new Error(`deleteHistory #relation: ${relation}`);
+
+        const history = await runQuery(queries.stock.deleteHistory(), [id]);
+        if (history instanceof Error) throw new Error(`deleteHistory #history: ${history}`);
+
+        const location = await runQuery(queries.stock.deleteHistoryLocationRelation(), [id]);
+        if (location instanceof Error) throw new Error(`deleteHistory #location: ${location}`);
       }
 
       return true;

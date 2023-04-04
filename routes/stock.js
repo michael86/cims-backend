@@ -111,12 +111,13 @@ router.delete("/delete", async function (req, res) {
 
   try {
     const stockDeleted = await stock.deleteStock(id);
+
     if (stockDeleted instanceof Error) throw new Error(stockDeleted);
 
     const historyDeleted = await stock.deleteHistory(id);
     if (historyDeleted instanceof Error) throw new Error(historyDeleted);
 
-    res.send({ status: 1, token });
+    // res.send({ status: 1, token });
   } catch (err) {
     res.status(500).send({ status: 0, token });
     console.log(`stock/delete
