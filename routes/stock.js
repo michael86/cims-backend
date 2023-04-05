@@ -4,6 +4,7 @@ const router = express.Router();
 const stock = require("../utils/stock");
 const account = require("../utils/account");
 const company = require("../utils/company");
+const { getUserData } = require("../cache/stock");
 
 router.post("/add", async function (req, res) {
   const { newToken: token, email } = req.headers;
@@ -63,7 +64,9 @@ router.get("/get", async function (req, res) {
     let user = await account.getUserDetails(["id"], ["email", email]);
     if (user instanceof Error) throw new Error(user);
 
-    const data = await stock.getStock(user.id, locations, history, id);
+    //Attempt to get data from cache, if fails then pull from database
+
+    const data = getUserData(user.id) || (await stock.getStock(user.id, locations, history, id));
 
     res.send({ status: 1, token, stock: data });
   } catch (err) {
@@ -117,7 +120,7 @@ router.delete("/delete", async function (req, res) {
     const historyDeleted = await stock.deleteHistory(id);
     if (historyDeleted instanceof Error) throw new Error(historyDeleted);
 
-    // res.send({ status: 1, token });
+    res.send({ status: 1, token });
   } catch (err) {
     res.status(500).send({ status: 0, token });
     console.log(`stock/delete

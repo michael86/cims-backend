@@ -58,6 +58,7 @@ module.exports.addToken = (email, payload) => (authenticatedUsers[email] = { ...
 
 module.exports.initTokenCache = async () => {
   try {
+    console.log("initiating token cache");
     const users = await runQuery(select("users", ["email", "id"]));
 
     for (const { id: userId, email } of users) {

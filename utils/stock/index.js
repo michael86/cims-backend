@@ -229,9 +229,14 @@ const utils = {
     }
   },
 
-  getLocationIds: async (id) => {
+  getLocationIds: async (id, history = false) => {
     try {
-      const ids = await runQuery(queries.stock.selectLocationRelation(), [id]);
+      const ids = await runQuery(
+        history
+          ? queries.stock.selectHistoryLocationRelation()
+          : queries.stock.selectLocationRelation(),
+        [id]
+      );
 
       if (ids instanceof Error) throw new Error(ids);
       return ids;
@@ -240,11 +245,11 @@ const utils = {
     }
   },
 
-  getLocations: async (id) => {
+  getLocations: async (id, history = false) => {
     try {
       const locations = [];
 
-      const ids = await utils.getLocationIds(id);
+      const ids = await utils.getLocationIds(id, history);
       for (const { id } of ids) {
         const location = await runQuery(queries.stock.selectLocation(), [id]);
         if (location instanceof Error) throw new Error(location);
@@ -263,37 +268,26 @@ const utils = {
   },
 
   getHistory: async (id) => {
-    const history = [];
-    const historyIds = await runQuery(select("stock_histories", ["history_id AS id"], "stock_id"), [
-      id,
-    ]);
+    try {
+      const history = [];
 
-    for (const hisId of historyIds) {
-      const { id } = hisId;
-      const [history] = await runQuery(
-        select("history", ["quantity", "price", "UNIX_TIMESTAMP(date_added) AS dateAdded"], "id"),
-        [id]
-      );
+      const historyIds = await runQuery(queries.stock.selectHistoryIds(), [id]);
+      if (historyIds instanceof Error) throw new Error(`stock/getHistory: ${historyIds}`);
 
-      const entry = { ...history };
-      entry.location = [];
+      for (const { id } of historyIds) {
+        const history = await runQuery(queries.stock.selectHistory(), [id]);
+        if (history instanceof Error) throw new Error(`stock/getHistory: ${history}`);
+        const entry = { ...history[0] };
 
-      const hisLocId = await runQuery(
-        select("history_locations", ["location_id AS id"], "history_id"),
-        [id]
-      );
+        entry.locations = await utils.getLocations(id, true);
 
-      for (const index of hisLocId) {
-        const { id } = index;
-
-        const [currentLoc] = await runQuery(select("locations", ["name", "value"], "id"), [id]);
-        entry.location.push({ ...currentLoc });
+        history.push(entry);
       }
 
-      history.push(entry);
+      return history;
+    } catch (err) {
+      console.log(err);
     }
-
-    return history;
   },
 
   getStock: async (user, locations, history, id) => {

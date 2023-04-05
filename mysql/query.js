@@ -60,6 +60,12 @@ const queries = {
 
     selectHistoryIds: () => `SELECT history_id AS id from stock_histories where stock_id = ?`,
 
+    selectHistory: () =>
+      `SELECT id, quantity, price, UNIX_TIMESTAMP(date_added) AS dateAdded FROM history WHERE id = ?`,
+
+    selectHistoryLocationRelation: () =>
+      `SELECT location_id AS id FROM history_locations where history_id = ?`,
+
     selectLocationRelation: () =>
       `SELECT location_id as id FROM stock_locations where stock_id = ?`,
 

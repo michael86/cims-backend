@@ -2,6 +2,7 @@ const express = require("express");
 const { validateToken, initTokenCache } = require("./middleware/tokens");
 const app = express();
 const cors = require("cors");
+const { initStockCache } = require("./cache/stock.js");
 
 require("dotenv").config();
 
@@ -16,8 +17,10 @@ app.use("/stock", validateToken, require("./routes/stock"));
 app.use("/download", require("./routes/download"));
 
 initTokenCache().then(() => {
-  const port = process.env.PORT || 6005;
-  app.listen(6005, async () => {
-    console.log(`listening port ${port}`);
+  initStockCache().then(() => {
+    const port = process.env.PORT || 6005;
+    app.listen(6005, async () => {
+      console.log(`listening port ${port}\nServer started`);
+    });
   });
 });
