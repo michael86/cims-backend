@@ -1,17 +1,19 @@
 const { runQuery } = require("../utils/sql");
+const { penniesToPounds } = require("../utils/generic");
 
 let stock, users, userStock, locations, stockLocations, history, stockHistory, historyLocation;
 const cache = [];
 
 const populate = async () => {
-  stock = await runQuery("SELECT * FROM stock");
+  stock = await runQuery("SELECT *, UNIX_TIMESTAMP(date_created) as date FROM stock");
+
   users = await runQuery("SELECT * FROM users");
   userStock = await runQuery("SELECT * FROM user_stock");
 
   locations = await runQuery("SELECT * FROM locations");
   stockLocations = await runQuery("SELECT * FROM stock_locations");
 
-  history = await runQuery("SELECT * FROM history");
+  history = await runQuery("SELECT *, UNIX_TIMESTAMP(date_added) as date FROM history");
   stockHistory = await runQuery("SELECT * FROM stock_histories");
   historyLocation = await runQuery("SELECT * FROM history_locations");
 };
@@ -95,11 +97,13 @@ const getItemHistory = (id) => {
 
 const getUserStock = (user) => {
   const data = [];
+
   for (const relation of userStock)
     for (const item of stock) {
       if (item.id === relation.stock_id) {
         item.locations = getItemLocations(item.id);
         item.history = getItemHistory(item.id);
+        item.price = penniesToPounds(item.price);
         data.push({ ...item });
       }
     }

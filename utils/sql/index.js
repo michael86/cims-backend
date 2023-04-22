@@ -4,15 +4,7 @@ const { update } = require("../../mysql/query");
 module.exports.runQuery = async (query, data) => {
   try {
     for (const i in data) if (typeof data[i] === "string") data[i] = data[i].toLowerCase();
-
-    const res = await asyncMySQL(query, data);
-
-    if (res.affectedRows === 0) {
-      // console.log("runQuery error", res);
-      return;
-    }
-
-    return res;
+    return await asyncMySQL(query, data);
   } catch (err) {
     if (err.code !== "ER_DUP_ENTRY") return new Error(`${err.code}\n${err.sqlMessage}`);
     err.sqlMessage && console.log(err.sqlMessage);

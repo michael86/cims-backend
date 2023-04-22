@@ -73,22 +73,23 @@ const utils = {
   },
 
   deleteHistory: async (id) => {
+    const now = Date.now();
     try {
       const historyIds = await runQuery(queries.stock.selectHistoryIds(), [id]);
 
       if (historyIds instanceof Error) throw new Error(`deleteHistory: ${historyIds}`);
 
+      let query = ``;
+      let values = [];
       for (const { id } of historyIds) {
-        const relation = await runQuery(queries.stock.deleteHistoryRelation(), [id]);
-        if (relation instanceof Error) throw new Error(`deleteHistory #relation: ${relation}`);
-
-        const history = await runQuery(queries.stock.deleteHistory(), [id]);
-        if (history instanceof Error) throw new Error(`deleteHistory #history: ${history}`);
-
-        const location = await runQuery(queries.stock.deleteHistoryLocationRelation(), [id]);
-        if (location instanceof Error) throw new Error(`deleteHistory #location: ${location}`);
+        query += `${queries.stock.deleteHistoryRelation()}${queries.stock.deleteHistory()}${queries.stock.deleteHistoryLocationRelation()}`;
+        values.push(id);
+        values.push(id);
+        values.push(id);
       }
+      await runQuery(query, values);
 
+      console.log(Date.now() - now);
       return true;
     } catch (err) {
       return err;
