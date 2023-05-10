@@ -5,7 +5,7 @@ let stock, users, userStock, locations, stockLocations, history, stockHistory, h
 const cache = [];
 
 const populate = async () => {
-  stock = await runQuery("SELECT *, UNIX_TIMESTAMP(date_created) as date FROM stock");
+  stock = await runQuery("SELECT *, UNIX_TIMESTAMP(date_created) as date_created FROM stock");
 
   users = await runQuery("SELECT * FROM users");
   userStock = await runQuery("SELECT * FROM user_stock");
@@ -13,7 +13,7 @@ const populate = async () => {
   locations = await runQuery("SELECT * FROM locations");
   stockLocations = await runQuery("SELECT * FROM stock_locations");
 
-  history = await runQuery("SELECT *, UNIX_TIMESTAMP(date_added) as date FROM history");
+  history = await runQuery("SELECT *, UNIX_TIMESTAMP(date_added) as date_added FROM history");
   stockHistory = await runQuery("SELECT * FROM stock_histories");
   historyLocation = await runQuery("SELECT * FROM history_locations");
 };
@@ -115,13 +115,19 @@ module.exports.initStockCache = async () => {
   console.log("initiating stock cache...\nThis may take a while based on database size");
 
   try {
+    console.log("selecting all stock");
     await populate();
 
     for (const { id: user } of users) {
+      console.log(`creating stock for user ${user}`);
       const relations = getStockRelations(user);
 
       cache[user] = getUserStock(stock, relations);
+
+      console.log(cache[user]);
     }
+
+    console.log("creating date objects");
   } catch (err) {
     console.log(err);
   }
