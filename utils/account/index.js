@@ -7,9 +7,13 @@ const queries = require("../../mysql/query");
 const utils = {
   validateUserLogin: async (email, password) => {
     try {
-      const [user] = await runQuery(queries.user.selectCreds(["password", "id"], "email"), [email]);
+      const [user] = await runQuery(
+        queries.user.selectCreds(["password", "id"], "email"),
+        [email]
+      );
 
       if (user instanceof Error) throw new Error(`validateUserLogin: ${user}`);
+
       if (sha256(`${process.env.SALT}${password}`) !== user.password) return 0;
 
       return user.id;
@@ -21,9 +25,13 @@ const utils = {
   updateUserPassword: async (id, password) => {
     try {
       const pass = sha256(`${process.env.SALT}${password}`);
-      const updateRes = await runQuery(queries.user.patch("password"), [pass, id]);
+      const updateRes = await runQuery(queries.user.patch("password"), [
+        pass,
+        id,
+      ]);
 
-      if (updateRes instanceof Error) throw new Error(`updateUserPassword: ${updateRes}`);
+      if (updateRes instanceof Error)
+        throw new Error(`updateUserPassword: ${updateRes}`);
 
       return true;
     } catch (err) {
@@ -93,9 +101,10 @@ const utils = {
   //any time we fail here, we still send 1 as a status as we don't want a malicious user knowing if request was partially successful.
   getUserDetails: async (targets, identifiers) => {
     try {
-      const [user] = await runQuery(queries.user.selectCreds(targets, identifiers[0]), [
-        identifiers[1],
-      ]);
+      const [user] = await runQuery(
+        queries.user.selectCreds(targets, identifiers[0]),
+        [identifiers[1]]
+      );
 
       if (user instanceof Error) throw new Error(user);
 
@@ -107,9 +116,12 @@ const utils = {
 
   validateUserResetToken: async (email, tokenId) => {
     try {
-      const [relation] = await runQuery(queries.tokens.selectResetEmail(), [tokenId]);
+      const [relation] = await runQuery(queries.tokens.selectResetEmail(), [
+        tokenId,
+      ]);
 
-      if (!relation?.id || !relation?.email) throw new Error("Error getting user id");
+      if (!relation?.id || !relation?.email)
+        throw new Error("Error getting user id");
 
       return email === relation.email ? relation.id : 0;
     } catch (err) {
