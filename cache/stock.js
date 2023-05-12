@@ -86,6 +86,7 @@ const getItemHistory = (id) => {
   const relations = getHistoryRelations(id);
   const data = [];
   for (const entry of history) {
+    entry.price = entry.price % 1 === 0 ? entry.price : penniesToPounds(entry.price);
     if (relations.includes(entry.id)) {
       entry.locations = getHistoryLocations(entry.id);
 
@@ -95,7 +96,7 @@ const getItemHistory = (id) => {
   return data;
 };
 
-const getUserStock = (user) => {
+const getUserStock = () => {
   const data = [];
 
   for (const relation of userStock)
@@ -123,11 +124,7 @@ module.exports.initStockCache = async () => {
       const relations = getStockRelations(user);
 
       cache[user] = getUserStock(stock, relations);
-
-      console.log(cache[user]);
     }
-
-    console.log("creating date objects");
   } catch (err) {
     console.log(err);
   }
