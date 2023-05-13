@@ -161,7 +161,9 @@ module.exports.patchStockCache = (user, data, history) => {
 
 module.exports.deleteStockCache = (user, id) => {
   const index = cache[user].findIndex((entry) => +entry.id === +id);
-  delete cache[user][index];
+  if (index < 0) return new Error(`delete from cahce, invalid id provided: ${id}`);
+  cache[user].splice(index, 1);
+  console.log(cache[user][index]);
 
   return cache[user];
 };

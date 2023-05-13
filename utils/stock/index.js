@@ -66,10 +66,10 @@ const utils = {
     try {
       const res = await runQuery(queries.stock.deleteStock(), [id]);
       if (res instanceof Error) throw new Error(`deleteStock: ${res}`);
+      console.log("delete here", id);
 
       const deleteCache = deleteStockCache(user, id);
       if (deleteCache instanceof Error) throw new Error(`DeleteStockCache: ${deleteCache}`);
-
       return res.affectedRows;
     } catch (err) {
       return err;
