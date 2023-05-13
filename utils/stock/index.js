@@ -2,7 +2,7 @@ const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
 const generic = require("../../utils/generic");
 const { convertDateToUnix, penniesToPounds } = require("../../utils/generic");
-const { patchStockCache, deleteStockCache } = require("../../cache/stock");
+const { patchStockCache, deleteStockCache, addStockCache } = require("../../cache/stock");
 
 const utils = {
   validateData: (payload) => {
@@ -66,6 +66,7 @@ const utils = {
     try {
       const res = await runQuery(queries.stock.deleteStock(), [id]);
       if (res instanceof Error) throw new Error(`deleteStock: ${res}`);
+
       const deleteCache = deleteStockCache(user, id);
       if (deleteCache instanceof Error) throw new Error(`DeleteStockCache: ${deleteCache}`);
 
@@ -76,7 +77,6 @@ const utils = {
   },
 
   deleteHistory: async (id) => {
-    const now = Date.now();
     try {
       const historyIds = await runQuery(queries.stock.selectHistoryIds(), [id]);
 
@@ -92,7 +92,6 @@ const utils = {
       }
       await runQuery(query, values);
 
-      console.log(Date.now() - now);
       return true;
     } catch (err) {
       return err;
@@ -117,6 +116,8 @@ const utils = {
       ]);
 
       if (relation instanceof Error) throw new Error(relation);
+
+      addStockCache(data, id);
 
       return itemId;
     } catch (err) {

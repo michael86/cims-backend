@@ -130,8 +130,12 @@ module.exports.initStockCache = async () => {
   }
 };
 
-module.exports.patchStockCache = (user, data, history, locations = false) => {
-  // console.log(cache[user]);
+module.exports.addStockCache = (data, user) => {
+  cache[user].push(data);
+  return cache[user];
+};
+
+module.exports.patchStockCache = (user, data, history) => {
   const skuId = data.id;
 
   const index = cache[user].findIndex((entry) => entry.id === skuId);
