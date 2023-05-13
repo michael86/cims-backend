@@ -1,5 +1,5 @@
 const { runQuery } = require("../utils/sql");
-const { penniesToPounds } = require("../utils/generic");
+const { penniesToPounds, poundsToPennies } = require("../utils/generic");
 
 let stock, users, userStock, locations, stockLocations, history, stockHistory, historyLocation;
 const cache = [];
@@ -128,6 +128,33 @@ module.exports.initStockCache = async () => {
   } catch (err) {
     console.log(err);
   }
+};
+
+module.exports.patchStockCache = (user, data, history, locations = false) => {
+  // console.log(cache[user]);
+  const skuId = data.id;
+
+  const index = cache[user].findIndex((entry) => entry.id === skuId);
+  if (index < 0) return new Error("Invalid sku id");
+
+  const entry = cache[user][index];
+  entry.sku = data.sku;
+  entry.quantity = data.quantity;
+  entry.price = data.price;
+  entry.locations = data.locations;
+  entry.history.push({
+    sku: history.sku,
+    quantity: +history.quantity,
+    price: poundsToPennies(history.price),
+    date_added: Math.floor(new Date() / 1000), //reflect database unix timestamp
+    locations: history.locations,
+  });
+
+  console.log(entry.history[entry.history.length - 1]);
+
+  cache[user][index] = entry;
+
+  return cache[user];
 };
 
 module.exports.getUserData = (id) => (cache[id] ? cache[id] : null);

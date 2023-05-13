@@ -2,6 +2,7 @@ const { runQuery } = require("../sql");
 const queries = require("../../mysql/query");
 const generic = require("../../utils/generic");
 const { convertDateToUnix, penniesToPounds } = require("../../utils/generic");
+const { patchStockCache } = require("../../cache/stock");
 
 const utils = {
   validateData: (payload) => {
@@ -406,6 +407,9 @@ const utils = {
 
       const locRes = locations && (await utils.updateLocations(data, history.locations));
       if (locRes instanceof Error) throw new Error(`patchItem: ${locRes}`);
+
+      const cachePatched = patchStockCache(user, data, history, locations);
+      if (cachePatched instanceof Error) throw new Error(`patchStockCache: ${cachePatched}`);
 
       return true;
     } catch (err) {
