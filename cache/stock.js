@@ -150,9 +150,14 @@ module.exports.patchStockCache = (user, data, history, locations = false) => {
     locations: history.locations,
   });
 
-  console.log(entry.history[entry.history.length - 1]);
-
   cache[user][index] = entry;
+
+  return cache[user];
+};
+
+module.exports.deleteStockCache = (user, id) => {
+  const index = cache[user].findIndex((entry) => +entry.id === +id);
+  delete cache[user][index];
 
   return cache[user];
 };

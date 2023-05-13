@@ -104,7 +104,7 @@ router.patch("/update", async function (req, res) {
 });
 
 router.delete("/delete", async function (req, res) {
-  const { newToken: token } = req.headers;
+  const { newToken: token, userId } = req.headers;
   const { id } = req.query;
 
   if (!id) {
@@ -113,7 +113,7 @@ router.delete("/delete", async function (req, res) {
   }
 
   try {
-    const stockDeleted = await stock.deleteStock(id);
+    const stockDeleted = await stock.deleteStock(userId, id);
 
     if (stockDeleted instanceof Error) throw new Error(stockDeleted);
 
