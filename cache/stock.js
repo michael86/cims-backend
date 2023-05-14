@@ -96,18 +96,19 @@ const getItemHistory = (id) => {
   return data;
 };
 
-const getUserStock = () => {
+const getUserStock = (relations) => {
   const data = [];
 
-  for (const relation of userStock)
+  for (const relation of relations) {
     for (const item of stock) {
-      if (item.id === relation.stock_id) {
+      if (item.id === relation) {
         item.locations = getItemLocations(item.id);
         item.history = getItemHistory(item.id);
         item.price = penniesToPounds(item.price);
         data.push({ ...item });
       }
     }
+  }
 
   return data;
 };
@@ -123,7 +124,7 @@ module.exports.initStockCache = async () => {
       console.log(`creating stock for user ${user}`);
       const relations = getStockRelations(user);
 
-      cache[user] = getUserStock(stock, relations);
+      cache[user] = getUserStock(relations);
     }
   } catch (err) {
     console.log(err);
@@ -163,7 +164,6 @@ module.exports.deleteStockCache = (user, id) => {
   const index = cache[user].findIndex((entry) => +entry.id === +id);
   if (index < 0) return new Error(`delete from cahce, invalid id provided: ${id}`);
   cache[user].splice(index, 1);
-  console.log(cache[user][index]);
 
   return cache[user];
 };

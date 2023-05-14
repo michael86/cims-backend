@@ -10,9 +10,11 @@ const emailUtils = require("../utils/sendInBlue");
 
 router.put("/login", async function (req, res) {
   const { email, password } = req.body;
+  console.log(email);
+  console.log(password);
 
   if (!email || !password) {
-    res.status(400).send({ status: 1, error: "credentials not sent" });
+    res.send({ status: 2 });
     return;
   }
 
