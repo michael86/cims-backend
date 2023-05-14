@@ -23,6 +23,7 @@
     "easyinvoice": "^3.0.7",
     "express": "^4.18.2",
     "mysql": "^2.18.1",
+    "node-cron": "^3.0.2",
     "nodemon": "^2.0.22",
     "pdfjs-dist": "^3.6.172",
     "sha256": "^0.2.0",

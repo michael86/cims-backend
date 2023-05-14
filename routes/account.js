@@ -7,6 +7,7 @@ const utils = require("../utils/account");
 const compUtils = require("../utils/company");
 const tokenUtils = require("../utils/tokens");
 const emailUtils = require("../utils/sendInBlue");
+const { addUserToCache } = require("../cache/stock");
 
 router.put("/login", async function (req, res) {
   const { email, password } = req.body;
@@ -75,6 +76,8 @@ router.put("/register", async function (req, res) {
       token: token.value,
       tokenId: token.id,
     });
+
+    addUserToCache(user.insertId);
 
     res.send({
       status: 1,

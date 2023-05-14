@@ -1,4 +1,5 @@
 const { runQuery } = require("../utils/sql");
+const cron = require("node-cron");
 const { penniesToPounds, poundsToPennies } = require("../utils/generic");
 
 let stock, users, userStock, locations, stockLocations, history, stockHistory, historyLocation;
@@ -168,4 +169,22 @@ module.exports.deleteStockCache = (user, id) => {
   return cache[user];
 };
 
+//When a user registers, we just need an empty array
+module.exports.addUserToCache = (user) => (cache[user] = []);
+
 module.exports.getUserData = (id) => (cache[id] ? cache[id] : null);
+
+//Refresh cache every midnight
+cron.schedule("0 0 0 * * *", async () => {
+  console.log("refreshing stock cache");
+  try {
+    await populate();
+
+    for (const { id: user } of users) {
+      const relations = getStockRelations(user);
+      cache[user] = getUserStock(relations);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
