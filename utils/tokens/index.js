@@ -15,7 +15,7 @@ const utils = {
     return (token += Date.now());
   },
 
-  createUserToken: async (userId, res) => {
+  createUserToken: async (userId) => {
     try {
       const token = utils.genToken();
 

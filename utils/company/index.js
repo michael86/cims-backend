@@ -4,14 +4,14 @@ const { runQuery } = require("../sql");
 const utils = {
   registerUserCompany: async (data, userId) => {
     try {
-      const company = await utils.insertCompany(data);
-      if (!company?.insertId) throw new Error(insertId);
+      const company = await utils.createCompany(data, true);
+      if (!company) throw new Error(company);
 
-      const relation = await utils.createUserRelation(userId, company.insertId);
+      const relation = await utils.createUserRelation(userId, company);
 
       if (!relation) throw new Error(relation);
 
-      return company.insertId;
+      return company;
     } catch (err) {
       console.log(`\x1b[31m${err}\x1b[0m`);
       return;

@@ -140,7 +140,7 @@ const queries = {
 
     insert: () => `INSERT INTO tokens (token) VALUES(?);`,
 
-    insertRelation: () => `INSERT INTO user_token (user, token) VALUES (?, ?);`,
+    insertRelation: () => `INSERT INTO user_token (user_id, token_id) VALUES (?, ?);`,
 
     patch: () => `UPDATE tokens SET token = ? WHERE id = ?`,
 
