@@ -64,13 +64,22 @@ const utils = {
 
   deleteStock: async (user, id) => {
     try {
-      const res = await runQuery(queries.stock.deleteStock(), [id]);
-      if (res instanceof Error) throw new Error(`deleteStock: ${res}`);
-      console.log("delete here", id);
+      const stock = await runQuery(queries.stock.deleteStock(), [id]);
+      if (stock instanceof Error) throw new Error(`deleteStock: ${stock}`);
+
+      const userStock = await runQuery(queries.stock.deleteUserStock(), [id]);
+      if (userStock instanceof Error) throw new Error(`deleteStock: ${userStock}`);
+
+      const stockLocations = await runQuery(queries.stock.deleteStockLocations(), [id]);
+      if (stockLocations instanceof Error) throw new Error(`deleteStock: ${stockLocations}`);
+
+      const stockCompany = await runQuery(queries.stock.deleteStockCompany(), [id]);
+      if (stockCompany instanceof Error) throw new Error(`deleteStock: ${stockCompany}`);
 
       const deleteCache = deleteStockCache(user, id);
       if (deleteCache instanceof Error) throw new Error(`DeleteStockCache: ${deleteCache}`);
-      return res.affectedRows;
+
+      return true;
     } catch (err) {
       return err;
     }
@@ -117,6 +126,7 @@ const utils = {
 
       if (relation instanceof Error) throw new Error(relation);
 
+      data.id = itemId;
       addStockCache(data, id);
 
       return itemId;

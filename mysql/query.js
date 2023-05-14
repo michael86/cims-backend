@@ -25,13 +25,10 @@ const queries = {
     insertStock: () =>
       `INSERT INTO stock (sku, quantity, price, image_name, free_issue) VALUES (?, ?, ?, ?, ?)`,
 
-    deleteStock: () =>
-      `DELETE user_stock, stock, stock_locations, stock_company
-        FROM user_stock
-          INNER JOIN stock ON user_stock.stock_id = stock.id 
-            INNER JOIN stock_locations ON user_stock.stock_id  = stock_locations.stock_id
-              INNER JOIN stock_company ON user_stock.stock_id  = stock_company.stock_id
-                WHERE user_stock.stock_id = ?`,
+    deleteUserStock: () => `DELETE FROM user_stock WHERE stock_id = ?`,
+    deleteStock: () => `DELETE FROM stock WHERE id = ?`,
+    deleteStockLocations: () => `DELETE FROM stock_locations WHERE stock_id = ?`,
+    deleteStockCompany: () => `DELETE FROM stock_company WHERE stock_id = ?`,
 
     patchStock: (columns) =>
       `UPDATE stock SET ${columns.map((column) => `${column} = ?`).join(", ")} WHERE id = ? `,
