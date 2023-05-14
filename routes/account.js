@@ -11,8 +11,6 @@ const { addUserToCache } = require("../cache/stock");
 
 router.put("/login", async function (req, res) {
   const { email, password } = req.body;
-  console.log(email);
-  console.log(password);
 
   if (!email || !password) {
     res.send({ status: 2 });
