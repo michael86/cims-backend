@@ -29,6 +29,7 @@ module.exports.validateToken = async (req, res, next) => {
       const newToken = genToken();
 
       const { userId, tokenId, connection } = authenticatedUsers[user];
+
       req.headers.newToken = newToken;
       req.headers.userId = userId;
       req.headers.tokenId = tokenId;
@@ -46,6 +47,14 @@ module.exports.validateToken = async (req, res, next) => {
 
       return;
     }
+  }
+
+  //Account route has no validation, however, because I'm lazy and want to use the same dynamically generated contact component in the client for both auth and non auth users,
+  //We need to validate the user when contacting company admin from the form, so here we are getting messy.
+  //I may refactor support into its own route at some point. Depends if we need multiple contact routes.
+  if (req.baseUrl === "/account") {
+    next();
+    return;
   }
 
   console.log("token not found/sent");

@@ -173,4 +173,11 @@ router.patch("/reset-password/:token/:email/:password", async function (req, res
   }
 });
 
+router.put("/support", async function (req, res) {
+  const { email, name, option, message } = req.body;
+  const { newToken: token, userId } = req.headers; //If both are undefined, then user is logged out
+
+  res.send({ status: 1, token });
+});
+
 module.exports = router;
