@@ -107,6 +107,7 @@ router.delete("/logout", async function (req, res) {
   }
 
   try {
+    console.log("yeet", getTokenCreds(email, token));
     const result = await tokenUtils.deleteUserToken(getTokenCreds(email, token), res);
     if (!result) throw new Error(`Error login user out\n result ${result}`);
 
@@ -173,6 +174,7 @@ router.patch("/reset-password/:token/:email/:password", async function (req, res
   }
 });
 
+//This route has to wait untill we have the account registration set up allowing multiple users.
 router.put("/support", async function (req, res) {
   const { email, name, option, message } = req.body;
   const { newToken: token, userId } = req.headers; //If both are undefined, then user is logged out

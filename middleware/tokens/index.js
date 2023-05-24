@@ -35,12 +35,21 @@ module.exports.validateToken = async (req, res, next) => {
       req.headers.tokenId = tokenId;
       req.headers.connection = connection;
       req.headers.email = user;
-      authenticatedUsers[user].token = newToken;
 
-      const updateRes = await updateToken("tokens", [["token", `'${newToken}'`]], ["id", tokenId]);
+      //Account route has no validation, however, because I'm lazy and want to use the same dynamically generated contact component in the client for both auth and non auth users,
+      //We need to validate the user when contacting company admin from the form, so here we are getting messy.
+      //I may refactor support into its own route at some point. Depends if we need multiple contact routes.
+      authenticatedUsers[user].token =
+        req.baseUrl === "/account" ? authenticatedUsers[user].token : newToken;
 
-      if (!updateRes) {
-        console.log("error updating user token in middleware", newToken);
+      if (!req.originalUrl.includes("logout")) {
+        const updateRes = await updateToken(
+          "tokens",
+          [["token", `'${newToken}'`]],
+          ["id", tokenId]
+        );
+
+        if (!updateRes) throw new Error("error updating user token in middleware", newToken);
       }
 
       next();
@@ -49,9 +58,6 @@ module.exports.validateToken = async (req, res, next) => {
     }
   }
 
-  //Account route has no validation, however, because I'm lazy and want to use the same dynamically generated contact component in the client for both auth and non auth users,
-  //We need to validate the user when contacting company admin from the form, so here we are getting messy.
-  //I may refactor support into its own route at some point. Depends if we need multiple contact routes.
   if (req.baseUrl === "/account") {
     next();
     return;
@@ -86,9 +92,13 @@ module.exports.initTokenCache = async () => {
   }
 };
 
-module.exports.getTokenCreds = (email, token) =>
-  token
+module.exports.getTokenCreds = (email, token) => {
+  console.log("match", authenticatedUsers[email].token === token);
+  console.log("authenticatedUsers", authenticatedUsers[email].token);
+  console.log("token", token);
+  return token
     ? authenticatedUsers[email].token === token
       ? authenticatedUsers[email]
       : null
     : authenticatedUsers[email];
+};
