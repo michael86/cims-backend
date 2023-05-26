@@ -120,6 +120,20 @@ const utils = {
       return;
     }
   },
+
+  validateEmail: async (email) => {
+    try {
+      const exists = await runQuery(queries.user.selectCreds(["email"], "email"), [email]);
+
+      if (exists instanceof Error)
+        throw new Error(`error validating user email\n email: ${email} \n err: ${err}`);
+
+      return exists.length;
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
+  },
 };
 
 module.exports = utils;

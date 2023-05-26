@@ -21,6 +21,10 @@ module.exports.authenticate = (req, res, next) => {
   next();
 };
 
+//Account route has no validation, however, because I'm lazy and want to use the same dynamically generated contact component in the client for both auth and non auth users,
+//We need to validate the user when contacting company admin from the form, so here we are getting messy by checkign if we're accessing the account route and just allowing the user to proceed..
+//The exception is the logout route. We don't need to update the cache with a new token because we're going to delete that user from the cache if tokens match at a later point.
+//I may refactor support into its own route at some point. Depends if we need multiple contact routes.
 module.exports.validateToken = async (req, res, next) => {
   let { token } = req.headers;
 
@@ -36,9 +40,6 @@ module.exports.validateToken = async (req, res, next) => {
       req.headers.connection = connection;
       req.headers.email = user;
 
-      //Account route has no validation, however, because I'm lazy and want to use the same dynamically generated contact component in the client for both auth and non auth users,
-      //We need to validate the user when contacting company admin from the form, so here we are getting messy.
-      //I may refactor support into its own route at some point. Depends if we need multiple contact routes.
       authenticatedUsers[user].token =
         req.baseUrl === "/account" ? authenticatedUsers[user].token : newToken;
 
