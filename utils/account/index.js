@@ -134,6 +134,16 @@ const utils = {
       return err;
     }
   },
+
+  validateCompany: async (name, postcode) => {
+    try {
+      const exists = await runQuery(queries.company.select(), [name, postcode]);
+      return exists.length;
+    } catch (err) {
+      console.log(err);
+      return err;
+    }
+  },
 };
 
 module.exports = utils;

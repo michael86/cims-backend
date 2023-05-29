@@ -50,6 +50,11 @@ router.get("/verify-account/:email", async (req, res) =>
   res.send({ status: 1, invalid: await utils.validateEmail(req.params.email) })
 );
 
+router.get("/verify-company/:name/:postcode", async (req, res) => {
+  const { name, postcode } = req.params;
+  res.send({ status: 1, invalid: await utils.validateCompany(name, postcode) });
+});
+
 router.put("/register", async function (req, res) {
   try {
     const account = await utils.validateRegistrationData(req.body.data);
