@@ -56,14 +56,14 @@ router.get("/verify-company/:name/:postcode", async (req, res) => {
 });
 
 router.put("/register", async function (req, res) {
+  const { data } = req.body;
   try {
-    const account = await utils.validateRegistrationData(req.body.data);
-    if (!account) {
+    if (!(await utils.validateRegistrationData(data))) {
       res.status(400).send({ status: 0 });
       return;
     }
 
-    const user = await utils.createUser(account);
+    const user = await utils.createUser(data);
 
     if (user === "ER_DUP_ENTRY") {
       res.send({ status: 2 });
@@ -71,14 +71,17 @@ router.put("/register", async function (req, res) {
     }
 
     if (!user) throw new Error(user);
+    console.log("user added fine");
 
-    const company = await compUtils.registerUserCompany(account, user.insertId);
+    const company = await compUtils.registerUserCompany(data, user.insertId);
     if (!company) throw new Error(company);
+
+    console.log("dcompany added fine");
 
     const token = await tokenUtils.createUserToken(user.insertId, res);
     if (!token) throw new Error(token);
 
-    addToken(account.email, {
+    addToken(data.email, {
       userId: user.insertId,
       token: token.value,
       tokenId: token.id,

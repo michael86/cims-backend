@@ -58,19 +58,21 @@ const utils = {
   },
 
   validateRegistrationData: (data) => {
-    if (
-      data.email &&
-      data.password &&
+    const { accountType } = data;
+
+    const person = () => (data.email && data.password && data.name ? true : false);
+    const company = () =>
+      person() &&
       data.company &&
       data.companyStreet &&
       data.companyCity &&
       data.companyCounty &&
       data.companyPostcode &&
-      data.companyCountry &&
-      typeof data.pricePlan === "number"
-    )
-      return data;
-    return;
+      data.companyCountry
+        ? true
+        : false;
+
+    return accountType ? person() : company();
   },
 
   createUser: async (data) => {
@@ -78,6 +80,7 @@ const utils = {
       const userRes = await runQuery(queries.user.insert(), [
         data.email,
         sha256(`${process.env.SALT}${data.password}`),
+        data.accountType > 0 ? 3 : 0,
       ]);
 
       if (userRes === "ER_DUP_ENTRY") return userRes;

@@ -7,7 +7,7 @@ const queries = {
       reset: "user_reset",
       token: "user_token",
     },
-    insert: () => `INSERT INTO users (email, password) VALUES (?, ?)`,
+    insert: () => `INSERT INTO users (email, password, role) VALUES (?, ?, ?)`,
 
     insertRelation: (table, column) => {
       //I really should have used normal functions so I can use 'this'
