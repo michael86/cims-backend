@@ -72,7 +72,7 @@ const utils = {
         ? true
         : false;
 
-    return accountType ? person() : company();
+    return accountType === 0 ? person() : company();
   },
 
   createUser: async (data) => {

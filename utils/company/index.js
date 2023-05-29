@@ -4,10 +4,10 @@ const { runQuery } = require("../sql");
 const utils = {
   registerUserCompany: async (data, userId) => {
     try {
-      const { accountType } = data;
+      console.log("data", data);
+      console.log("userId", userId);
 
-      const company =
-        accountType > 0 ? await utils.createCompany(data, true) : console.log("get company id");
+      const company = await utils.createCompany(data, true);
 
       if (!company || company instanceof Error) throw new Error(company);
 

@@ -71,14 +71,9 @@ router.put("/register", async function (req, res) {
     }
 
     if (!user) throw new Error(user);
-    console.log("user added fine");
-
-    const company = await compUtils.registerUserCompany(data, user.insertId);
-    if (!company) throw new Error(company);
-
-    console.log("dcompany added fine");
 
     const token = await tokenUtils.createUserToken(user.insertId, res);
+
     if (!token) throw new Error(token);
 
     addToken(data.email, {
@@ -87,19 +82,25 @@ router.put("/register", async function (req, res) {
       tokenId: token.id,
     });
 
-    addUserToCache(user.insertId);
+    if (data.accountType === 0) {
+      res.send({ status: 1, token: token.value, authenticated: true });
+      return;
+    }
+
+    const company = await compUtils.registerUserCompany(data, user.insertId);
+    if (!company) throw new Error(company);
 
     res.send({
       status: 1,
       data: {
-        user: { email: account.email, token: token.value, authenticated: true },
+        user: { email: data.email, token: token.value, authenticated: true },
         company: {
-          name: account.company,
-          street: account.companyStreet,
-          city: account.companyCity,
-          county: account.companyCounty,
-          postcode: account.companyPostcode,
-          country: account.companyCountry,
+          name: data.company,
+          street: data.companyStreet,
+          city: data.companyCity,
+          county: data.companyCounty,
+          postcode: data.companyPostcode,
+          country: data.companyCountry,
         },
       },
     });
