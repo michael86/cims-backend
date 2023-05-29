@@ -57,6 +57,7 @@ router.get("/verify-company/:name/:postcode", async (req, res) => {
 
 router.put("/register", async function (req, res) {
   const { data } = req.body;
+
   try {
     if (!(await utils.validateRegistrationData(data))) {
       res.status(400).send({ status: 0 });
@@ -83,27 +84,14 @@ router.put("/register", async function (req, res) {
     });
 
     if (data.accountType === 0) {
-      res.send({ status: 1, token: token.value, authenticated: true });
+      res.send({ status: 1, token: token.value });
       return;
     }
 
     const company = await compUtils.registerUserCompany(data, user.insertId);
     if (!company) throw new Error(company);
 
-    res.send({
-      status: 1,
-      data: {
-        user: { email: data.email, token: token.value, authenticated: true },
-        company: {
-          name: data.company,
-          street: data.companyStreet,
-          city: data.companyCity,
-          county: data.companyCounty,
-          postcode: data.companyPostcode,
-          country: data.companyCountry,
-        },
-      },
-    });
+    res.send({ status: 1, token: token.value });
   } catch (error) {
     console.log(`Error registering user\n${error}`);
     res.status(500).send();
