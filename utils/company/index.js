@@ -4,9 +4,6 @@ const { runQuery } = require("../sql");
 const utils = {
   registerUserCompany: async (data, userId) => {
     try {
-      console.log("data", data);
-      console.log("userId", userId);
-
       const company = await utils.createCompany(data, true);
 
       if (!company || company instanceof Error) throw new Error(company);
@@ -25,8 +22,9 @@ const utils = {
   getUserCompany: async (id) => {
     try {
       const [company] = await runQuery(queries.company.selectUserCompany(), [id]);
-
-      if (!company) throw new Error(`unable to get user company on log in, user id: ${id}`);
+      console.log("company", company);
+      if (company instanceof Error)
+        throw new Error(`unable to get user company on log in, user id: ${id}`);
 
       return company;
     } catch (err) {

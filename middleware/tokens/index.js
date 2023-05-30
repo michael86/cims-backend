@@ -29,6 +29,8 @@ module.exports.validateToken = async (req, res, next) => {
   let { token } = req.headers;
 
   for (const user in authenticatedUsers) {
+    console.log("cache", authenticatedUsers[user].token);
+    console.log("received", token);
     if (authenticatedUsers[user].token === token) {
       const newToken = genToken();
 
@@ -88,15 +90,15 @@ module.exports.initTokenCache = async () => {
         tokenId: token[0].id,
       });
     }
+
+    console.log("authenticatedUsers");
+    console.log(authenticatedUsers);
   } catch (err) {
     console.log(`Error initiating token cache\n${err}`);
   }
 };
 
 module.exports.getTokenCreds = (email, token) => {
-  console.log("match", authenticatedUsers[email].token === token);
-  console.log("authenticatedUsers", authenticatedUsers[email].token);
-  console.log("token", token);
   return token
     ? authenticatedUsers[email].token === token
       ? authenticatedUsers[email]

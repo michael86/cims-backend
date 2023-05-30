@@ -18,26 +18,25 @@ router.put("/login", async function (req, res) {
   }
 
   try {
-    const userId = await utils.validateUserLogin(email, password, res);
+    const user = await utils.validateUserLogin(email, password, res);
 
     //password Invalid
-    if (userId === 0) {
+    if (!user) {
       res.send({ status: 2 });
       return;
     }
 
-    if (!userId) throw new Error(`Error login user in\n${userId}`);
+    if (user instanceof Error) throw new Error(`Error login user in\n${user}`);
 
-    const company = await compUtils.getUserCompany(userId);
-    if (!company) throw new Error(`Account.js\nError selecting user company\n${company}`);
-
-    const token = await utils.patchUserToken(email, userId);
+    const token = await utils.patchUserToken(email, user.id);
     if (token instanceof Error) throw new Error(token);
+
+    const company = await compUtils.getUserCompany(user.id);
 
     res.send({
       status: 1,
       token,
-      email,
+      user,
       company,
     });
   } catch (err) {

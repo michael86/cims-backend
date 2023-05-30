@@ -7,13 +7,15 @@ const queries = require("../../mysql/query");
 const utils = {
   validateUserLogin: async (email, password) => {
     try {
-      const [user] = await runQuery(queries.user.selectCreds(["password", "id"], "email"), [email]);
+      const [user] = await runQuery(queries.user.selectCreds(["password", "id", "role"], "email"), [
+        email,
+      ]);
 
       if (user instanceof Error) throw new Error(`validateUserLogin: ${user}`);
 
-      if (sha256(`${process.env.SALT}${password}`) !== user.password) return 0;
+      if (sha256(`${process.env.SALT}${password}`) !== user.password) return;
 
-      return user.id;
+      return { id: user.id, role: user.role };
     } catch (err) {
       return err;
     }
