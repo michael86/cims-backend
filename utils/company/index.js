@@ -23,6 +23,7 @@ const utils = {
     try {
       const [company] = await runQuery(queries.company.selectUserCompany(), [id]);
       console.log("company", company);
+
       if (company instanceof Error)
         throw new Error(`unable to get user company on log in, user id: ${id}`);
 
